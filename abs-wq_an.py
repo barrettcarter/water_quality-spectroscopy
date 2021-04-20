@@ -16,6 +16,7 @@ import seaborn as sns
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV
 
 # IMPORTANT: Don't have the baseDir and saveDir be the same
 user = os.getlogin() 
@@ -23,11 +24,14 @@ abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
 wq_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/wq/'
 
 wq_df_fn='wq_aj_df.csv'
+# wq_df_fn = 'wq_tot_df.csv'
+# wq_kal_df_fn = 'wq_kalera_df.csv'
 abs_df_fn = 'abs_df_u2d.csv'
 
 # Bring in data
 abs_df=pd.read_csv(abs_df_dir+abs_df_fn)
 wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
+# wq_kal_df = pd.read_csv(wq_df_dir+wq_kal_df_fn)
 
 # Make names consistent formatting
 
@@ -98,10 +102,11 @@ keep = (abs_wq_df['Name']!='swb')
 X = abs_wq_df.loc[:,'band_1':'band_1024']
 Y = abs_wq_df.Nitrate.to_numpy()
 name_dum = pd.get_dummies(abs_wq_df['Name'])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
 # X = abs_wq_df.loc[keep,'band_1':'band_1024']
 # Y = abs_wq_df.Nitrate[keep].to_numpy()
 # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-X = pd.concat([name_dum,X],axis=1).to_numpy()
+X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
@@ -133,12 +138,13 @@ keep = (abs_wq_df['Name']!='swb')
 X = abs_wq_df.loc[:,'band_1':'band_1024']
 Y = abs_wq_df.Phosphate.to_numpy()
 name_dum = pd.get_dummies(abs_wq_df['Name'])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
 # X = abs_wq_df.loc[keep,'band_1':'band_1024']
 # Y = abs_wq_df.Phosphate[keep].to_numpy()
 # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-X = pd.concat([name_dum,X],axis=1).to_numpy()
+X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2)
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
 pls = PLSRegression(n_components = 10)
 pls.fit(X_train,y_train)
 Y_hat = pls.predict(X_test)
@@ -160,35 +166,127 @@ coefs = pls.coef_
 
 plt.plot(coefs[0:200])
 
-# separate between filtered and unfiltered
+# # separate between filtered and unfiltered
 
-X = abs_wq_df.loc[abs_wq_df.Filtered==True,'band_1':'band_1024']
-X = X.to_numpy()
-Y = abs_wq_df.loc[abs_wq_df.Filtered==True,'Phosphate']
-Y = Y.to_numpy()
+# X = abs_wq_df.loc[abs_wq_df.Filtered==True,'band_1':'band_1024']
+# X = X.to_numpy()
+# Y = abs_wq_df.loc[abs_wq_df.Filtered==True,'Phosphate']
+# Y = Y.to_numpy()
+
+# X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+# pls = PLSRegression(n_components = 10)
+# pls.fit(X_train,y_train)
+# Y_hat = pls.predict(X_test)
+
+# r_sq = pls.score(X_test,y_test)
+
+# plt.plot(Y_hat,y_test,'b.')
+
+# #not good for filtered samples
+
+# X = abs_wq_df.loc[abs_wq_df.Filtered==False,'band_1':'band_1024']
+# X = X.to_numpy()
+# Y = abs_wq_df.loc[abs_wq_df.Filtered==False,'Phosphate']
+# Y = Y.to_numpy()
+
+# X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+# pls = PLSRegression(n_components = 5)
+# pls.fit(X_train,y_train)
+# Y_hat = pls.predict(X_test)
+
+# r_sq = pls.score(X_test,y_test)
+
+# plt.plot(Y_hat,y_test,'b.')
+
+### Tuning the models
+
+## Nitrate
+
+# Best r_sq achieved by not including name or filtered with abs
+
+param_grid = [{'n_components':np.arange(1,21)}]
+
+keep = (abs_wq_df['Name']!='swb')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
+X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024']
+Y = abs_wq_df.Nitrate.to_numpy()
+name_dum = pd.get_dummies(abs_wq_df['Name'])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+# X = abs_wq_df.loc[keep,'band_1':'band_1024']
+# Y = abs_wq_df.Nitrate[keep].to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+# X = pd.concat([name_dum,X],axis=1).to_numpy()
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-pls = PLSRegression(n_components = 10)
-pls.fit(X_train,y_train)
-Y_hat = pls.predict(X_test)
+pls = PLSRegression()
+clf = GridSearchCV(pls,param_grid)
+clf.fit(X_train,y_train)
+n_comp = clf.best_params_['n_components']
+pls_opt = clf.best_estimator_
+Y_hat = pls_opt.predict(X_test)
 
-r_sq = pls.score(X_test,y_test)
+r_sq = pls_opt.score(X_test,y_test)
 
 plt.plot(Y_hat,y_test,'b.')
 
-#not good for filtered samples
+line11 = np.linspace(min(y_test),max(y_test))
 
-X = abs_wq_df.loc[abs_wq_df.Filtered==False,'band_1':'band_1024']
-X = X.to_numpy()
-Y = abs_wq_df.loc[abs_wq_df.Filtered==False,'Phosphate']
-Y = Y.to_numpy()
+plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+plt.xlabel('Predicted Nitrate')
+plt.ylabel('True Nitrate')
+plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.show()
+
+coefs = pls.coef_
+
+plt.plot(coefs[0:200])
+
+## Phosphate
+
+# best r_sq when just including names with abs
+
+param_grid = [{'n_components':np.arange(1,21)}]
+
+keep = (abs_wq_df['Name']!='swb')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
+# X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
+X = abs_wq_df.loc[:,'band_1':'band_1024']
+Y = abs_wq_df.Phosphate.to_numpy()
+name_dum = pd.get_dummies(abs_wq_df['Name'])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+# X = abs_wq_df.loc[keep,'band_1':'band_1024']
+# Y = abs_wq_df.Phosphate[keep].to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+# X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
+# X = pd.concat([filtered_dum,X],axis=1).to_numpy()
+X = pd.concat([name_dum,X],axis=1).to_numpy()
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-pls = PLSRegression(n_components = 5)
-pls.fit(X_train,y_train)
-Y_hat = pls.predict(X_test)
+pls = PLSRegression()
+clf = GridSearchCV(pls,param_grid)
+clf.fit(X_train,y_train)
+print(clf.best_params_)
+n_comp = clf.best_params_['n_components']
+pls_opt = clf.best_estimator_
+Y_hat = pls_opt.predict(X_test)
 
-r_sq = pls.score(X_test,y_test)
+r_sq = pls_opt.score(X_test,y_test)
 
 plt.plot(Y_hat,y_test,'b.')
 
+line11 = np.linspace(min(y_test),max(y_test))
+
+plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+plt.xlabel('Predicted Phosphate')
+plt.ylabel('True Phosphate')
+plt.text(0.2,0.8,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.show()
+
+coefs = pls.coef_
+
+plt.plot(coefs[0:200])
