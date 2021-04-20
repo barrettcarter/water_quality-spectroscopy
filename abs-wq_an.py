@@ -34,10 +34,18 @@ wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
 wq_df.Name = wq_df.Name.apply(lambda x: x.lower())
 wq_df.Name[wq_df.Name=='hognw16']='hogup' # this makes a warning but is okay
 
+# Get rid of wq data from 11/5/2020 (mix-up with sample dates)
+
+wq_df = wq_df.loc[wq_df.Date_col!='11/5/2020',:]
+wq_df=wq_df.reset_index(drop = True)
+
 # Makes dates match
 
+wq_dates = wq_df.Date_col.unique()
+abs_dates = abs_df.Date_col.unique()
 wq_df['Date_col'][wq_df.Date_col=='8/14/2020']='8/13/2020'
 wq_df['Date_col'][wq_df.Date_col=='8/24/2020']='8/25/2020'
+wq_dates = wq_df.Date_col.unique()
 
 # Create sample IDs for combining two dataframes
 
@@ -70,9 +78,9 @@ abs_wq_df = abs_wq_df.loc[abs_wq_df.Ammonium>0,:]
 # trying out PLS
 
 # Nitrate
-X = abs_wq_df.loc[:,'band_1':'band_1024']
+X = abs_wq_df.loc[abs_wq_df.Name=='swb','band_1':'band_1024']
 X = X.to_numpy()
-Y = abs_wq_df.Nitrate.to_numpy()
+Y = abs_wq_df.Nitrate[abs_wq_df.Name=='swb'].to_numpy()
 pls = PLSRegression(n_components = 10)
 pls.fit(X,Y)
 Y_hat = pls.predict(X)
@@ -85,9 +93,16 @@ plt.plot(Y_hat,Y,'b.')
 
 # Nitrate
 
+keep = (abs_wq_df['Name']!='swb')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 X = abs_wq_df.loc[:,'band_1':'band_1024']
-X = X.to_numpy()
 Y = abs_wq_df.Nitrate.to_numpy()
+name_dum = pd.get_dummies(abs_wq_df['Name'])
+# X = abs_wq_df.loc[keep,'band_1':'band_1024']
+# Y = abs_wq_df.Nitrate[keep].to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+X = pd.concat([name_dum,X],axis=1).to_numpy()
+
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
 pls = PLSRegression(n_components = 10)
@@ -104,17 +119,26 @@ plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
 plt.plot(line11,line11,label= '1:1 line')
 plt.xlabel('Predicted Nitrate')
 plt.ylabel('True Nitrate')
-# plt.text(400,25,r'$removal = \frac{0.444 \times \tau}{4.49 + \tau}$',fontsize = 'large')
-plt.text(0.5,2,r'$r^2 = 0.968$')
+plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 plt.show()
+
+coefs = pls.coef_
+
+plt.plot(coefs[0:200])
 
 # Phosphate
     
+keep = (abs_wq_df['Name']!='swb')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 X = abs_wq_df.loc[:,'band_1':'band_1024']
-X = X.to_numpy()
 Y = abs_wq_df.Phosphate.to_numpy()
+name_dum = pd.get_dummies(abs_wq_df['Name'])
+# X = abs_wq_df.loc[keep,'band_1':'band_1024']
+# Y = abs_wq_df.Phosphate[keep].to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+X = pd.concat([name_dum,X],axis=1).to_numpy()
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2)
 pls = PLSRegression(n_components = 10)
 pls.fit(X_train,y_train)
 Y_hat = pls.predict(X_test)
@@ -123,7 +147,18 @@ r_sq = pls.score(X_test,y_test)
 
 plt.plot(Y_hat,y_test,'b.')
 
-# not good
+line11 = np.linspace(min(y_test),max(y_test))
+
+plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+plt.xlabel('Predicted Phosphate')
+plt.ylabel('True Phosphate')
+plt.text(0.2,0.8,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.show()
+
+coefs = pls.coef_
+
+plt.plot(coefs[0:200])
 
 # separate between filtered and unfiltered
 
@@ -149,7 +184,7 @@ Y = abs_wq_df.loc[abs_wq_df.Filtered==False,'Phosphate']
 Y = Y.to_numpy()
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-pls = PLSRegression(n_components = 10)
+pls = PLSRegression(n_components = 5)
 pls.fit(X_train,y_train)
 Y_hat = pls.predict(X_test)
 
