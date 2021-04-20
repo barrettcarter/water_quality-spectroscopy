@@ -23,8 +23,8 @@ user = os.getlogin()
 abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
 wq_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/wq/'
 
-wq_df_fn='wq_aj_df.csv'
-# wq_df_fn = 'wq_tot_df.csv'
+# wq_df_fn='wq_aj_df.csv'
+wq_df_fn = 'wq_tot_df.csv'
 # wq_kal_df_fn = 'wq_kalera_df.csv'
 abs_df_fn = 'abs_df_u2d.csv'
 
@@ -37,6 +37,14 @@ wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
 
 wq_df.Name = wq_df.Name.apply(lambda x: x.lower())
 wq_df.Name[wq_df.Name=='hognw16']='hogup' # this makes a warning but is okay
+wq_df.Name.unique()
+# Make species names consistent
+
+wq_df.Species.unique()
+
+wq_df.Species[wq_df.Species=='Ammonia-Nitrogen']='Ammonia (N)'
+wq_df.Species[wq_df.Species=='Phosphorus']='Orthophosphate (P)'
+wq_df.Species[wq_df.Species=='Nitrate-Nitrogen']='Nitrate-Nitrite (N)'
 
 # Get rid of wq data from 11/5/2020 (mix-up with sample dates)
 
@@ -197,7 +205,7 @@ plt.plot(coefs[0:200])
 # r_sq = pls.score(X_test,y_test)
 
 # plt.plot(Y_hat,y_test,'b.')
-
+######################################################
 ### Tuning the models
 
 ## Nitrate
@@ -238,6 +246,25 @@ plt.plot(line11,line11,label= '1:1 line')
 plt.xlabel('Predicted Nitrate')
 plt.ylabel('True Nitrate')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.show()
+
+X_kal = X[(abs_wq_df['Name'] == 'kalera1') | 
+          (abs_wq_df['Name'] == 'kalera2'),:]
+y_kal = Y[(abs_wq_df['Name'] == 'kalera1') |
+          (abs_wq_df['Name'] == 'kalera2')]
+Y_hat = pls_opt.predict(X_kal)
+
+r_sq = pls_opt.score(X_kal,y_kal)
+
+plt.plot(Y_hat,y_kal,'b.')
+
+line11 = np.linspace(min(y_kal),max(y_kal))
+
+plt.plot(Y_hat,y_kal,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+plt.xlabel('Predicted Nitrate')
+plt.ylabel('True Nitrate')
+plt.text(160,210,r'$r^2 =$'+str(np.round(r_sq,3)))
 plt.show()
 
 coefs = pls.coef_
