@@ -105,16 +105,16 @@ plt.plot(Y_hat,Y,'b.')
 
 # Nitrate
 
-keep = (abs_wq_df['Name']!='swb')
+keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
-X = abs_wq_df.loc[:,'band_1':'band_1024']
-Y = abs_wq_df.Nitrate.to_numpy()
-name_dum = pd.get_dummies(abs_wq_df['Name'])
-filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-# X = abs_wq_df.loc[keep,'band_1':'band_1024']
-# Y = abs_wq_df.Nitrate[keep].to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024']
+# Y = abs_wq_df.Nitrate.to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'])
+# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+X = abs_wq_df.loc[keep,'band_1':'band_1024']
+Y = abs_wq_df.Nitrate[keep].to_numpy()
 # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
+# X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
@@ -214,15 +214,15 @@ plt.plot(coefs[0:200])
 
 param_grid = [{'n_components':np.arange(1,21)}]
 
-keep = (abs_wq_df['Name']!='swb')
+keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
-X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
-Y = abs_wq_df.Nitrate.to_numpy()
-name_dum = pd.get_dummies(abs_wq_df['Name'])
-filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-# X = abs_wq_df.loc[keep,'band_1':'band_1024']
-# Y = abs_wq_df.Nitrate[keep].to_numpy()
+# Y = abs_wq_df.Nitrate.to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'])
+# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+X = abs_wq_df.loc[keep,'band_1':'band_1024'].to_numpy()
+Y = abs_wq_df.Nitrate[keep].to_numpy()
 # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
 # X = pd.concat([name_dum,X],axis=1).to_numpy()
 
@@ -248,10 +248,8 @@ plt.ylabel('True Nitrate')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 plt.show()
 
-X_kal = X[(abs_wq_df['Name'] == 'kalera1') | 
-          (abs_wq_df['Name'] == 'kalera2'),:]
-y_kal = Y[(abs_wq_df['Name'] == 'kalera1') |
-          (abs_wq_df['Name'] == 'kalera2')]
+X_kal = abs_wq_df.loc[keep==False,'band_1':'band_1024'].to_numpy()
+y_kal = abs_wq_df.Nitrate[keep==False].to_numpy()
 Y_hat = pls_opt.predict(X_kal)
 
 r_sq = pls_opt.score(X_kal,y_kal)
