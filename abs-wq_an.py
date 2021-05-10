@@ -17,6 +17,9 @@ from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LinearRegression
+from sklearn.utils import resample
+from sklearn.metrics import mean_squared_error as MSE
 
 # IMPORTANT: Don't have the baseDir and saveDir be the same
 user = os.getlogin() 
@@ -208,7 +211,7 @@ plt.plot(coefs[0:200])
 ######################################################
 ### Tuning the models
 
-## Nitrate
+## Nitrate (trained withough Kalera data, absorbance only)
 
 # Best r_sq achieved by not including name or filtered with abs
 
@@ -221,13 +224,18 @@ keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
 # Y = abs_wq_df.Nitrate.to_numpy()
 # name_dum = pd.get_dummies(abs_wq_df['Name'])
 # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-X = abs_wq_df.loc[keep,'band_1':'band_1024'].to_numpy()
+X = abs_wq_df.loc[keep,:]
 Y = abs_wq_df.Nitrate[keep].to_numpy()
 # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
 # X = pd.concat([name_dum,X],axis=1).to_numpy()
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+test_names = X_test.Name.reset_index(drop=True)
+test_filt = X_test.Filtered.reset_index(drop=True)
+
+X_train = X_train.loc[:,'band_1':'band_1024']
+X_test = X_test.loc[:,'band_1':'band_1024']
 pls = PLSRegression()
 clf = GridSearchCV(pls,param_grid)
 clf.fit(X_train,y_train)
@@ -237,56 +245,95 @@ Y_hat = pls_opt.predict(X_test)
 
 r_sq = pls_opt.score(X_test,y_test)
 
-plt.plot(Y_hat,y_test,'b.')
+# plt.plot(Y_hat,y_test,'b.')
 
-line11 = np.linspace(min(y_test),max(y_test))
+line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
+                     max(np.concatenate((y_test,Y_hat[:,0]))))
 
-plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
+lr = LinearRegression().fit(Y_hat,y_test)
+linelr = lr.predict(line11.reshape(-1,1))
+
+plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
 plt.plot(line11,line11,label= '1:1 line')
-plt.xlabel('Predicted Nitrate')
-plt.ylabel('True Nitrate')
+# plt.plot(line11,linelr,label = 'regression line')
+plt.xlabel('Lab Measured Nitrate (mg/L)')
+plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.legend()
 plt.show()
 
-X_kal = abs_wq_df.loc[keep==False,'band_1':'band_1024'].to_numpy()
-y_kal = abs_wq_df.Nitrate[keep==False].to_numpy()
-Y_hat = pls_opt.predict(X_kal)
+# make better plot
+data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
+data_out = pd.concat([data_out,test_names,test_filt],axis=1)
 
-r_sq = pls_opt.score(X_kal,y_kal)
+sns.set_theme(style ='ticks',font_scale = 1.25,
+              palette = 'colorblind')
 
-plt.plot(Y_hat,y_kal,'b.')
+g = sns.relplot(
+    data=data_out,
+    x = 'y_test',
+    y = 'y_pred',
+    hue = 'Filtered',
+    style = 'Name',
+    s = 60
+    )
 
-line11 = np.linspace(min(y_kal),max(y_kal))
+plt.plot(line11,line11,label= '1:1 line',color = 'k',ls = 'dashed')
+plt.xlabel('Lab Measured Nitrate (mg/L)')
+plt.ylabel('Predicted Nitrate (mg/L)')
+plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-plt.plot(Y_hat,y_kal,'o',markersize = 4, label = 'predictions')
-plt.plot(line11,line11,label= '1:1 line')
-plt.xlabel('Predicted Nitrate')
-plt.ylabel('True Nitrate')
-plt.text(160,210,r'$r^2 =$'+str(np.round(r_sq,3)))
-plt.show()
+# determine r2 for sites otherthan swb
 
-coefs = pls.coef_
+r2_score(data_out.y_test[data_out.Name!='swb'],
+         data_out.y_pred[data_out.Name!='swb'])
 
-plt.plot(coefs[0:200])
+# this r2 is less than that for when the model is trained only on these sites
 
-## Phosphate
+# predicting concs. of Kalera data with model calibrated with AJ data
+# This does not work well.
 
-# best r_sq when just including names with abs
+# X_kal = abs_wq_df.loc[keep==False,'band_1':'band_1024'].to_numpy()
+# y_kal = abs_wq_df.Nitrate[keep==False].to_numpy()
+# Y_hat = pls_opt.predict(X_kal)
+
+# r_sq = pls_opt.score(X_kal,y_kal)
+
+# plt.plot(Y_hat,y_kal,'b.')
+
+# line11 = np.linspace(min(y_kal),max(y_kal))
+
+# plt.plot(Y_hat,y_kal,'o',markersize = 4, label = 'predictions')
+# plt.plot(line11,line11,label= '1:1 line')
+# plt.xlabel('Predicted Nitrate')
+# plt.ylabel('True Nitrate')
+# plt.text(160,210,r'$r^2 =$'+str(np.round(r_sq,3)))
+# plt.show()
+
+# coefs = pls.coef_
+
+# plt.plot(coefs[0:200])
+
+# Nitrate without swb
+# best results obtained with abs and name
 
 param_grid = [{'n_components':np.arange(1,21)}]
 
-keep = (abs_wq_df['Name']!='swb')
+keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')\
+    &(abs_wq_df['Name']!='swb')
+
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
-X = abs_wq_df.loc[:,'band_1':'band_1024']
-Y = abs_wq_df.Phosphate.to_numpy()
-name_dum = pd.get_dummies(abs_wq_df['Name'])
-filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-# X = abs_wq_df.loc[keep,'band_1':'band_1024']
-# Y = abs_wq_df.Phosphate[keep].to_numpy()
-# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-# X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
-# X = pd.concat([filtered_dum,X],axis=1).to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024']
+# Y = abs_wq_df.Nitrate.to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'])
+# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+# X = abs_wq_df.loc[keep,'band_1':'band_1024'].to_numpy()
+X = abs_wq_df.loc[keep,'band_1':'band_1024'] # if needed to be concatenated
+Y = abs_wq_df.Nitrate[keep].to_numpy()
+name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'][keep])
+# X = pd.concat([name_dum,X],axis=1).to_numpy()
 X = pd.concat([name_dum,X],axis=1).to_numpy()
 
 
@@ -294,7 +341,6 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
 pls = PLSRegression()
 clf = GridSearchCV(pls,param_grid)
 clf.fit(X_train,y_train)
-print(clf.best_params_)
 n_comp = clf.best_params_['n_components']
 pls_opt = clf.best_estimator_
 Y_hat = pls_opt.predict(X_test)
@@ -303,15 +349,361 @@ r_sq = pls_opt.score(X_test,y_test)
 
 plt.plot(Y_hat,y_test,'b.')
 
-line11 = np.linspace(min(y_test),max(y_test))
+line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
+                     max(np.concatenate((y_test,Y_hat[:,0]))))
+
+lr = LinearRegression().fit(Y_hat,y_test)
+linelr = lr.predict(line11.reshape(-1,1))
 
 plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
 plt.plot(line11,line11,label= '1:1 line')
-plt.xlabel('Predicted Phosphate')
-plt.ylabel('True Phosphate')
-plt.text(0.2,0.8,r'$r^2 =$'+str(np.round(r_sq,3)))
+# plt.plot(line11,linelr,label = 'regression line')
+plt.xlabel('Predicted Nitrate (mg/L)')
+plt.ylabel('True Nitrate (mg/L)')
+plt.text(0.5,0.1,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.legend()
 plt.show()
+
+## Phosphate without Kalera data
+
+# best r_sq when just including abs, names and filtration
+
+param_grid = [{'n_components':np.arange(1,21)}]
+
+keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
+# X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024']
+# Y = abs_wq_df.Phosphate.to_numpy()
+# name_dum = pd.get_dummies(abs_wq_df['Name'])
+# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+X = abs_wq_df.loc[keep,:]
+Y = abs_wq_df.Phosphate[keep].to_numpy()
+name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'][keep])
+# X = pd.concat([name_dum,X],axis=1)
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+test_names = X_test.Name.reset_index(drop=True)
+test_filt = X_test.Filtered.reset_index(drop=True)
+
+# absorbance values
+X_train = X_train.loc[:,'band_1':'band_1024']
+X_test = X_test.loc[:,'band_1':'band_1024']
+
+# abs and names
+# X_train = pd.concat([name_dum.loc[X_train.index,:],
+#                       X_train],axis=1)
+# X_test = pd.concat([name_dum.loc[X_test.index,:],X_test],axis=1)
+
+# abs and filtered
+# X_train = pd.concat([filtered_dum.loc[X_train.index,1],
+#                       X_train],axis=1)
+# X_test = pd.concat([filtered_dum.loc[X_test.index,1],X_test],axis=1)
+
+# abs, names, and filtered
+X_train = pd.concat([name_dum.loc[X_train.index,:],
+                      filtered_dum.loc[X_train.index,:],X_train],axis=1)
+X_test = pd.concat([name_dum.loc[X_test.index,:],
+                    filtered_dum.loc[X_test.index,:],X_test],axis=1)
+
+pls = PLSRegression()
+clf = GridSearchCV(pls,param_grid)
+clf.fit(X_train,y_train)
+n_comp = clf.best_params_['n_components']
+pls_opt = clf.best_estimator_
+Y_hat = pls_opt.predict(X_test)
+
+r_sq = pls_opt.score(X_test,y_test)
+rmse = MSE(y_test,Y_hat)
+
+# plt.plot(Y_hat,y_test,'b.')
+
+line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
+                     max(np.concatenate((y_test,Y_hat[:,0]))))
+
+lr = LinearRegression().fit(Y_hat,y_test)
+linelr = lr.predict(line11.reshape(-1,1))
+
+plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+# plt.plot(line11,linelr,label = 'regression line')
+plt.xlabel('Lab Measured Phosphate (mg/L)')
+plt.ylabel('Predicted Phosphate (mg/L)')
+plt.text(0.6,0.2,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.legend()
+plt.show()
+
+# make better plot
+data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
+data_out = pd.concat([data_out,test_names,test_filt],axis=1)
+
+sns.set_theme(style ='ticks',font_scale = 1.25,palette = 'colorblind')
+
+g = sns.relplot(
+    data=data_out,
+    x = 'y_test',
+    y = 'y_pred',
+    hue = 'Filtered',
+    style = 'Name',
+    s = 60
+    )
+
+plt.plot(line11,line11,label= '1:1 line',color = 'k',ls = 'dashed')
+plt.xlabel('Lab Measured Phosphate (mg/L)')
+plt.ylabel('Predicted Phosphate (mg/L)')
+plt.text(0.5,0.2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
 coefs = pls.coef_
 
 plt.plot(coefs[0:200])
+
+### Using bootstrapping to obtain better performance metrics
+
+## Nitrate (trained withough Kalera data)
+
+# Best r_sq achieved by including names and abs
+
+param_grid = [{'n_components':np.arange(1,21)}]
+
+keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
+# X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024']
+# Y = abs_wq_df.Nitrate
+# name_dum = pd.get_dummies(abs_wq_df['Name'])
+# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+
+# just absorbance values
+X = abs_wq_df.loc[keep,'band_1':'band_1024']
+
+# dummy variables
+name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'][keep])
+
+# include name_dum
+X = pd.concat([name_dum,X],axis=1)
+
+# include filtered_dum
+# X = pd.concat([filtered_dum,X],axis=1)
+
+# include name_dum and filtered_dum
+# X = pd.concat([filtered_dum,name_dum,X],axis=1)
+
+Y = abs_wq_df.Nitrate[keep]
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+
+num_b = 10
+train_inds = np.zeros([X_train.shape[0],num_b])
+test_inds = np.zeros([X_test.shape[0],num_b])
+r_squares = np.zeros(num_b)
+rmses = np.zeros(num_b)
+errors = np.zeros([X_test.shape[0],num_b])
+n_comps = np.zeros(num_b)
+y_hats = np.zeros([X_test.shape[0],num_b])
+y_trues = np.zeros([X_test.shape[0],num_b])
+
+for b in range(10):
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=b)
+    X_test = resample(X_test,random_state = b)
+    X_train = resample(X_train,random_state = b)
+    y_train = resample(y_train,random_state = b)
+    y_test = resample(y_test,random_state = b)
+    
+    train_inds[:,b]=X_train.index
+    test_inds[:,b]=X_test.index
+
+    # X_train = X_train.loc[:,'band_1':'band_1024']
+    # X_test = X_test.loc[:,'band_1':'band_1024']
+    pls = PLSRegression()
+    clf = GridSearchCV(pls,param_grid)
+    clf.fit(X_train,y_train)
+    pls_opt = clf.best_estimator_
+    Y_hat = pls_opt.predict(X_test)
+    
+    n_comp = clf.best_params_['n_components']
+    r_sq = pls_opt.score(X_test,y_test)
+    rmse = MSE(y_test,Y_hat)
+    
+    n_comps[b]=n_comp
+    r_squares[b]=r_sq
+    rmses[b]= rmse
+    errors[:,b]=y_test-Y_hat[:,0]
+    y_hats[:,b]=Y_hat[:,0]
+    y_trues[:,b]=y_test
+
+# plt.plot(Y_hat,y_test,'b.')
+
+y_hats_flat = y_hats.flatten()
+y_trues_flat = y_trues.flatten()
+r_sq = np.mean(r_squares)
+r_sq_sd = np.std(r_squares)
+rmse = np.mean(rmses**0.5)
+rmse_sd = np.std(rmses**0.5)
+
+line11 = np.linspace(min(min(y_hats_flat),min(y_trues_flat)),
+                     max(max(y_hats_flat),max(y_trues_flat)))
+
+# lr = LinearRegression().fit(Y_hat,y_test)
+# linelr = lr.predict(line11.reshape(-1,1))
+
+plt.plot(y_trues_flat,y_hats_flat,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+# plt.plot(line11,linelr,label = 'regression line')
+plt.xlabel('Lab Measured Nitrate (mg/L)')
+plt.ylabel('Predicted Nitrate (mg/L)')
+plt.text(2,1,r'$r^2 =$'+str(np.round(r_sq,3))+r'$\pm$'+str(np.round(r_sq_sd,3)))
+plt.text(2,0.5,'rmse ='+str(np.round(rmse,3))+r'$\pm$'+str(np.round(rmse_sd,3)))
+plt.legend()
+plt.show()
+
+# make better plot
+
+# test_names = X_test.Name.reset_index(drop=True)
+# test_filt = X_test.Filtered.reset_index(drop=True)
+
+# data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
+# data_out = pd.concat([data_out,test_names,test_filt],axis=1)
+
+# sns.set_theme(style ='ticks',font_scale = 1.25,
+#               palette = 'colorblind')
+
+# g = sns.relplot(
+#     data=data_out,
+#     x = 'y_test',
+#     y = 'y_pred',
+#     hue = 'Filtered',
+#     style = 'Name',
+#     s = 60
+#     )
+
+# plt.plot(line11,line11,label= '1:1 line',color = 'k',ls = 'dashed')
+# plt.xlabel('Lab Measured Nitrate (mg/L)')
+# plt.ylabel('Predicted Nitrate (mg/L)')
+# plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
+
+## Phosphate (trained withough Kalera data)
+
+# Best r_sq achieved by including names and abs
+
+param_grid = [{'n_components':np.arange(1,21)}]
+
+keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
+# X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
+# X = abs_wq_df.loc[:,'band_1':'band_1024']
+# Y = abs_wq_df.Phosphate
+# name_dum = pd.get_dummies(abs_wq_df['Name'])
+# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+
+# just absorbance values
+X = abs_wq_df.loc[keep,'band_1':'band_1024']
+
+# dummy variables
+name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+filtered_dum = pd.get_dummies(abs_wq_df['Filtered'][keep])
+
+# include name_dum
+X = pd.concat([name_dum,X],axis=1)
+
+# include filtered_dum
+# X = pd.concat([filtered_dum,X],axis=1)
+
+# include name_dum and filtered_dum
+# X = pd.concat([filtered_dum,name_dum,X],axis=1)
+
+Y = abs_wq_df.Phosphate[keep]
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
+
+num_b = 10
+train_inds = np.zeros([X_train.shape[0],num_b])
+test_inds = np.zeros([X_test.shape[0],num_b])
+r_squares = np.zeros(num_b)
+rmses = np.zeros(num_b)
+errors = np.zeros([X_test.shape[0],num_b])
+n_comps = np.zeros(num_b)
+y_hats = np.zeros([X_test.shape[0],num_b])
+y_trues = np.zeros([X_test.shape[0],num_b])
+
+for b in range(10):
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=b)
+    X_test = resample(X_test,random_state = b)
+    X_train = resample(X_train,random_state = b)
+    y_train = resample(y_train,random_state = b)
+    y_test = resample(y_test,random_state = b)
+    
+    train_inds[:,b]=X_train.index
+    test_inds[:,b]=X_test.index
+
+    # X_train = X_train.loc[:,'band_1':'band_1024']
+    # X_test = X_test.loc[:,'band_1':'band_1024']
+    pls = PLSRegression()
+    clf = GridSearchCV(pls,param_grid)
+    clf.fit(X_train,y_train)
+    pls_opt = clf.best_estimator_
+    Y_hat = pls_opt.predict(X_test)
+    
+    n_comp = clf.best_params_['n_components']
+    r_sq = pls_opt.score(X_test,y_test)
+    rmse = MSE(y_test,Y_hat)
+    
+    n_comps[b]=n_comp
+    r_squares[b]=r_sq
+    rmses[b]= rmse
+    errors[:,b]=y_test-Y_hat[:,0]
+    y_hats[:,b]=Y_hat[:,0]
+    y_trues[:,b]=y_test
+
+# plt.plot(Y_hat,y_test,'b.')
+
+y_hats_flat = y_hats.flatten()
+y_trues_flat = y_trues.flatten()
+r_sq = np.mean(r_squares)
+r_sq_sd = np.std(r_squares)
+rmse = np.mean(rmses**0.5)
+rmse_sd = np.std(rmses**0.5)
+
+line11 = np.linspace(min(min(y_hats_flat),min(y_trues_flat)),
+                     max(max(y_hats_flat),max(y_trues_flat)))
+
+# lr = LinearRegression().fit(Y_hat,y_test)
+# linelr = lr.predict(line11.reshape(-1,1))
+
+plt.plot(y_trues_flat,y_hats_flat,'o',markersize = 4, label = 'predictions')
+plt.plot(line11,line11,label= '1:1 line')
+# plt.plot(line11,linelr,label = 'regression line')
+plt.xlabel('Lab Measured Phosphate (mg/L)')
+plt.ylabel('Predicted Phosphate (mg/L)')
+plt.text(0.6,0.2,r'$r^2 =$'+str(np.round(r_sq,3))+r'$\pm$'+str(np.round(r_sq_sd,3)))
+plt.text(0.6,0.1,'rmse ='+str(np.round(rmse,3))+r'$\pm$'+str(np.round(rmse_sd,3)))
+plt.legend()
+plt.show()
+
+# make better plot
+
+# test_names = X_test.Name.reset_index(drop=True)
+# test_filt = X_test.Filtered.reset_index(drop=True)
+
+# data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
+# data_out = pd.concat([data_out,test_names,test_filt],axis=1)
+
+# sns.set_theme(style ='ticks',font_scale = 1.25,
+#               palette = 'colorblind')
+
+# g = sns.relplot(
+#     data=data_out,
+#     x = 'y_test',
+#     y = 'y_pred',
+#     hue = 'Filtered',
+#     style = 'Name',
+#     s = 60
+#     )
+
+# plt.plot(line11,line11,label= '1:1 line',color = 'k',ls = 'dashed')
+# plt.xlabel('Lab Measured Nitrate (mg/L)')
+# plt.ylabel('Predicted Nitrate (mg/L)')
+# plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
+
