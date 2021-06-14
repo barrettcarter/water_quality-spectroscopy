@@ -22,6 +22,10 @@ from sklearn.utils import resample
 from sklearn.metrics import mean_squared_error as MSE
 from sklearn.ensemble import RandomForestRegressor
 
+# for looking up available scorers
+# import sklearn.metrics
+# sorted(sklearn.metrics.SCORERS.keys())
+
 # IMPORTANT: Don't have the baseDir and saveDir be the same
 user = os.getlogin() 
 abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
@@ -37,7 +41,8 @@ wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
 
 # Select only kalera samples
 
-abs_df = abs_df.loc[(abs_df.Name == 'kalera1') | (abs_df.Name == 'kalera2'),:]
+abs_df = abs_df.loc[(abs_df.Name == 'kalera1') | (abs_df.Name == 'kalera2')\
+                    | (abs_df.Name == 'kalera3'),:]
 abs_df = abs_df.reset_index(drop = True)
 abs_df.loc[7,'Name']='kalera1' # this sample was labelled incorrectly (probably)
 # Make species names consistent
@@ -50,9 +55,11 @@ wq_df.Species[wq_df.Species=='Nitrate-Nitrogen']='Nitrate-N'
 # Makes dates match
 
 wq_dates = wq_df.Date_col.unique()
+print(wq_dates)
 abs_dates = abs_df.Date_col.unique()
-wq_df['Date_col'][wq_df.Date_col=='5/3/2021']='5/4/2021'
-wq_dates = wq_df.Date_col.unique()
+print(abs_dates)
+# wq_df['Date_col'][wq_df.Date_col=='5/3/2021']='5/4/2021'
+# wq_dates = wq_df.Date_col.unique()
 
 # Create sample IDs for combining two dataframes
 wq_cols = list(wq_df.columns[0:4])
@@ -81,126 +88,8 @@ for wq_row in range(wq_df.shape[0]):
             for s in species:
                 if wq_df.Species[wq_row] == s:
                     abs_wq_df.loc[abs_row,s]=wq_df.Value[wq_row]
-                    
-############# NOT USED ############################################          
-# # trying out PLS
+                             
 
-# # Nitrate
-# X = abs_wq_df.loc[abs_wq_df.Name=='swb','band_1':'band_1024']
-# X = X.to_numpy()
-# Y = abs_wq_df.Nitrate[abs_wq_df.Name=='swb'].to_numpy()
-# pls = PLSRegression(n_components = 10)
-# pls.fit(X,Y)
-# Y_hat = pls.predict(X)
-
-# r_sq = pls.score(X,Y)
-
-# plt.plot(Y_hat,Y,'b.')
-
-# # with test and train data
-
-# # Nitrate
-
-# keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
-# # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
-# # X = abs_wq_df.loc[:,'band_1':'band_1024']
-# # Y = abs_wq_df.Nitrate.to_numpy()
-# # name_dum = pd.get_dummies(abs_wq_df['Name'])
-# # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-# X = abs_wq_df.loc[keep,'band_1':'band_1024']
-# Y = abs_wq_df.Nitrate[keep].to_numpy()
-# # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-# # X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
-
-
-# X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-# pls = PLSRegression(n_components = 10)
-# pls.fit(X_train,y_train)
-# Y_hat = pls.predict(X_test)
-
-# r_sq = pls.score(X_test,y_test)
-
-# plt.plot(Y_hat,y_test,'b.')
-
-# line11 = np.linspace(min(y_test),max(y_test))
-
-# plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
-# plt.plot(line11,line11,label= '1:1 line')
-# plt.xlabel('Predicted Nitrate')
-# plt.ylabel('True Nitrate')
-# plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
-# plt.show()
-
-# coefs = pls.coef_
-
-# plt.plot(coefs[0:200])
-
-# # Phosphate
-    
-# keep = (abs_wq_df['Name']!='swb')
-# # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
-# X = abs_wq_df.loc[:,'band_1':'band_1024']
-# Y = abs_wq_df.Phosphate.to_numpy()
-# name_dum = pd.get_dummies(abs_wq_df['Name'])
-# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-# # X = abs_wq_df.loc[keep,'band_1':'band_1024']
-# # Y = abs_wq_df.Phosphate[keep].to_numpy()
-# # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-# X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
-
-# X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-# pls = PLSRegression(n_components = 10)
-# pls.fit(X_train,y_train)
-# Y_hat = pls.predict(X_test)
-
-# r_sq = pls.score(X_test,y_test)
-
-# plt.plot(Y_hat,y_test,'b.')
-
-# line11 = np.linspace(min(y_test),max(y_test))
-
-# plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
-# plt.plot(line11,line11,label= '1:1 line')
-# plt.xlabel('Predicted Phosphate')
-# plt.ylabel('True Phosphate')
-# plt.text(0.2,0.8,r'$r^2 =$'+str(np.round(r_sq,3)))
-# plt.show()
-
-# coefs = pls.coef_
-
-# plt.plot(coefs[0:200])
-
-# # # separate between filtered and unfiltered
-
-# # X = abs_wq_df.loc[abs_wq_df.Filtered==True,'band_1':'band_1024']
-# # X = X.to_numpy()
-# # Y = abs_wq_df.loc[abs_wq_df.Filtered==True,'Phosphate']
-# # Y = Y.to_numpy()
-
-# # X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-# # pls = PLSRegression(n_components = 10)
-# # pls.fit(X_train,y_train)
-# # Y_hat = pls.predict(X_test)
-
-# # r_sq = pls.score(X_test,y_test)
-
-# # plt.plot(Y_hat,y_test,'b.')
-
-# # #not good for filtered samples
-
-# # X = abs_wq_df.loc[abs_wq_df.Filtered==False,'band_1':'band_1024']
-# # X = X.to_numpy()
-# # Y = abs_wq_df.loc[abs_wq_df.Filtered==False,'Phosphate']
-# # Y = Y.to_numpy()
-
-# # X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-# # pls = PLSRegression(n_components = 5)
-# # pls.fit(X_train,y_train)
-# # Y_hat = pls.predict(X_test)
-
-# # r_sq = pls.score(X_test,y_test)
-
-# # plt.plot(Y_hat,y_test,'b.')
 #################################################################
 
 
@@ -226,14 +115,16 @@ Y = abs_wq_df['Nitrate-N']
 # X = name_dum
 
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2)
+X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
+                                                    test_size = 0.2)
 # test_names = X_test.Name.reset_index(drop=True)
 # test_filt = X_test.Filtered.reset_index(drop=True)
 
 # X_train = X_train.loc[:,'band_1':'band_1024']
 # X_test = X_test.loc[:,'band_1':'band_1024']
 pls = PLSRegression()
-clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_squared_error')
+clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
+# clf.cv_results_
 # clf = GridSearchCV(pls,param_grid)
 clf.fit(X_train,y_train)
 n_comp = clf.best_params_['n_components']
@@ -272,7 +163,7 @@ plt.plot(line11,line11,label= '1:1 line')
 # plt.plot(line11,linelr,label = 'regression line')
 plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
-plt.text(170,200,r'$r^2 =$'+str(np.round(r_sq_train,3)))
+plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq_train,3)))
 plt.legend()
 plt.show()
 
@@ -297,7 +188,68 @@ plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-
+for s in species:
+    Y = abs_wq_df[s]
+    # name_dum = pd.get_dummies(abs_wq_df['Name'])
+    # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+    # X = abs_wq_df.loc[keep,:]
+    # Y = abs_wq_df.Nitrate[keep].to_numpy()
+    # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+    # X = pd.concat([name_dum,X],axis=1).to_numpy()
+    # X = name_dum
+    
+    
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
+                                                        test_size = 0.2)
+    # test_names = X_test.Name.reset_index(drop=True)
+    # test_filt = X_test.Filtered.reset_index(drop=True)
+    
+    # X_train = X_train.loc[:,'band_1':'band_1024']
+    # X_test = X_test.loc[:,'band_1':'band_1024']
+    pls = PLSRegression()
+    clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
+    # clf.cv_results_
+    # clf = GridSearchCV(pls,param_grid)
+    clf.fit(X_train,y_train)
+    n_comp = clf.best_params_['n_components']
+    pls_opt = clf.best_estimator_
+    Y_hat = pls_opt.predict(X_test)
+    Y_hat_train = pls_opt.predict(X_train)
+    
+    r_sq = pls_opt.score(X_test,y_test)
+    r_sq_train = pls_opt.score(X_train,y_train)
+    
+    # plt.plot(Y_hat,y_test,'b.')
+    
+    line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
+                         max(np.concatenate((y_test,Y_hat[:,0]))))
+    
+    # lr = LinearRegression().fit(Y_hat,y_test)
+    # linelr = lr.predict(line11.reshape(-1,1))
+    
+    plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
+    plt.plot(line11,line11,label= '1:1 line')
+    # plt.plot(line11,linelr,label = 'regression line')
+    plt.xlabel('Lab Measured '+s+' (mg/L)')
+    plt.ylabel('Predicted '+s+' (mg/L)')
+    plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq,3)))
+    plt.legend()
+    plt.show()
+    
+    line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train[:,0]))),
+                         max(np.concatenate((y_train,Y_hat_train[:,0]))))
+    
+    # lr = LinearRegression().fit(Y_hat,y_test)
+    # linelr = lr.predict(line11.reshape(-1,1))
+    
+    plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
+    plt.plot(line11,line11,label= '1:1 line')
+    # plt.plot(line11,linelr,label = 'regression line')
+    plt.xlabel('Lab Measured '+s+' (mg/L)')
+    plt.ylabel('Predicted '+s+' (mg/L)')
+    plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq_train,3)))
+    plt.legend()
+    plt.show()
 
 ## Random Forest (nitrate)
 

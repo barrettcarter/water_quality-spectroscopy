@@ -23,8 +23,8 @@ from sklearn.metrics import mean_squared_error as MSE
 from sklearn.ensemble import RandomForestRegressor
 
 # for looking up available scorers
-# import sklearn.metrics
-# sorted(sklearn.metrics.SCORERS.keys())
+import sklearn.metrics
+sorted(sklearn.metrics.SCORERS.keys())
 
 # IMPORTANT: Don't have the baseDir and saveDir be the same
 user = os.getlogin() 
@@ -44,7 +44,8 @@ wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
 abs_df = abs_df.loc[(abs_df.Name == 'kalera1d30') | (abs_df.Name == 'kalera2d30')|
                     (abs_df.Name == 'kalera1d27') | (abs_df.Name == 'kalera2d27')|
                     (abs_df.Name == 'kalera3d27')| (abs_df.Name == 'kalera2d30b')|
-                    (abs_df.Name == 'kalera2d30c')|(abs_df.Name == 'kalera2d30d'),:]
+                    (abs_df.Name == 'kalera3d30')|(abs_df.Name == 'kalera2d30c')|
+                    (abs_df.Name == 'kalera2d30d'),:]
 abs_df = abs_df.reset_index(drop = True)
 
 # Make species names consistent
@@ -56,14 +57,14 @@ wq_df.Species[wq_df.Species=='Nitrate-Nitrogen']='Nitrate-N'
 
 # Makes dates match
 
-wq_dates = wq_df.Date_col.unique()
-print(wq_dates)
-abs_dates = abs_df.Date_col.unique()
-print(abs_dates)
-abs_df['Date_col'][abs_df.Date_col=='4/5/2021']='4/2/2021'
-abs_dates = abs_df.Date_col.unique()
-print(wq_dates)
-print(abs_dates)
+# wq_dates = wq_df.Date_col.unique()
+# print(wq_dates)
+# abs_dates = abs_df.Date_col.unique()
+# print(abs_dates)
+# abs_df['Date_col'][abs_df.Date_col=='4/5/2021']='4/2/2021'
+# abs_dates = abs_df.Date_col.unique()
+# print(wq_dates)
+# print(abs_dates)
 
 # Create sample IDs for combining two dataframes
 # wq_cols = list(wq_df.columns[0:4])
@@ -89,6 +90,13 @@ for r in range(abs_wq_df.shape[0]):
         abs_wq_df.loc[r,'dilution']=30
     abs_wq_df.loc[r,'Name']=abs_wq_df.Name[r][0:7]
 
+
+# This is based on modeling results. May not be correct.
+# abs_wq_df.loc[5,'Name']='kalera2'
+# abs_wq_df.loc[11,'Name']='kalera1'
+# abs_wq_df.loc[12,'Name']='kalera1'
+# abs_wq_df.loc[13,'Name']='kalera2'
+
 abs_wq_df['ID']=abs_wq_df.Name+abs_wq_df.Date_col
 
 abs_wq_df = abs_wq_df[aw_df_cols]
@@ -100,7 +108,10 @@ for wq_row in range(wq_df.shape[0]):
                 if wq_df.Species[wq_row] == s:
                     abs_wq_df.loc[abs_row,s]=wq_df.Value[wq_row]/\
                     abs_wq_df.loc[abs_row,'dilution']
-                             
+  
+concs = abs_wq_df.loc[:,'Nitrate-N':'Conductivity'] 
+concs.mask(concs<0,inplace = True)
+abs_wq_df.loc[:,'Nitrate-N':'Conductivity']=concs
 
 #################################################################
 
@@ -114,12 +125,12 @@ for wq_row in range(wq_df.shape[0]):
 
 # train model on all but last three rows (mislabeled)
 
-param_grid = [{'n_components':np.arange(1,5)}]
+param_grid = [{'n_components':np.arange(1,10)}]
 
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 X = abs_wq_df.loc[:,'band_1':'band_1024']
-Y = abs_wq_df['Nitrate-N']
+Y = abs_wq_df['Potassium']
 # name_dum = pd.get_dummies(abs_wq_df['Name'])
 # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
 # X = abs_wq_df.loc[keep,:]
@@ -187,7 +198,7 @@ plt.show()
 
 # now random train-test split
 
-param_grid = [{'n_components':np.arange(1,5)}]
+param_grid = [{'n_components':np.arange(1,10)}]
 
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
@@ -277,10 +288,13 @@ plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
 # do all species
 
-X = abs_wq_df.loc[:,'band_1':'band_1024']
+param_grid = [{'n_components':np.arange(1,10)}]
+
+s = 'Molybdenum'
 
 for s in species:
-    Y = abs_wq_df[s]
+    X = abs_wq_df.loc[pd.notna(abs_wq_df[s]),'band_1':'band_1024']
+    Y = abs_wq_df.loc[pd.notna(abs_wq_df[s]),s]
     # name_dum = pd.get_dummies(abs_wq_df['Name'])
     # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
     # X = abs_wq_df.loc[keep,:]
@@ -290,20 +304,20 @@ for s in species:
     # X = name_dum
     
     
-    X_train = X.loc[abs_wq_df.Date_col!='5/3/2021',:]
-    X_test = X.loc[abs_wq_df.Date_col=='5/3/2021',:]
-    y_train = Y[abs_wq_df.Date_col!='5/3/2021']
-    y_test = Y[abs_wq_df.Date_col=='5/3/2021']
+    # X_train = X.loc[abs_wq_df.Date_col!='5/3/2021',:]
+    # X_test = X.loc[abs_wq_df.Date_col=='5/3/2021',:]
+    # y_train = Y[abs_wq_df.Date_col!='5/3/2021']
+    # y_test = Y[abs_wq_df.Date_col=='5/3/2021']
     
-    # X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
-    #                                                     test_size = 0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
+                                                        test_size = 0.2)
     # test_names = X_test.Name.reset_index(drop=True)
     # test_filt = X_test.Filtered.reset_index(drop=True)
     
     # X_train = X_train.loc[:,'band_1':'band_1024']
     # X_test = X_test.loc[:,'band_1':'band_1024']
     pls = PLSRegression()
-    clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
+    clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_squared_error')
     # clf.cv_results_
     # clf = GridSearchCV(pls,param_grid)
     clf.fit(X_train,y_train)
