@@ -1,10 +1,11 @@
+#%%
 print('Loading modules')
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import os
 print('...done loading modules')
-
+#%%
 ################################################# FUNCTIONS
 def calc_abs(sampleFile,referenceFile,specDirectory):
 
@@ -23,11 +24,11 @@ def calc_abs(sampleFile,referenceFile,specDirectory):
     absorbance = np.log10(refSpec_array/sampleSpec_array)
 
     return absorbance
-
+#%%
 ################################################# DEFAULTS
 user = os.getlogin()
 specDir='C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data\\spectra\\'      # LOCATION WHERE SPECTRA ARE SAVED
-
+#%%
 ############################### Bring in files
 
 refName = 'spec_ref_0deg_22500.0_UFABE_2021-01-08T10%3A15%3A35.160053.csv'          # reference spectrum
@@ -40,12 +41,14 @@ sample2Name = 'spec_posnw16_unfiltered_01-05-2021_0deg_22500.0_UFABE_2021-01-08T
 sample1 = pd.read_csv(specDir+sample1Name)
 
 sample2 = pd.read_csv(specDir+sample2Name)
-
-### Calculate absorbances and plot
+#%%
+### Calculate absorbances
 
 spec1 = calc_abs(sample1Name,refName,specDir)
 spec2 = calc_abs(sample2Name,refName,specDir)
+#%%
 
+### make plots
 plt.figure()
 plt.plot(waveLengths,spec1,label = 'hat unfiltered')
 plt.plot(waveLengths,spec2,label = 'posnw16 unfiltered')
@@ -65,5 +68,6 @@ plt.ylabel('power (counts)')
 plt.legend(loc='upper left')
 plt.ylim([0,16000])
 
+#%%
 
 
