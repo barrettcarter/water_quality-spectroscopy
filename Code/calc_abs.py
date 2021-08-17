@@ -41,7 +41,7 @@ sample1 = pd.read_csv(specDir+sample1Name)
 
 sample2 = pd.read_csv(specDir+sample2Name)
 
-
+### Calculate absorbances and plot
 
 spec1 = calc_abs(sample1Name,refName,specDir)
 spec2 = calc_abs(sample2Name,refName,specDir)
@@ -53,8 +53,7 @@ plt.title('otow lysimeter samples')
 plt.xlabel('wavelength (nm)')
 plt.ylabel('absorbance')
 plt.legend(loc='upper right')
-# plt.show() # use this when in VS Code
-plt.show(block = False) # use this when out of VS Code
+
 
 plt.figure()
 plt.plot(waveLengths,sample1.INT,label = 'hat unfiltered')
@@ -64,8 +63,7 @@ plt.title('spectra')
 plt.xlabel('wavelength (nm)')
 plt.ylabel('power (counts)')
 plt.legend(loc='upper left')
-# plt.show() # use this when in VS Code
-plt.ylim([0,16000]) # use this when out of VS Code
+plt.ylim([0,16000])
 
 
 
