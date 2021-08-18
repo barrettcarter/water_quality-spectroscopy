@@ -3,15 +3,22 @@
 Created on Tue Mar 23 16:39:55 2021
 
 @author: jbarrett.carter
-"""
 
+This code is for creating and evaluating regression models for predicting
+stream solute concentrations using UV-visible absorbance spectra.
+
+The data used here was produced from stream samples collected in and around 
+Gainesville, FL bi-weekly for ~1 year.
+
+Stream solutes analyzed are Nitrate-N, Ammonium-N, and Orthophosphate-P.
+
+"""
+#%%
+### Bring in libraries
 import pandas as pd
 import numpy as np
 import os
-import datetime as dt
 import matplotlib.pyplot as plt
-import scipy
-from scipy import stats
 import seaborn as sns
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
@@ -22,14 +29,17 @@ from sklearn.utils import resample
 from sklearn.metrics import mean_squared_error as MSE
 from sklearn.ensemble import RandomForestRegressor
 
-# IMPORTANT: Don't have the baseDir and saveDir be the same
+#%%
+
+### Bring in data
+
 user = os.getlogin() 
 abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
 wq_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/wq/'
 
 # wq_df_fn='wq_aj_df.csv'
 wq_df_fn = 'wq_tot_df.csv'
-# wq_kal_df_fn = 'wq_kalera_df.csv'
+# wq_kal_df_fn = 'wq_HNSr_df.csv'
 abs_df_fn = 'abs_df_u2d.csv'
 
 # Bring in data
@@ -109,7 +119,7 @@ plt.plot(Y_hat,Y,'b.')
 
 # Nitrate
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
 # Y = abs_wq_df.Nitrate.to_numpy()
@@ -212,14 +222,14 @@ plt.plot(coefs[0:200])
 ######################################################
 ### Tuning the models
 
-## Nitrate (trained withough Kalera data, absorbance only)
+## Nitrate (trained withough Hydroponic data, absorbance only)
 ## PlSR
 
 # Best r_sq achieved by not including name or filtered with abs
 
 param_grid = [{'n_components':np.arange(1,8)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -300,7 +310,7 @@ r2_score(data_out.y_test[data_out.Name!='swb'],
 
 # this r2 is less than that for when the model is trained only on these sites
 
-# predicting concs. of Kalera data with model calibrated with AJ data
+# predicting concs. of Hydroponic data with model calibrated with AJ data
 # This does not work well.
 
 # X_kal = abs_wq_df.loc[keep==False,'band_1':'band_1024'].to_numpy()
@@ -329,7 +339,7 @@ r2_score(data_out.y_test[data_out.Name!='swb'],
 
 param_grid = [{'n_components':np.arange(1,21)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')\
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')\
     &(abs_wq_df['Name']!='swb')
 
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
@@ -382,7 +392,7 @@ plt.show()
 param_grid = [{'max_features':np.arange(10,110,10)}]
 # param_grid = [{'max_features':np.arange(60,80,2)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -484,19 +494,19 @@ plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-## Phosphate without Kalera data
+## Phosphate without Hydroponic data
 
 # best r_sq whe including abs, names and filtration
 # good results also obtained with just names
 
-## Nitrate (trained withough Kalera data, absorbance only)
+## Nitrate (trained withough Hydroponic data, absorbance only)
 ## PlSR
 
 # Best r_sq achieved by not including name or filtered with abs
 
 param_grid = [{'n_components':np.arange(1,8)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -583,7 +593,7 @@ plt.plot(coefs[0:200])
 param_grid = [{'max_features':np.arange(10,1020,100)}]
 # param_grid = [{'max_features':np.arange(60,80,2)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -656,13 +666,13 @@ plt.plot(y_test,Y_hat)
 
 ### Using bootstrapping to obtain better performance metrics
 
-## Nitrate (trained withough Kalera data), PLS
+## Nitrate (trained withough Hydroponic data), PLS
 
 # Best r_sq achieved by including names and abs
 
 param_grid = [{'n_components':np.arange(1,21)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -782,13 +792,13 @@ plt.show()
 # plt.ylabel('Predicted Nitrate (mg/L)')
 # plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-## Phosphate (trained withough Kalera data), PLS
+## Phosphate (trained withough Hydroponic data), PLS
 
 # Best r_sq achieved by including names and abs
 
 param_grid = [{'n_components':np.arange(1,21)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -908,13 +918,13 @@ plt.show()
 # plt.ylabel('Predicted Nitrate (mg/L)')
 # plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-## Nitrate (trained withough Kalera data), RF
+## Nitrate (trained withough Hydroponic data), RF
 
 # Best r_sq achieved by including names and abs
 
 param_grid = [{'max_features':np.arange(10,120,10)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
@@ -1037,13 +1047,13 @@ plt.show()
 # plt.ylabel('Predicted Nitrate (mg/L)')
 # plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-## Phosphate (trained withough Kalera data), RF
+## Phosphate (trained withough Hydroponic data), RF
 
 # Best r_sq achieved by including names and abs
 
 param_grid = [{'max_features':np.arange(10,120,10)}]
 
-keep = (abs_wq_df['Name']!='kalera1')&(abs_wq_df['Name']!='kalera2')
+keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
 # X = abs_wq_df.loc[:,'band_1':'band_1024']
