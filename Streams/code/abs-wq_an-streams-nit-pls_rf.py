@@ -4,8 +4,9 @@ Created on Tue Mar 23 16:39:55 2021
 
 @author: jbarrett.carter
 
-This code is for creating and evaluating regression models for predicting
-stream solute concentrations using UV-visible absorbance spectra.
+This code is for creating and evaluating PLS and Random Forest 
+regression models for predicting stream solute concentrations using UV-visible 
+absorbance spectra.
 
 The data used here was produced from stream samples collected in and around 
 Gainesville, FL bi-weekly for ~1 year.
@@ -33,19 +34,20 @@ from sklearn.ensemble import RandomForestRegressor
 
 ### Bring in data
 
-user = os.getlogin() 
-abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
-wq_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/wq/'
+user = os.getlogin()
+wqs_dir =  'C:/Users/'+user+'/OneDrive/Research/PhD/Data_analysis/water_quality-spectroscopy/'
+abs_df_dir=wqs_dir+'Streams/inputs/absorbance/'
+wq_df_dir=wqs_dir+'Streams/inputs/water_quality/'
 
 # wq_df_fn='wq_aj_df.csv'
 wq_df_fn = 'wq_tot_df.csv'
-# wq_hnsr_df_fn = 'wq_HNSr_df.csv'
+# wq_kal_df_fn = 'wq_HNSr_df.csv'
 abs_df_fn = 'abs_df_u2d.csv'
 
 # Bring in data
 abs_df=pd.read_csv(abs_df_dir+abs_df_fn)
 wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
-# wq_hnsr_df = pd.read_csv(wq_df_dir+wq_hnsr_df_fn)
+# wq_kal_df = pd.read_csv(wq_df_dir+wq_kal_df_fn)
 
 # Make names consistent formatting
 
@@ -100,134 +102,17 @@ for wq_row in range(wq_df.shape[0]):
                 abs_wq_df.Phosphate[abs_row]=wq_df.Conc[wq_row]
             
 abs_wq_df = abs_wq_df.loc[abs_wq_df.Ammonium>0,:]     
-            
-# trying out PLS
 
-# Nitrate
-X = abs_wq_df.loc[abs_wq_df.Name=='swb','band_1':'band_1024']
-X = X.to_numpy()
-Y = abs_wq_df.Nitrate[abs_wq_df.Name=='swb'].to_numpy()
-pls = PLSRegression(n_components = 10)
-pls.fit(X,Y)
-Y_hat = pls.predict(X)
-
-r_sq = pls.score(X,Y)
-
-plt.plot(Y_hat,Y,'b.')
-
-# with test and train data
-
-# Nitrate
-
-keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
-# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
-# X = abs_wq_df.loc[:,'band_1':'band_1024']
-# Y = abs_wq_df.Nitrate.to_numpy()
-# name_dum = pd.get_dummies(abs_wq_df['Name'])
-# filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-X = abs_wq_df.loc[keep,'band_1':'band_1024']
-Y = abs_wq_df.Nitrate[keep].to_numpy()
-# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-# X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
-
-
-X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-pls = PLSRegression(n_components = 10)
-pls.fit(X_train,y_train)
-Y_hat = pls.predict(X_test)
-
-r_sq = pls.score(X_test,y_test)
-
-plt.plot(Y_hat,y_test,'b.')
-
-line11 = np.linspace(min(y_test),max(y_test))
-
-plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
-plt.plot(line11,line11,label= '1:1 line')
-plt.xlabel('Predicted Nitrate')
-plt.ylabel('True Nitrate')
-plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
-plt.show()
-
-coefs = pls.coef_
-
-plt.plot(coefs[0:200])
-
-# Phosphate
-    
-keep = (abs_wq_df['Name']!='swb')
-# keep = abs_wq_df['Name'].isin(['hogdn','hat'])
-X = abs_wq_df.loc[:,'band_1':'band_1024']
-Y = abs_wq_df.Phosphate.to_numpy()
-name_dum = pd.get_dummies(abs_wq_df['Name'])
-filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-# X = abs_wq_df.loc[keep,'band_1':'band_1024']
-# Y = abs_wq_df.Phosphate[keep].to_numpy()
-# name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-X = pd.concat([name_dum,filtered_dum,X],axis=1).to_numpy()
-
-X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-pls = PLSRegression(n_components = 10)
-pls.fit(X_train,y_train)
-Y_hat = pls.predict(X_test)
-
-r_sq = pls.score(X_test,y_test)
-
-plt.plot(Y_hat,y_test,'b.')
-
-line11 = np.linspace(min(y_test),max(y_test))
-
-plt.plot(Y_hat,y_test,'o',markersize = 4, label = 'predictions')
-plt.plot(line11,line11,label= '1:1 line')
-plt.xlabel('Predicted Phosphate')
-plt.ylabel('True Phosphate')
-plt.text(0.2,0.8,r'$r^2 =$'+str(np.round(r_sq,3)))
-plt.show()
-
-coefs = pls.coef_
-
-plt.plot(coefs[0:200])
-
-# # separate between filtered and unfiltered
-
-# X = abs_wq_df.loc[abs_wq_df.Filtered==True,'band_1':'band_1024']
-# X = X.to_numpy()
-# Y = abs_wq_df.loc[abs_wq_df.Filtered==True,'Phosphate']
-# Y = Y.to_numpy()
-
-# X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-# pls = PLSRegression(n_components = 10)
-# pls.fit(X_train,y_train)
-# Y_hat = pls.predict(X_test)
-
-# r_sq = pls.score(X_test,y_test)
-
-# plt.plot(Y_hat,y_test,'b.')
-
-# #not good for filtered samples
-
-# X = abs_wq_df.loc[abs_wq_df.Filtered==False,'band_1':'band_1024']
-# X = X.to_numpy()
-# Y = abs_wq_df.loc[abs_wq_df.Filtered==False,'Phosphate']
-# Y = Y.to_numpy()
-
-# X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=1)
-# pls = PLSRegression(n_components = 5)
-# pls.fit(X_train,y_train)
-# Y_hat = pls.predict(X_test)
-
-# r_sq = pls.score(X_test,y_test)
-
-# plt.plot(Y_hat,y_test,'b.')
+#%%
 ######################################################
-### Tuning the models
+### Tuning the PLS model
 
 ## Nitrate (trained withough Hydroponic data, absorbance only)
 ## PlSR
 
 # Best r_sq achieved by not including name or filtered with abs
 
-param_grid = [{'n_components':np.arange(1,8)}]
+param_grid = [{'n_components':np.arange(1,50)}]
 
 keep = (abs_wq_df['Name']!='HNSr1')&(abs_wq_df['Name']!='HNSr2')
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
@@ -256,14 +141,18 @@ X_test = X_test.loc[:,X_cols]
 # X_train = X_train.loc[:,'band_1':'band_1024']
 # X_test = X_test.loc[:,'band_1':'band_1024']
 pls = PLSRegression()
-clf = GridSearchCV(pls,param_grid)
+clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
 clf.fit(X_train,y_train)
 n_comp = clf.best_params_['n_components']
 pls_opt = clf.best_estimator_
 Y_hat = pls_opt.predict(X_test)
 
-r_sq = pls_opt.score(X_test,y_test)
+#%% analyze results
 
+r_sq = pls_opt.score(X_test,y_test)
+mean_scores = clf.cv_results_['mean_test_score']
+plt.figure()
+plt.plot(mean_scores)
 # plt.plot(Y_hat,y_test,'b.')
 
 line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
@@ -272,14 +161,17 @@ line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
 lr = LinearRegression().fit(Y_hat,y_test)
 linelr = lr.predict(line11.reshape(-1,1))
 
+plt.figure()
 plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
 plt.plot(line11,line11,label= '1:1 line')
 # plt.plot(line11,linelr,label = 'regression line')
 plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
-plt.legend()
+plt.legend(loc='lower right')
 plt.show()
+
+#%%
 
 # make better plot
 data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
@@ -303,27 +195,30 @@ plt.xlabel('Lab Measured Nitrate (mg-N/L)')
 plt.ylabel('Predicted Nitrate (mg-N/L)')
 plt.text(1.5,0,r'$R^2 =$'+str(np.round(r_sq,3)))
 
+#%%
+
 # determine r2 for sites otherthan swb
 
-r2_score(data_out.y_test[data_out.Name!='swb'],
-         data_out.y_pred[data_out.Name!='swb'])
+print(r2_score(data_out.y_test[data_out['Site ID']!='swb'],
+         data_out.y_pred[data_out['Site ID']!='swb']))
 
 # this r2 is less than that for when the model is trained only on these sites
+#%%
 
 # predicting concs. of Hydroponic data with model calibrated with AJ data
 # This does not work well.
 
-# X_hnsr = abs_wq_df.loc[keep==False,'band_1':'band_1024'].to_numpy()
-# y_hnsr = abs_wq_df.Nitrate[keep==False].to_numpy()
-# Y_hat = pls_opt.predict(X_hnsr)
+# X_kal = abs_wq_df.loc[keep==False,'band_1':'band_1024'].to_numpy()
+# y_kal = abs_wq_df.Nitrate[keep==False].to_numpy()
+# Y_hat = pls_opt.predict(X_kal)
 
-# r_sq = pls_opt.score(X_hnsr,y_hnsr)
+# r_sq = pls_opt.score(X_kal,y_kal)
 
-# plt.plot(Y_hat,y_hnsr,'b.')
+# plt.plot(Y_hat,y_kal,'b.')
 
-# line11 = np.linspace(min(y_hnsr),max(y_hnsr))
+# line11 = np.linspace(min(y_kal),max(y_kal))
 
-# plt.plot(Y_hat,y_hnsr,'o',markersize = 4, label = 'predictions')
+# plt.plot(Y_hat,y_kal,'o',markersize = 4, label = 'predictions')
 # plt.plot(line11,line11,label= '1:1 line')
 # plt.xlabel('Predicted Nitrate')
 # plt.ylabel('True Nitrate')
