@@ -26,10 +26,14 @@ from sklearn.ensemble import RandomForestRegressor
 # import sklearn.metrics
 # sorted(sklearn.metrics.SCORERS.keys())
 
-# IMPORTANT: Don't have the baseDir and saveDir be the same
+#%%
+
+### Set paths and bring in data
+
 user = os.getlogin() 
-abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
-wq_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/wq/'
+path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+abs_df_dir=os.path.join(path_to_wqs,'Data/spectra/')
+wq_df_dir=os.path.join(path_to_wqs,'Hydroponics/inputs/water_quality/')
 
 
 wq_df_fn = 'wq_HNSr_df.csv'
@@ -38,6 +42,10 @@ abs_df_fn = 'abs_df_u2d.csv'
 # Bring in data
 abs_df=pd.read_csv(abs_df_dir+abs_df_fn)
 wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
+
+#%%
+
+### Some data wrangling
 
 # Select only HNSr samples
 
@@ -62,13 +70,19 @@ print(abs_dates)
 # wq_dates = wq_df.Date_col.unique()
 
 # Create sample IDs for combining two dataframes
-wq_cols = list(wq_df.columns[0:4])
-wq_cols.append('Name')
-wq_df.columns=wq_cols
+# wq_cols = list(wq_df.columns[0:4])
+# wq_cols.append('Name')
+# wq_df.columns=wq_cols
+
+wq_df.rename(columns={'Sample_num':'Name'},inplace=True)
 wq_df['ID']=wq_df.Name+wq_df.Date_col
 
 # concs_ind = range(int((wq_df.shape[0]-1)/3))
 # concs_df = wq_df.pivot(index = range(268),columns = 'Species',values = 'Conc')
+
+#%%
+
+### Make dataframe with absorbances and water quality
 
 species = wq_df.Species.unique()
 species = np.append(species,'ID')
@@ -89,7 +103,7 @@ for wq_row in range(wq_df.shape[0]):
                 if wq_df.Species[wq_row] == s:
                     abs_wq_df.loc[abs_row,s]=wq_df.Value[wq_row]
                              
-
+#%%
 #################################################################
 
 
@@ -98,9 +112,7 @@ for wq_row in range(wq_df.shape[0]):
 ## Nitrate
 ## PlSR
 
-# Best r_sq achieved by not including name or filtered with abs
-
-param_grid = [{'n_components':np.arange(1,5)}]
+param_grid = [{'n_components':np.arange(1,20)}]
 
 # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
 # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
@@ -116,7 +128,7 @@ Y = abs_wq_df['Nitrate-N']
 
 
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
-                                                    test_size = 0.2)
+                                                    test_size = 0.3)
 # test_names = X_test.Name.reset_index(drop=True)
 # test_filt = X_test.Filtered.reset_index(drop=True)
 
@@ -128,13 +140,20 @@ clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
 # clf = GridSearchCV(pls,param_grid)
 clf.fit(X_train,y_train)
 n_comp = clf.best_params_['n_components']
+print('Number of components:\t'+str(n_comp))
 pls_opt = clf.best_estimator_
 Y_hat = pls_opt.predict(X_test)
 Y_hat_train = pls_opt.predict(X_train)
 
 r_sq = pls_opt.score(X_test,y_test)
-r_sq_train = pls_opt.score(X_train,y_train)
+print('Test r-squared value:\t'+str(round(r_sq,3)))
 
+r_sq_train = pls_opt.score(X_train,y_train)
+print('Training r-squared value:\t'+str(round(r_sq_train,3)))
+
+
+#%%
+### Plot results
 # plt.plot(Y_hat,y_test,'b.')
 
 line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
@@ -149,6 +168,7 @@ plt.plot(line11,line11,label= '1:1 line')
 plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(170,200,r'$r^2 =$'+str(np.round(r_sq,3)))
+plt.title('Test Set')
 plt.legend()
 plt.show()
 
@@ -161,11 +181,14 @@ line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train[:,0]))),
 plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
 plt.plot(line11,line11,label= '1:1 line')
 # plt.plot(line11,linelr,label = 'regression line')
+plt.title('Training Set')
 plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq_train,3)))
 plt.legend()
 plt.show()
+
+#%%
 
 # make better plot
 data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
@@ -188,6 +211,9 @@ plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
+#%% 
+### Create a model for every species
+s = species[3]
 for s in species:
     Y = abs_wq_df[s]
     # name_dum = pd.get_dummies(abs_wq_df['Name'])
@@ -200,12 +226,13 @@ for s in species:
     
     
     X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
-                                                        test_size = 0.2)
+                                                        test_size = 0.3)
     # test_names = X_test.Name.reset_index(drop=True)
     # test_filt = X_test.Filtered.reset_index(drop=True)
     
     # X_train = X_train.loc[:,'band_1':'band_1024']
     # X_test = X_test.loc[:,'band_1':'band_1024']
+    param_grid = [{'n_components':np.arange(1,20)}]
     pls = PLSRegression()
     clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
     # clf.cv_results_
@@ -219,37 +246,63 @@ for s in species:
     r_sq = pls_opt.score(X_test,y_test)
     r_sq_train = pls_opt.score(X_train,y_train)
     
+    MSE_test = MSE(y_test,Y_hat)
+    RMSE_test = np.sqrt(MSE_test)
+    
+    abs_test_errors = abs(y_test-Y_hat[:,0])
+    APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
+    MAPE_test = np.mean(APE_test)*100 # this is percentage
+    
+    abs_train_errors = abs(y_train-Y_hat_train[:,0])
+    APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
+    MAPE_train = np.mean(APE_train)*100 # this is percentage
+    
     # plt.plot(Y_hat,y_test,'b.')
     
     line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
                          max(np.concatenate((y_test,Y_hat[:,0]))))
+    
+    y_text1 = min(line11)+(max(line11)-min(line11))*0.05
+    y_text2 = min(line11)+(max(line11)-min(line11))*0.15
+    x_text = max(line11)-(max(line11)-min(line11))*0.3
     
     # lr = LinearRegression().fit(Y_hat,y_test)
     # linelr = lr.predict(line11.reshape(-1,1))
     
     plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
     plt.plot(line11,line11,label= '1:1 line')
+    plt.title('Test Set')
     # plt.plot(line11,linelr,label = 'regression line')
     plt.xlabel('Lab Measured '+s+' (mg/L)')
     plt.ylabel('Predicted '+s+' (mg/L)')
-    plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq,3)))
+    plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
+    plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
     plt.legend()
     plt.show()
     
     line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train[:,0]))),
                          max(np.concatenate((y_train,Y_hat_train[:,0]))))
     
+    y_text1 = min(line11)+(max(line11)-min(line11))*0.05
+    y_text2 = min(line11)+(max(line11)-min(line11))*0.15
+    
+    x_text = max(line11)-(max(line11)-min(line11))*0.3
+    
     # lr = LinearRegression().fit(Y_hat,y_test)
     # linelr = lr.predict(line11.reshape(-1,1))
     
     plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
     plt.plot(line11,line11,label= '1:1 line')
+    plt.title('Training Set')
     # plt.plot(line11,linelr,label = 'regression line')
     plt.xlabel('Lab Measured '+s+' (mg/L)')
     plt.ylabel('Predicted '+s+' (mg/L)')
-    plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq_train,3)))
+    plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq_train,3)))
+    plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_train,1))+'%')
     plt.legend()
     plt.show()
+
+#%%
 
 ## Random Forest (nitrate)
 
