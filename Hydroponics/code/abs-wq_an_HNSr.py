@@ -92,7 +92,8 @@ abs_wq_df = abs_df
 abs_wq_df.loc[:,species] = -0.1
 abs_wq_df['ID']=abs_wq_df.Name+abs_wq_df.Date_col
 
-species = np.delete(species,len(species)-1)
+species = np.delete(species,len(species)-1) #get rid of ID
+species = np.delete(species,len(species)-1) #get rid of Conductivity
 
 abs_wq_df = abs_wq_df[aw_df_cols]
 
@@ -213,9 +214,41 @@ plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
 #%% 
 ### Create a model for every species
-s = species[3]
+s = 'Molybdenum'
+# y_hat_test_df = pd.DataFrame(columns=species)
+y_hat_test_dict = dict()
+y_hat_train_dict = dict()
+# y_true_train_dict = dict()
+# y_true_test_dict = dict()
+test_ind_dict = dict()
+train_ind_dict = dict()
+test_rsq_dict = dict()
+train_rsq_dict = dict()
+test_rmse_dict = dict()
+train_rmse_dict = dict()
+test_mape_dict = dict()
+train_mape_dict = dict()
+n_comp_dict = dict()
+
+for s in species:
+    y_hat_test_dict[s]=[]
+    y_hat_train_dict[s] = []
+    test_ind_dict[s] = []
+    train_ind_dict[s] = []
+    test_rsq_dict[s] = []
+    train_rsq_dict[s] = []
+    test_rmse_dict[s] = []
+    train_rmse_dict[s] = []
+    test_mape_dict[s] = []
+    train_mape_dict[s] = []
+    n_comp_dict[s] = []
+
 for s in species:
     Y = abs_wq_df[s]
+    keep = Y>0
+    X = abs_wq_df.loc[keep,'band_1':'band_1024']
+    Y = Y[keep]
+    
     # name_dum = pd.get_dummies(abs_wq_df['Name'])
     # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
     # X = abs_wq_df.loc[keep,:]
@@ -240,8 +273,8 @@ for s in species:
     clf.fit(X_train,y_train)
     n_comp = clf.best_params_['n_components']
     pls_opt = clf.best_estimator_
-    Y_hat = pls_opt.predict(X_test)
-    Y_hat_train = pls_opt.predict(X_train)
+    Y_hat = pls_opt.predict(X_test)[:,0]
+    Y_hat_train = pls_opt.predict(X_train)[:,0]
     
     r_sq = pls_opt.score(X_test,y_test)
     r_sq_train = pls_opt.score(X_train,y_train)
@@ -249,59 +282,93 @@ for s in species:
     MSE_test = MSE(y_test,Y_hat)
     RMSE_test = np.sqrt(MSE_test)
     
-    abs_test_errors = abs(y_test-Y_hat[:,0])
+    MSE_train = MSE(y_train,Y_hat_train)
+    RMSE_train = np.sqrt(MSE_train)
+    
+    abs_test_errors = abs(y_test-Y_hat)
     APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
     MAPE_test = np.mean(APE_test)*100 # this is percentage
     
-    abs_train_errors = abs(y_train-Y_hat_train[:,0])
+    abs_train_errors = abs(y_train-Y_hat_train)
     APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
     MAPE_train = np.mean(APE_train)*100 # this is percentage
     
+    y_hat_test_dict[s].extend(list(Y_hat))
+    y_hat_train_dict[s].extend(list(Y_hat_train))
+    test_ind_dict[s].extend(list(X_test.index))
+    train_ind_dict[s].extend(list(X_train.index))
+    test_rsq_dict[s].append(float(r_sq))
+    train_rsq_dict[s].append(float(r_sq_train))
+    test_rmse_dict[s].append(float(RMSE_test))
+    train_rmse_dict[s].append(float(RMSE_train))
+    test_mape_dict[s].append(float(MAPE_test))
+    train_mape_dict[s].append(float(MAPE_train))
+    n_comp_dict[s].append(float(n_comp))
+    
     # plt.plot(Y_hat,y_test,'b.')
     
-    line11 = np.linspace(min(np.concatenate((y_test,Y_hat[:,0]))),
-                         max(np.concatenate((y_test,Y_hat[:,0]))))
+    # line11 = np.linspace(min(np.concatenate((y_test,Y_hat))),
+    #                      max(np.concatenate((y_test,Y_hat))))
     
-    y_text1 = min(line11)+(max(line11)-min(line11))*0.05
-    y_text2 = min(line11)+(max(line11)-min(line11))*0.15
-    x_text = max(line11)-(max(line11)-min(line11))*0.3
+    # y_text1 = min(line11)+(max(line11)-min(line11))*0.05
+    # y_text2 = min(line11)+(max(line11)-min(line11))*0.15
+    # x_text = max(line11)-(max(line11)-min(line11))*0.3
     
-    # lr = LinearRegression().fit(Y_hat,y_test)
-    # linelr = lr.predict(line11.reshape(-1,1))
+    # # lr = LinearRegression().fit(Y_hat,y_test)
+    # # linelr = lr.predict(line11.reshape(-1,1))
     
-    plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
-    plt.plot(line11,line11,label= '1:1 line')
-    plt.title('Test Set')
-    # plt.plot(line11,linelr,label = 'regression line')
-    plt.xlabel('Lab Measured '+s+' (mg/L)')
-    plt.ylabel('Predicted '+s+' (mg/L)')
-    plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
-    plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
-    plt.legend()
-    plt.show()
+    # plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
+    # plt.plot(line11,line11,label= '1:1 line')
+    # plt.title('Test Set')
+    # # plt.plot(line11,linelr,label = 'regression line')
+    # plt.xlabel('Lab Measured '+s+' (mg/L)')
+    # plt.ylabel('Predicted '+s+' (mg/L)')
+    # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
+    # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
+    # plt.legend()
+    # plt.show()
     
-    line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train[:,0]))),
-                         max(np.concatenate((y_train,Y_hat_train[:,0]))))
+    # line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train))),
+    #                      max(np.concatenate((y_train,Y_hat_train))))
     
-    y_text1 = min(line11)+(max(line11)-min(line11))*0.05
-    y_text2 = min(line11)+(max(line11)-min(line11))*0.15
+    # y_text1 = min(line11)+(max(line11)-min(line11))*0.05
+    # y_text2 = min(line11)+(max(line11)-min(line11))*0.15
     
-    x_text = max(line11)-(max(line11)-min(line11))*0.3
+    # x_text = max(line11)-(max(line11)-min(line11))*0.3
     
-    # lr = LinearRegression().fit(Y_hat,y_test)
-    # linelr = lr.predict(line11.reshape(-1,1))
+    # # lr = LinearRegression().fit(Y_hat,y_test)
+    # # linelr = lr.predict(line11.reshape(-1,1))
     
-    plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
-    plt.plot(line11,line11,label= '1:1 line')
-    plt.title('Training Set')
-    # plt.plot(line11,linelr,label = 'regression line')
-    plt.xlabel('Lab Measured '+s+' (mg/L)')
-    plt.ylabel('Predicted '+s+' (mg/L)')
-    plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq_train,3)))
-    plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_train,1))+'%')
-    plt.legend()
-    plt.show()
+    # plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
+    # plt.plot(line11,line11,label= '1:1 line')
+    # plt.title('Training Set')
+    # # plt.plot(line11,linelr,label = 'regression line')
+    # plt.xlabel('Lab Measured '+s+' (mg/L)')
+    # plt.ylabel('Predicted '+s+' (mg/L)')
+    # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq_train,3)))
+    # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_train,1))+'%')
+    # plt.legend()
+    # plt.show()
+    
+fig, axs = plt.subplots(4,4)
+fig.set_size_inches(12.8,9.6)
+row = 0
+col = 0
+for s in species:
+    y_true_train = abs_wq_df.loc[train_ind_dict[s],s]
+    y_hat_train = y_hat_train_dict[s]
+    axs[row,col].plot(y_true_train,y_hat_train)
+    if col == 3:
+        col = 0
+        row += 1
+    else:
+        col +=1
 
+#%%
+fig,axs = plt.subplots(2)
+fig.set_size_inches(12.8,9.6)
+for plots in [0,1]:
+    axs[plots].plot([1,2],[2,4])
 #%%
 
 ## Random Forest (nitrate)
