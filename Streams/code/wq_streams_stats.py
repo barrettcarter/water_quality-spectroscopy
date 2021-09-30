@@ -35,6 +35,15 @@ wq_codes = pd.read_csv(wq_df_dir+wq_codes_fn)
 wq_df2 = wq_df2.loc[pd.notna(wq_df2['ARL_code']),:]
 wq_df2.reset_index(drop = True,inplace = True)
 
+# c = wq_df2.columns[1]
+for c in wq_df2.columns:
+    wq_df2.loc[:,c] = pd.to_numeric(wq_df2[c])
+
+# Make units consistent
+
+wq_df2.loc[:,'Phosphate-P'] = wq_df2.loc[:,'Phosphate-P']/1000
+wq_df2.loc[:,'TP'] = wq_df2.loc[:,'TP']/1000
+
 # select only relevant codes
 wq_codes = wq_codes.iloc[0:wq_df2.shape[0],:]
 
@@ -81,18 +90,90 @@ wq_df = wq_df.loc[np.isnan(wq_df['Fil_code'])==False,:]
 
 conc_df = pd.pivot_table(wq_df,values = 'Conc',columns = ['Species'],index = ['ID'])
 conc_df.reset_index(inplace=True)
-conc_df_fil = pd.pivot_table(wq_df,values = 'Conc',columns = ['Species'],index = ['Fil_code'])
-conc_df_fil.reset_index(inplace=True)
-conc_df_unf = pd.pivot_table(wq_df,values = 'Conc',columns = ['Species'],index = ['Unf_code'])
-conc_df_unf.reset_index(inplace=True)
+
+# separate into filtered and unfiltered samples for each lab
+# the values are the same for lab1 because all samples were filtered
+Lab1_fil = pd.pivot_table(wq_df,values = 'Conc',columns = ['Species'],index = ['Fil_code'])
+Lab1_fil.reset_index(inplace=True)
+Lab1_unf = pd.pivot_table(wq_df,values = 'Conc',columns = ['Species'],index = ['Unf_code'])
+Lab1_unf.reset_index(inplace=True)
+
+Lab2_fil = wq_df2.loc[wq_df2['ARL_code'].isin(Lab1_fil['Fil_code']),:]
+Lab2_fil.reset_index(inplace=True)
+Lab2_unf = wq_df2.loc[wq_df2['ARL_code'].isin(Lab1_unf['Unf_code']),:]
+Lab2_unf.reset_index(inplace=True)
+
+# remove unneeded columns
+
+Lab1_fil = Lab1_fil.iloc[:,1:4]
+Lab1_unf = Lab1_unf.iloc[:,1:4]
+Lab2_fil = Lab2_fil.iloc[:,1:6]
+Lab2_unf = Lab2_unf.iloc[:,1:6]
+
 
 #%% make subsets
 
-Nit_fil = pd.DataFrame(columns = ['Lab1','Lab2'])
-Nit_fil['Lab1']=conc_df_fil['Nitrate-N']
-Nit_fil['Lab2']=wq_df2.loc[wq_df2['ARL_code'].isin(conc_df_fil['Fil_code']),'Nitrate-N'].values
-Nit_fil['Lab2']=pd.to_numeric(Nit_fil['Lab2'])
-#%% make plots
+# Nit_fil = pd.DataFrame(columns = ['Lab1','Lab2'])
+# Nit_fil['Lab1']=conc_df_fil['Nitrate-N']
+# Nit_fil['Lab2']=wq_df2.loc[wq_df2['ARL_code'].isin(conc_df_fil['Fil_code']),'Nitrate-N'].values
+# Nit_fil['Lab2']=pd.to_numeric(Nit_fil['Lab2'])
+
+# Nit_unf = pd.DataFrame(columns = ['Lab1','Lab2'])
+# Nit_unf['Lab1']=conc_df_unf['Nitrate-N']
+# Nit_unf['Lab2']=wq_df2.loc[wq_df2['ARL_code'].isin(conc_df_unf['Unf_code']),'Nitrate-N'].values
+# Nit_unf['Lab2']=pd.to_numeric(Nit_unf['Lab2'])
+
+#%%
 sns.set_theme(font_scale = 1.25,style='ticks')
-plt.plot(Nit_fil['Lab1'],Nit_fil['Lab2'],'k.')
-plt.plot([0,3],[0,3],'--k')
+for c1 in Lab1_fil.columns:
+    for c2 in Lab2_fil.columns:
+        
+        if c1==c2:
+            
+            slope, intercept, r_value, p_value, std_err =\
+                stats.linregress(Lab1_fil[c1],Lab2_fil[c2])
+                
+            y_text = min(Lab1_fil[c1])+(max(Lab1_fil[c1])-min(Lab1_fil[c1]))*0.05
+            x_text = max(Lab1_fil[c1])-(max(Lab1_fil[c1])-min(Lab1_fil[c1]))*0.3
+            
+            plt.figure()
+            plt.scatter(Lab1_fil[c1],Lab2_fil[c2],s = 50,label = 'Filtered')
+            plt.scatter(Lab1_unf[c1],Lab2_unf[c2],facecolor = 'none',edgecolor = 'orange',
+                        s = 50,label = 'Unfiltered')
+            plt.plot([min(Lab1_fil[c1]),max(Lab1_fil[c1])],[min(Lab1_fil[c1]),
+                                                            max(Lab1_fil[c1])],
+                     '--k',label = '1:1 line')
+            plt.xlabel('Lab 1 '+c1+ ' (mg/L)')
+            plt.ylabel('Lab 2 '+c1+ ' (mg/L)')
+            plt.legend()
+            plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3)))
+
+#%% make plot for Nitrate < 1
+sns.set_theme(font_scale = 1.25,style='ticks')
+c = 'Nitrate-N'
+c1 = c
+c2 = c
+
+Nit1_fil = Lab1_fil[c1][Lab1_fil[c1]<1]
+Nit2_fil = Lab2_fil[c2][Lab1_fil[c1]<1]
+
+Nit1_unf = Lab1_unf[c1][Lab1_unf[c1]<1]
+Nit2_unf = Lab2_unf[c2][Lab1_unf[c1]<1]
+
+slope, intercept, r_value, p_value, std_err =\
+    stats.linregress(Nit1_fil,Nit2_fil)
+    
+y_text = min(Nit1_fil)+(max(Nit1_fil)-min(Nit1_fil))*0.05
+x_text = max(Nit1_fil)-(max(Nit1_fil)-min(Nit1_fil))*0.3
+
+plt.figure()
+plt.scatter(Nit1_fil,Nit2_fil,s = 50,label = 'Filtered')
+plt.scatter(Nit1_unf,Nit2_unf,facecolor = 'none',edgecolor = 'orange',
+            s = 50,label = 'Unfiltered')
+plt.plot([min(Nit1_fil),max(Nit1_fil)],[min(Nit1_fil),
+                                                max(Nit1_fil)],
+         '--k',label = '1:1 line')
+plt.xlabel('Lab 1 '+c1+ ' (mg/L)')
+plt.ylabel('Lab 2 '+c1+ ' (mg/L)')
+plt.legend()
+plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3)))
