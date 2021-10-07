@@ -8,11 +8,12 @@ Created on Wed September 22 17:45 2021
 import pandas as pd
 import numpy as np
 import os
-import datetime as dt
+# import datetime as dt
 import matplotlib.pyplot as plt
-import scipy
+# import scipy
 from scipy import stats
 import seaborn as sns
+from sklearn.linear_model import LinearRegression
 #%% bring in data
 
 user = os.getlogin() 
@@ -130,23 +131,29 @@ for c1 in Lab1_fil.columns:
         
         if c1==c2:
             
+            stack = np.concatenate((Lab1_fil[c1],Lab2_fil[c2],Lab1_unf[c1],Lab2_unf[c2]))
+            
             slope, intercept, r_value, p_value, std_err =\
                 stats.linregress(Lab1_fil[c1],Lab2_fil[c2])
+            
+            x_reg = np.array([min(stack),max(stack)])
+            y_reg = x_reg*slope+intercept
                 
-            y_text = min(Lab1_fil[c1])+(max(Lab1_fil[c1])-min(Lab1_fil[c1]))*0.05
-            x_text = max(Lab1_fil[c1])-(max(Lab1_fil[c1])-min(Lab1_fil[c1]))*0.3
+            y_text = min(stack)+(max(stack)-min(stack))*0.05
+            x_text = max(stack)-(max(stack)-min(stack))*0.4
             
             plt.figure()
             plt.scatter(Lab1_fil[c1],Lab2_fil[c2],s = 50,label = 'Filtered')
             plt.scatter(Lab1_unf[c1],Lab2_unf[c2],facecolor = 'none',edgecolor = 'orange',
                         s = 50,label = 'Unfiltered')
-            plt.plot([min(Lab1_fil[c1]),max(Lab1_fil[c1])],[min(Lab1_fil[c1]),
-                                                            max(Lab1_fil[c1])],
-                     '--k',label = '1:1 line')
+            plt.plot(x_reg,x_reg,'--k',label = '1:1 line')
+            plt.plot(x_reg,y_reg,'-k',label = 'regression line')
             plt.xlabel('Lab 1 '+c1+ ' (mg/L)')
             plt.ylabel('Lab 2 '+c1+ ' (mg/L)')
             plt.legend()
-            plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3)))
+            plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3))+
+                     '\n'+'slope = '+str(np.round(slope,2))+'\n'+'intercept = '+
+                     str(np.round(intercept,3)))
 
 #%% make plot for Nitrate < 1
 sns.set_theme(font_scale = 1.25,style='ticks')
@@ -160,20 +167,26 @@ Nit2_fil = Lab2_fil[c2][Lab1_fil[c1]<1]
 Nit1_unf = Lab1_unf[c1][Lab1_unf[c1]<1]
 Nit2_unf = Lab2_unf[c2][Lab1_unf[c1]<1]
 
+Nit_stack = np.concatenate((Nit1_fil,Nit2_fil,Nit1_unf,Nit2_unf))
+
 slope, intercept, r_value, p_value, std_err =\
     stats.linregress(Nit1_fil,Nit2_fil)
     
-y_text = min(Nit1_fil)+(max(Nit1_fil)-min(Nit1_fil))*0.05
-x_text = max(Nit1_fil)-(max(Nit1_fil)-min(Nit1_fil))*0.3
+x_reg = np.array([min(Nit_stack),max(Nit_stack)])
+y_reg = x_reg*slope+intercept
+    
+y_text = min(Nit_stack)+(max(Nit_stack)-min(Nit_stack))*0.05
+x_text = max(Nit_stack)-(max(Nit_stack)-min(Nit_stack))*0.4
 
 plt.figure()
 plt.scatter(Nit1_fil,Nit2_fil,s = 50,label = 'Filtered')
 plt.scatter(Nit1_unf,Nit2_unf,facecolor = 'none',edgecolor = 'orange',
             s = 50,label = 'Unfiltered')
-plt.plot([min(Nit1_fil),max(Nit1_fil)],[min(Nit1_fil),
-                                                max(Nit1_fil)],
-         '--k',label = '1:1 line')
+plt.plot(x_reg,x_reg,'--k',label = '1:1 line')
+plt.plot(x_reg,y_reg,'-k',label = 'regression line')
 plt.xlabel('Lab 1 '+c1+ ' (mg/L)')
 plt.ylabel('Lab 2 '+c1+ ' (mg/L)')
 plt.legend()
-plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3)))
+plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3))+
+         '\n'+'slope = '+str(np.round(slope,2))+'\n'+'intercept = '+
+         str(np.round(intercept,3)))
