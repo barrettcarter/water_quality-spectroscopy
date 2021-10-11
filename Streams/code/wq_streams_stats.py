@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 # import scipy
 from scipy import stats
 import seaborn as sns
-from sklearn.linear_model import LinearRegression
+# from sklearn.linear_model import LinearRegression
 #%% bring in data
 
 user = os.getlogin() 
