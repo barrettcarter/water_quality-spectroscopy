@@ -8,10 +8,10 @@ Created on Tue Mar 23 16:39:55 2021
 import pandas as pd
 import numpy as np
 import os
-import datetime as dt
+# import datetime as dt
 import matplotlib.pyplot as plt
-import scipy
-from scipy import stats
+# import scipy
+# from scipy import stats
 import seaborn as sns
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
