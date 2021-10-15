@@ -52,12 +52,16 @@ wq_codes = wq_codes.iloc[0:wq_df2.shape[0],:]
 wq_df['ID']=wq_df['Name']+wq_df['Date_col']
 
 wq_df2['ID']=wq_codes['Name']+wq_codes['Date_col']
+wq_df2['Name']=wq_codes['Name']
+wq_df2['Date_col']=wq_codes['Date_col']
+wq_df2['Filtered']=wq_codes['Filtered']
 
 # mark problematic data from 11/5/2020
 # samples from 11/5 and 11/19 were given same label and stored for too long
 
 wq_df2['ID'][wq_codes['Date_col']=='11/5/2020']=\
-wq_df2['ID'][wq_codes['Date_col']=='11/5/2020']+wq_codes['Date_an'][wq_codes['Date_col']=='11/5/2020']
+wq_df2['ID'][wq_codes['Date_col']=='11/5/2020']+\
+    wq_codes['Date_an'][wq_codes['Date_col']=='11/5/2020']
 
 
 # re-order wq_df to match wq_df2
@@ -190,3 +194,72 @@ plt.legend()
 plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3))+
          '\n'+'slope = '+str(np.round(slope,2))+'\n'+'intercept = '+
          str(np.round(intercept,3)))
+
+#%% t-test
+
+for c1 in Lab1_fil.columns:
+    for c2 in Lab2_fil.columns:
+        
+        if c1==c2:
+            
+            print(c1+' - '+'filtereed')
+            pval = stats.ttest_rel(Lab1_fil[c1],Lab2_fil[c2]).pvalue
+            print('  p-value: '+str(round(pval,5)))
+            print(c1+' - '+'unfiltereed')
+            pval = stats.ttest_rel(Lab1_unf[c1],Lab2_unf[c2]).pvalue
+            print('  p-value: '+str(round(pval,5)))
+
+#%% t-test for sub Nitrate
+
+c = 'Nitrate-N'
+c1 = c
+c2 = c
+
+Nit1_fil = Lab1_fil[c1][Lab1_fil[c1]<1]
+Nit2_fil = Lab2_fil[c2][Lab1_fil[c1]<1]
+
+Nit1_unf = Lab1_unf[c1][Lab1_unf[c1]<1]
+Nit2_unf = Lab2_unf[c2][Lab1_unf[c1]<1]
+
+print('two-sided')
+print(c1+' - '+'filtereed')
+pval = stats.ttest_rel(Nit1_fil,Nit2_fil).pvalue
+print('  p-value: '+str(round(pval,5)))
+print(c1+' - '+'unfiltereed')
+pval = stats.ttest_rel(Nit1_unf,Nit2_unf).pvalue
+print('  p-value: '+str(round(pval,5)))
+
+#%% One-sided t-test
+
+print('----------------')
+print('Alternative: Lab 1 > Lab 2')
+print(c1+' - '+'filtereed')
+pval = stats.ttest_rel(Nit1_fil,Nit2_fil,alternative='greater').pvalue
+print('  p-value: '+str(round(pval,5)))
+print(c1+' - '+'unfiltereed')
+pval = stats.ttest_rel(Nit1_unf,Nit2_unf,alternative='greater').pvalue
+print('  p-value: '+str(round(pval,5)))
+
+print('----------------')
+print('Alternative: Lab 1 < Lab 2')
+print(c1+' - '+'filtereed')
+pval = stats.ttest_rel(Nit1_fil,Nit2_fil,alternative='less').pvalue
+print('  p-value: '+str(round(pval,5)))
+print(c1+' - '+'unfiltereed')
+pval = stats.ttest_rel(Nit1_unf,Nit2_unf,alternative='less').pvalue
+print('  p-value: '+str(round(pval,5)))
+
+#%%
+"""
+Anova
+"""
+df2_col = wq_df2.columns
+df2_species = df2_col[1:6]
+wq_df2_long = pd.melt(wq_df2,id_vars = ['Name','Date_col','Filtered'],value_vars = df2_species)
+wq_df2_long.rename(columns = {'variable':'Species','value':'Conc'},inplace=True)
+wq_df2_long['Lab']='Lab2'
+
+wq_df['Lab']='Lab1'
+wq_df['Filtered']=True
+
+wq_df_nar = wq_df[wq_df2_long.columns]
