@@ -14,6 +14,8 @@ import matplotlib.pyplot as plt
 from scipy import stats
 import seaborn as sns
 # from sklearn.linear_model import LinearRegression
+import statsmodels.api as sm
+from statsmodels.formula.api import ols
 #%% bring in data
 
 user = os.getlogin() 
@@ -88,7 +90,8 @@ for row in range(wq_df.shape[0]):
         
     else:
         wq_df.loc[row,'Unf_code']=unf_code
-        
+
+wq_df_orig = wq_df
 wq_df = wq_df.loc[np.isnan(wq_df['Fil_code'])==False,:]
 
 # pivot wq_df to make separate species columns
@@ -143,7 +146,7 @@ for c1 in Lab1_fil.columns:
             x_reg = np.array([min(stack),max(stack)])
             y_reg = x_reg*slope+intercept
                 
-            y_text = min(stack)+(max(stack)-min(stack))*0.05
+            y_text = min(y_reg)+(max(y_reg)-(min(y_reg)))*0.05
             x_text = max(stack)-(max(stack)-min(stack))*0.4
             
             plt.figure()
@@ -154,10 +157,11 @@ for c1 in Lab1_fil.columns:
             plt.plot(x_reg,y_reg,'-k',label = 'regression line')
             plt.xlabel('Lab 1 '+c1+ ' (mg/L)')
             plt.ylabel('Lab 2 '+c1+ ' (mg/L)')
-            plt.legend()
+            plt.legend(loc = 'upper left')
             plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3))+
                      '\n'+'slope = '+str(np.round(slope,2))+'\n'+'intercept = '+
-                     str(np.round(intercept,3)))
+                     str(np.round(intercept,3))+'\n'+'p-value = '+
+                     str(np.round(p_value,3)))
 
 #%% make plot for Nitrate < 1
 sns.set_theme(font_scale = 1.25,style='ticks')
@@ -193,7 +197,8 @@ plt.ylabel('Lab 2 '+c1+ ' (mg/L)')
 plt.legend()
 plt.text(x_text,y_text,r'$r^2 =$'+str(np.round(r_value,3))+
          '\n'+'slope = '+str(np.round(slope,2))+'\n'+'intercept = '+
-         str(np.round(intercept,3)))
+         str(np.round(intercept,3))+'\n'+'p-value = '+
+         str(np.round(p_value,3)))
 
 #%% t-test
 
@@ -202,12 +207,40 @@ for c1 in Lab1_fil.columns:
         
         if c1==c2:
             
+            plt.figure()
+            plt.hist(Lab1_fil[c1],label = 'Lab 1',alpha = 0.5)
+            plt.hist(Lab2_fil[c2],label = 'Lab 2',alpha = 0.5)
+            plt.title(c1)
+            plt.legend()
+            
+            diffs = Lab1_fil[c1] - Lab2_fil[c2]
+            
+            plt.figure()
+            plt.hist(diffs,label = 'differences',alpha = 0.5)
+            plt.title(c1)
+            plt.legend()
+            
+            #t-test
+            print('t-test')
             print(c1+' - '+'filtereed')
             pval = stats.ttest_rel(Lab1_fil[c1],Lab2_fil[c2]).pvalue
             print('  p-value: '+str(round(pval,5)))
             print(c1+' - '+'unfiltereed')
             pval = stats.ttest_rel(Lab1_unf[c1],Lab2_unf[c2]).pvalue
             print('  p-value: '+str(round(pval,5)))
+            print('_________')
+            
+            #wilcoxon
+            pval = stats.wilcoxon(Lab1_fil[c1],Lab2_fil[c2]).pvalue
+            
+            print('Wilcoxon')
+            print(c1+' - '+'filtereed')
+            print('  p-value: '+str(round(pval,5)))
+            print(c1+' - '+'unfiltereed')
+
+            pval = stats.wilcoxon(Lab1_unf[c1],Lab2_unf[c2]).pvalue
+            print('  p-value: '+str(round(pval,5)))
+            print('_________')
 
 #%% t-test for sub Nitrate
 
@@ -222,16 +255,30 @@ Nit1_unf = Lab1_unf[c1][Lab1_unf[c1]<1]
 Nit2_unf = Lab2_unf[c2][Lab1_unf[c1]<1]
 
 print('two-sided')
+print('t-test')
 print(c1+' - '+'filtereed')
 pval = stats.ttest_rel(Nit1_fil,Nit2_fil).pvalue
 print('  p-value: '+str(round(pval,5)))
 print(c1+' - '+'unfiltereed')
+print('t-test')
 pval = stats.ttest_rel(Nit1_unf,Nit2_unf).pvalue
+print('  p-value: '+str(round(pval,5)))
+print('_________')
+
+
+print('two-sided')
+print('Wilcoxon')
+print(c1+' - '+'filtereed')
+pval = stats.wilcoxon(Nit1_fil,Nit2_fil).pvalue
+print('  p-value: '+str(round(pval,5)))
+print(c1+' - '+'unfiltereed')
+print('Wilcoxon')
+pval = stats.wilcoxon(Nit1_unf,Nit2_unf).pvalue
 print('  p-value: '+str(round(pval,5)))
 
 #%% One-sided t-test
 
-print('----------------')
+print('-----t-test-----')
 print('Alternative: Lab 1 > Lab 2')
 print(c1+' - '+'filtereed')
 pval = stats.ttest_rel(Nit1_fil,Nit2_fil,alternative='greater').pvalue
@@ -240,7 +287,7 @@ print(c1+' - '+'unfiltereed')
 pval = stats.ttest_rel(Nit1_unf,Nit2_unf,alternative='greater').pvalue
 print('  p-value: '+str(round(pval,5)))
 
-print('----------------')
+print('-----t-test-----')
 print('Alternative: Lab 1 < Lab 2')
 print(c1+' - '+'filtereed')
 pval = stats.ttest_rel(Nit1_fil,Nit2_fil,alternative='less').pvalue
@@ -249,17 +296,80 @@ print(c1+' - '+'unfiltereed')
 pval = stats.ttest_rel(Nit1_unf,Nit2_unf,alternative='less').pvalue
 print('  p-value: '+str(round(pval,5)))
 
+print('-----wilcoxon-----')
+print('Alternative: Lab 1 > Lab 2')
+print(c1+' - '+'filtereed')
+pval = stats.wilcoxon(Nit1_fil,Nit2_fil,alternative='greater').pvalue
+print('  p-value: '+str(round(pval,5)))
+print(c1+' - '+'unfiltereed')
+pval = stats.wilcoxon(Nit1_unf,Nit2_unf,alternative='greater').pvalue
+print('  p-value: '+str(round(pval,5)))
+
+print('-----wilcoxon-----')
+print('Alternative: Lab 1 < Lab 2')
+print(c1+' - '+'filtereed')
+pval = stats.wilcoxon(Nit1_fil,Nit2_fil,alternative='less').pvalue
+print('  p-value: '+str(round(pval,5)))
+print(c1+' - '+'unfiltereed')
+pval = stats.wilcoxon(Nit1_unf,Nit2_unf,alternative='less').pvalue
+print('  p-value: '+str(round(pval,5)))
+
 #%%
 """
 Anova
 """
+
+#%% make combined dataframe
 df2_col = wq_df2.columns
 df2_species = df2_col[1:6]
 wq_df2_long = pd.melt(wq_df2,id_vars = ['Name','Date_col','Filtered'],value_vars = df2_species)
 wq_df2_long.rename(columns = {'variable':'Species','value':'Conc'},inplace=True)
 wq_df2_long['Lab']='Lab2'
 
-wq_df['Lab']='Lab1'
-wq_df['Filtered']=True
+wq_df_orig['Lab']='Lab1'
+wq_df_orig['Filtered']=True
 
-wq_df_nar = wq_df[wq_df2_long.columns]
+wq_df_nar = wq_df_orig[wq_df2_long.columns]
+
+wq_df_anova = pd.concat([wq_df_nar,wq_df2_long])
+wq_df_anova.reset_index(drop = True, inplace = True)
+
+#%% make Q-Q plot
+
+species = wq_df_anova['Species'].unique()
+
+
+for s in species:
+    plt.figure()
+    stats.probplot(wq_df_anova[wq_df_anova['Species']==s]['Conc'],dist = 'norm',
+                   plot = plt)
+    plt.title('Probability Plot - '+ s)
+    
+# Data is not normal!
+
+#%% log transform
+
+wq_df_anova['log_Conc']=np.log(wq_df_anova['Conc'])
+wq_df_anova.dropna(inplace = True)
+wq_df_anova = wq_df_anova.loc[abs(wq_df_anova['log-Conc'])!=np.inf,:]
+
+for s in species:
+    plt.figure()
+    stats.probplot(wq_df_anova[wq_df_anova['Species']==s]['log-Conc'],dist = 'norm',
+                   plot = plt)
+    plt.title('Probability Plot - '+ s)
+    
+#%% perform ANOVA
+
+# Conc_lm = ols(formula = 'log_Conc ~ Name + Date_col + Filtered + Species + Lab',
+#               data = wq_df_anova).fit()
+
+# table = sm.stats.anova_lm(Conc_lm, typ = 2)
+# print(table)
+
+Conc_lm = ols(formula = 'log_Conc ~ Lab + Name + Filtered + Species + Date_col',
+              data = wq_df_anova).fit()
+
+table = sm.stats.anova_lm(Conc_lm, typ = 2)
+print(table)
+
