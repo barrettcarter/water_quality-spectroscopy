@@ -16,6 +16,7 @@ import seaborn as sns
 # from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
+from patsy import dmatrices
 #%% bring in data
 
 user = os.getlogin() 
@@ -351,25 +352,43 @@ for s in species:
 
 wq_df_anova['log_Conc']=np.log(wq_df_anova['Conc'])
 wq_df_anova.dropna(inplace = True)
-wq_df_anova = wq_df_anova.loc[abs(wq_df_anova['log-Conc'])!=np.inf,:]
+wq_df_anova = wq_df_anova.loc[abs(wq_df_anova['log_Conc'])!=np.inf,:]
 
 for s in species:
     plt.figure()
-    stats.probplot(wq_df_anova[wq_df_anova['Species']==s]['log-Conc'],dist = 'norm',
+    stats.probplot(wq_df_anova[wq_df_anova['Species']==s]['log_Conc'],dist = 'norm',
                    plot = plt)
-    plt.title('Probability Plot - '+ s)
+    plt.title('Probability Plot - log('+ s+')')
     
 #%% perform ANOVA
 
-# Conc_lm = ols(formula = 'log_Conc ~ Name + Date_col + Filtered + Species + Lab',
-#               data = wq_df_anova).fit()
-
-# table = sm.stats.anova_lm(Conc_lm, typ = 2)
-# print(table)
-
-Conc_lm = ols(formula = 'log_Conc ~ Lab + Name + Filtered + Species + Date_col',
+Conc_lm = ols(formula = 'log_Conc ~ Name + Date_col + Filtered + Species + Lab',
               data = wq_df_anova).fit()
 
 table = sm.stats.anova_lm(Conc_lm, typ = 2)
+print('With Collection Dates')
 print(table)
+print('----------------------------------')
+
+# Conc_lm = ols(formula = 'log_Conc ~ Name + Date_col + Filtered + Species + Lab + Date_col:Lab',
+#               data = wq_df_anova).fit()
+
+# table = sm.stats.anova_lm(Conc_lm, typ = 2)
+# print('With Interaction between Collection Dates and Lab')
+# print(table)
+# print('----------------------------------')
+
+Conc_lm = ols(formula = 'log_Conc ~ Lab + Name + Filtered + Species',
+              data = wq_df_anova).fit()
+
+table = sm.stats.anova_lm(Conc_lm, typ = 2)
+print('Without Collection Dates')
+print(table)
+
+#%% Kruskal-Wallis
+
+dmatrices('Conc ~ Name + Date_col + Filtered + Species + Lab',
+                 data = wq_df_anova)
+
+
 
