@@ -10,8 +10,8 @@ import numpy as np
 import os
 import datetime as dt
 import matplotlib.pyplot as plt
-import scipy
-from scipy import stats
+# import scipy
+# from scipy import stats
 import seaborn as sns
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.metrics import r2_score
@@ -67,6 +67,10 @@ abs_df = abs_df.iloc[stream_abs,:]
 wq_df2 = wq_df2.loc[pd.notna(wq_df2['ARL_code']),:]
 wq_df2.reset_index(drop = True,inplace = True)
 
+# make ID column
+
+wq_df['ID']=wq_df['Name']+wq_df['Date_col']
+
 #%%
 
 ### Make dataframe with absorbances and water quality
@@ -80,6 +84,7 @@ abs_wq_df = abs_df
 abs_wq_df.loc[:,species] = -0.1
 abs_wq_df['ID']=abs_wq_df.Name+abs_wq_df.Date_col
 abs_wq_df = abs_wq_df[aw_df_cols]
+abs_wq_df.reset_index(drop = True,inplace = True)
 
 species = np.delete(species,len(species)-1) #get rid of ID
 
@@ -88,7 +93,7 @@ for wq_row in range(wq_df.shape[0]):
         if wq_df.ID[wq_row]==abs_wq_df.ID[abs_row]:
             for s in species:
                 if wq_df.Species[wq_row] == s:
-                    abs_wq_df.loc[abs_row,s]=wq_df.Value[wq_row]
+                    abs_wq_df.loc[abs_row,s]=wq_df.Conc[wq_row]
                              
 #%%
 #################################################################

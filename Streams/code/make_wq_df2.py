@@ -41,8 +41,9 @@ wq_df2.loc[:,'TP'] = wq_df2.loc[:,'TP']/1000
 # select only relevant codes
 wq_codes = wq_codes.iloc[0:wq_df2.shape[0],:]
 
-# create sample IDs
+# create sample Name and ID columns
 
+wq_df2['Name'] = wq_codes['Name']
 wq_df2['ID']=wq_codes['Name']+wq_codes['Date_col']
 
 # mark problematic data from 11/5/2020
