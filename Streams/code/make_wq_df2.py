@@ -44,6 +44,8 @@ wq_codes = wq_codes.iloc[0:wq_df2.shape[0],:]
 # create sample Name and ID columns
 
 wq_df2['Name'] = wq_codes['Name']
+wq_df2['Date_col']=wq_codes['Date_col']
+wq_df2['Filtered']=wq_codes['Filtered']
 wq_df2['ID']=wq_codes['Name']+wq_codes['Date_col']
 
 # mark problematic data from 11/5/2020
