@@ -25,10 +25,6 @@ def make_datetime(date_string):
     else:
         return('ERROR: Date not in right format (MM/DD/YYYY)')
 
-def bool2string(a_bool):
-    a_str = str(a_bool)
-    return(a_str)
-
 #%%
 
 ### Set paths and bring in data
@@ -37,7 +33,7 @@ user = os.getlogin()
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 abs_df_dir=os.path.join(path_to_wqs,'Data/spectra/')
 wq_df_dir=os.path.join(path_to_wqs,'Streams/inputs/water_quality/')
-output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
+inter_dir = os.path.join(path_to_wqs,'Streams/intermediates/')
 
 
 wq_df_fn = 'wq_streams_aj_df.csv'
@@ -106,8 +102,8 @@ wq_df2.reset_index(drop = True,inplace = True)
 
 # Make new ID row (ID2) for matching up abs and wq2 data by adding in filtration
 
-abs_df['ID2'] = abs_df.Filtered.apply(lambda x: bool2string(x))+abs_df.ID
-wq_df2['ID2'] = wq_df2.Filtered.apply(lambda x: bool2string(x))+wq_df2.ID
+abs_df['ID2'] = abs_df.Filtered.apply(lambda x: str(x))+abs_df.ID
+wq_df2['ID2'] = wq_df2.Filtered.apply(lambda x: str(x))+wq_df2.ID
 
 
 #%%
@@ -141,4 +137,8 @@ for wq_ID in wq_df2.ID2:
     for s in ['TKN','TP','Phosphate-P']:
         if s in wq_df2.columns:
             abs_wq_df.loc[abs_wq_df.ID2==wq_ID,s] = float(wq_df2.loc[wq_df2.ID2==wq_ID,s].values)
+
+#%% Save data as csv
+
+abs_wq_df.to_csv(inter_dir+'abs_wq_df_streams.csv')
             
