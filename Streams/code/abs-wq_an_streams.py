@@ -32,72 +32,15 @@ sorted(sklearn.metrics.SCORERS.keys())
 
 user = os.getlogin() 
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-abs_df_dir=os.path.join(path_to_wqs,'Data/spectra/')
-wq_df_dir=os.path.join(path_to_wqs,'Streams/inputs/water_quality/')
+inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 
-
-wq_df_fn = 'wq_streams_aj_df.csv'
-wq_df_fn2 = 'wq_streams_arl_df.csv'
-wq_codes_fn = 'ARL_codes.csv'
-abs_df_fn = 'abs_df_u2d.csv'
+abs_wq_df_fn = 'abs_wq_df_streams.csv'
 
 # Bring in data
-abs_df=pd.read_csv(abs_df_dir+abs_df_fn)
-wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
-wq_df2=pd.read_csv(wq_df_dir+wq_df_fn2)
-wq_codes = pd.read_csv(wq_df_dir+wq_codes_fn)
-
-#%%
-
-### Some data wrangling
-
-# Select only stream samples
-
-stream_names = wq_df['Name'].unique()
-
-stream_abs = []
-
-for n in abs_df.Name:
-    stream_abs.append(any(stream_names==n))
-
-abs_df = abs_df.iloc[stream_abs,:]
-
-# Clean up wq_df2
-
-wq_df2 = wq_df2.loc[pd.notna(wq_df2['ARL_code']),:]
-wq_df2.reset_index(drop = True,inplace = True)
-
-# make ID column
-
-wq_df['ID']=wq_df['Name']+wq_df['Date_col']
-
-#%%
-
-### Make dataframe with absorbances and water quality
-
-species = wq_df.Species.unique()
-species = np.concatenate((species,['TKN','TP','ID']))
-species = np.delete(species,0) #get rid of Ammonium
-aw_df_cols = np.append(species,abs_df.columns)
-abs_wq_df = abs_df
-
-abs_wq_df.loc[:,species] = -0.1
-abs_wq_df['ID']=abs_wq_df.Name+abs_wq_df.Date_col
-abs_wq_df = abs_wq_df[aw_df_cols]
-abs_wq_df.reset_index(drop = True,inplace = True)
-
-species = np.delete(species,len(species)-1) #get rid of ID
-
-for wq_row in range(wq_df.shape[0]):
-    for abs_row in range(abs_wq_df.shape[0]):
-        if wq_df.ID[wq_row]==abs_wq_df.ID[abs_row]:
-            for s in species:
-                if wq_df.Species[wq_row] == s:
-                    abs_wq_df.loc[abs_row,s]=wq_df.Conc[wq_row]
+abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
                              
 #%%
 #################################################################
-
 
 ### Tuning the models
 
@@ -111,7 +54,7 @@ for rs in range(10):
     # keep = abs_wq_df['Name'].isin(['hogdn','hat'])
     # X = abs_wq_df.loc[:,'band_1':'band_1024'].to_numpy()
     Y = abs_wq_df['Nitrate-N']
-    keep = Y>0
+    keep = pd.notna(Y)
     X = abs_wq_df.loc[keep,'band_1':'band_1024']
     Y = Y[keep]
     
@@ -166,7 +109,7 @@ for rs in range(10):
     # plt.plot(line11,linelr,label = 'regression line')
     plt.xlabel('Lab Measured Nitrate (mg/L)')
     plt.ylabel('Predicted Nitrate (mg/L)')
-    plt.text(170,200,r'$r^2 =$'+str(np.round(r_sq,3)))
+    plt.text(0.8*max(line11),min(line11),r'$r^2 =$'+str(np.round(r_sq,3)))
     plt.title('Test Set')
     plt.legend()
     plt.show()
@@ -189,26 +132,26 @@ for rs in range(10):
 
 #%%
 
-# make better plot
-data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
-data_out = pd.concat([data_out,test_names,test_filt],axis=1)
+# # make better plot
+# data_out = pd.DataFrame({'y_test':y_test,'y_pred':Y_hat[:,0]})
+# data_out = pd.concat([data_out,test_names,test_filt],axis=1)
 
-sns.set_theme(style ='ticks',font_scale = 1.25,
-              palette = 'colorblind')
+# sns.set_theme(style ='ticks',font_scale = 1.25,
+#               palette = 'colorblind')
 
-g = sns.relplot(
-    data=data_out,
-    x = 'y_test',
-    y = 'y_pred',
-    hue = 'Filtered',
-    style = 'Name',
-    s = 60
-    )
+# g = sns.relplot(
+#     data=data_out,
+#     x = 'y_test',
+#     y = 'y_pred',
+#     hue = 'Filtered',
+#     style = 'Name',
+#     s = 60
+#     )
 
-plt.plot(line11,line11,label= '1:1 line',color = 'k',ls = 'dashed')
-plt.xlabel('Lab Measured Nitrate (mg/L)')
-plt.ylabel('Predicted Nitrate (mg/L)')
-plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
+# plt.plot(line11,line11,label= '1:1 line',color = 'k',ls = 'dashed')
+# plt.xlabel('Lab Measured Nitrate (mg/L)')
+# plt.ylabel('Predicted Nitrate (mg/L)')
+# plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
 #%% 
 ### Create a model for every species
@@ -272,6 +215,7 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
     return(sub_df)
 
 iteration = 1 # this is for testing
+
 
 
 for s in species:
