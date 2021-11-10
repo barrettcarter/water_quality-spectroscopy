@@ -242,7 +242,7 @@ def create_outputs(input_df):
         # X = name_dum
         
         
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=2,
+        X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
                                                             test_size = 0.3)
         # test_names = X_test.Name.reset_index(drop=True)
         # test_filt = X_test.Filtered.reset_index(drop=True)
