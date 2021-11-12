@@ -179,6 +179,8 @@ def create_outputs(input_df,num_epochs = 1000):
         
         y_train = y_train.repeat(multiplier, axis=0)
         
+        # X_train = pd.DataFrame(X_train)
+        
         """## Train/Val Split"""
         print('Full set:',X_train.shape)
         
@@ -248,9 +250,19 @@ def create_outputs(input_df,num_epochs = 1000):
         ### Write outputs
         
         for out in range(len(output_names)):
-            # print(out)
-            sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-            outputs_df = outputs_df.append(sub_df,ignore_index=True)
+            print(type(out))
+            try:
+                print(variable_names[out])
+                print(type(variable_names[out]))
+                print(type(output_names[out]))
+                sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
+                outputs_df = outputs_df.append(sub_df,ignore_index=True)
+            except AttributeError as e:
+                print(e)
+                import sys
+                sys.exit(0)
+        
+        return(outputs_df)
     
     ################################################################################ CHECK FITS
     
@@ -304,7 +316,7 @@ def create_outputs(input_df,num_epochs = 1000):
 
 #%% Create outputs
 
-create_outputs(abs_wq_df,num_epochs=5000)
+outputs_df = create_outputs(abs_wq_df,num_epochs=1000)
 
 #%%
 
