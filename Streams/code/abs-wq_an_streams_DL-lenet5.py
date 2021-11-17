@@ -31,6 +31,7 @@ from sklearn.metrics import mean_squared_error as MSE
 user = os.getlogin() 
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 spectra_path = os.path.join(path_to_wqs,'Streams/intermediates/')
+output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 abs_wq_fn = 'abs_wq_df_streams.csv'
 spectra_path = os.path.join(spectra_path,abs_wq_fn)
 os.path.exists(spectra_path)
@@ -102,7 +103,7 @@ def create_outputs(input_df,num_epochs = 1000):
                     'train_rmse','test_mape','train_mape']
     
     variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
-                      'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
+                      'list(y_test.index)','list(y_train.index)','r_sq','r_sq_train','RMSE_test',
                       'RMSE_train','MAPE_test','MAPE_train']
 ################################################################################ PROCESS
 
@@ -179,6 +180,8 @@ def create_outputs(input_df,num_epochs = 1000):
         
         y_train = y_train.repeat(multiplier, axis=0)
         
+        y_train = pd.Series(y_train[:,0])
+        
         # X_train = pd.DataFrame(X_train)
         
         """## Train/Val Split"""
@@ -188,6 +191,9 @@ def create_outputs(input_df,num_epochs = 1000):
                                                           random_state= iteration)
         X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.20,
                                                               random_state=iteration)
+        
+        
+        
         
         print('Train set:',X_train.shape)
         print('Validation set:',X_val.shape)
@@ -218,7 +224,7 @@ def create_outputs(input_df,num_epochs = 1000):
         lenet.add(Dropout(drop))
         lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
         lenet.add(Dropout(drop))
-        lenet.add(Dense(y_train.shape[1],activation = 'linear'))
+        lenet.add(Dense(1,activation = 'linear'))
         lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
         history = lenet.fit(
             X_train, y_train,
@@ -262,7 +268,7 @@ def create_outputs(input_df,num_epochs = 1000):
                 import sys
                 sys.exit(0)
         
-        return(outputs_df)
+        
     
     ################################################################################ CHECK FITS
     
@@ -278,47 +284,152 @@ def create_outputs(input_df,num_epochs = 1000):
         
         ################################################################################ PREDICT
         
-        val_i_y = predict([lenet], X_test)
-        val_v_y = predict([lenet], X_val)
-        val_m_y = predict([lenet], X_train)
+        # val_i_y = predict([lenet], X_test)
+        # val_v_y = predict([lenet], X_val)
+        # val_m_y = predict([lenet], X_train)
         
-        mod_x, mod_y = (np.expand_dims(y_train.flatten(), axis=1),np.expand_dims(val_m_y.flatten(), axis=1))
-        regr = linear_model.LinearRegression()
-        regr.fit(mod_x, mod_y)
-        y_pred = regr.predict(mod_x)
-        print('Model calibration',r2_score(mod_y, y_pred))
+        # mod_x, mod_y = (np.expand_dims(y_train.flatten(), axis=1),np.expand_dims(val_m_y.flatten(), axis=1))
+        # regr = linear_model.LinearRegression()
+        # regr.fit(mod_x, mod_y)
+        # y_pred = regr.predict(mod_x)
+        # print('Model calibration',r2_score(mod_y, y_pred))
         
-        int_x, int_y = (np.expand_dims(y_val.flatten(), axis=1),np.expand_dims(val_v_y.flatten(), axis=1))
-        regr = linear_model.LinearRegression()
-        regr.fit(int_x, int_y)
-        y_pred = regr.predict(int_x)
-        print('Internal validation',r2_score(int_y, y_pred))
+        # int_x, int_y = (np.expand_dims(y_val.flatten(), axis=1),np.expand_dims(val_v_y.flatten(), axis=1))
+        # regr = linear_model.LinearRegression()
+        # regr.fit(int_x, int_y)
+        # y_pred = regr.predict(int_x)
+        # print('Internal validation',r2_score(int_y, y_pred))
         
-        ext_x, ext_y = (np.expand_dims(y_test.flatten(), axis=1),np.expand_dims(val_i_y.flatten(), axis=1))
-        regr = linear_model.LinearRegression()
-        regr.fit(ext_x, ext_y)
-        y_pred = regr.predict(ext_x)
+        # ext_x, ext_y = (np.expand_dims(y_test.flatten(), axis=1),np.expand_dims(val_i_y.flatten(), axis=1))
+        # regr = linear_model.LinearRegression()
+        # regr.fit(ext_x, ext_y)
+        # y_pred = regr.predict(ext_x)
         
-        print('External validation',r2_score(ext_x, ext_y))
-        plt.figure(figsize=(12,8))
-        plt.scatter(ext_x, ext_y, c='red',alpha=0.5,s=200)
-        plt.scatter(int_x, int_y, c='blue',alpha=0.5,s=200)
-        plt.scatter(mod_x, mod_y, c='none',alpha=0.5,s=200,edgecolors='black')
-        #plt.plot(x, y_pred, linewidth=3)
-        plt.plot([np.min(mod_x),np.max(mod_x)], [np.min(mod_x),np.max(mod_x)], color='k', linestyle='--', linewidth=2)
+        # print('External validation',r2_score(ext_x, ext_y))
+        # plt.figure(figsize=(12,8))
+        # plt.scatter(ext_x, ext_y, c='red',alpha=0.5,s=200)
+        # plt.scatter(int_x, int_y, c='blue',alpha=0.5,s=200)
+        # plt.scatter(mod_x, mod_y, c='none',alpha=0.5,s=200,edgecolors='black')
+        # #plt.plot(x, y_pred, linewidth=3)
+        # plt.plot([np.min(mod_x),np.max(mod_x)], [np.min(mod_x),np.max(mod_x)], color='k', linestyle='--', linewidth=2)
         
-        #plt.ylim(0, 1)
-        #plt.xlim(0, 1)
-        plt.xlabel('Observed',fontsize=14)
-        plt.ylabel('Predicted',fontsize=14)
-        plt.title(s+f' model (R^2={round(r2_score(ext_x, ext_y), 2)})',fontsize=14)
-        plt.show()
+        # #plt.ylim(0, 1)
+        # #plt.xlim(0, 1)
+        # plt.xlabel('Observed',fontsize=14)
+        # plt.ylabel('Predicted',fontsize=14)
+        # plt.title(s+f' model (R^2={round(r2_score(ext_x, ext_y), 2)})',fontsize=14)
+        # plt.show()
+        
+    return(outputs_df)
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000)
+outputs_df = create_outputs(abs_wq_df,num_epochs=5000)
 
-#%%
+#%% Define function for making plots
+
+def make_plots(outputs_df, output_label):
+
+    ## make plots for both filtered and unfiltered samples
+        
+    fig, axs = plt.subplots(3,2)
+    fig.set_size_inches(10,15)
+    fig.suptitle(output_label,fontsize = 18)
+    fig.tight_layout(pad = 4)
+    axs[2, 1].axis('off')
+    row = 0
+    col = 0
+    species = outputs_df.species.unique()
+    for s in species:
+        y_true_train = outputs_df.loc[((outputs_df.species == s) &
+                                        (outputs_df.output == 'y_true_train')),
+                                       'value']
+        
+        y_hat_train = outputs_df.loc[((outputs_df.species == s) &
+                                        (outputs_df.output == 'y_hat_train')),
+                                       'value']
+        
+        y_true_test = outputs_df.loc[((outputs_df.species == s) &
+                                        (outputs_df.output == 'y_true_test')),
+                                       'value']
+        
+        y_hat_test = outputs_df.loc[((outputs_df.species == s) &
+                                        (outputs_df.output == 'y_hat_test')),
+                                       'value']
+        
+        line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
+                                                 y_true_test,y_hat_test))),
+                              max(np.concatenate((y_true_train,y_hat_train,
+                                                 y_true_test,y_hat_test))))
+        
+        y_text = min(line11)+(max(line11)-min(line11))*0
+        x_text = max(line11)-(max(line11)-min(line11))*0.5
+        
+        # lr = LinearRegression().fit(Y_hat,y_test)
+        # linelr = lr.predict(line11.reshape(-1,1))
+        
+        # plt.plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'predictions')
+        # plt.plot(line11,line11,label= '1:1 line')
+        # plt.title(s)
+        # # plt.plot(line11,linelr,label = 'regression line')
+        # plt.xlabel('Lab Measured '+s+' (mg/L)')
+        # plt.ylabel('Predicted '+s+' (mg/L)')
+        # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
+        # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
+        # plt.legend()
+        # plt.show()
+        
+        train_rsq = float(outputs_df['value'][(outputs_df.output == 'train_rsq')&
+                            (outputs_df.species==s)])
+        
+        test_rsq = float(outputs_df['value'][(outputs_df.output == 'test_rsq')&
+                            (outputs_df.species==s)])
+        
+        ax = axs[row,col]
+        
+        for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+            label.set_fontsize(16)
+        
+        axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
+        axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
+        axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
+        # axs[row,col].set_title(s)
+        axs[row,col].legend(loc = 'upper left',fontsize = 16)
+        axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
+        axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
+        # axs[row,col].get_xaxis().set_visible(False)
+        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
+                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
+        # ticks = ax.get_yticks()
+        # print(ticks)
+        # # tick_labels = ax.get_yticklabels()
+        # tick_labels =[str(round(x,1)) for x in ticks]
+        # tick_labels = tick_labels[1:-1]
+        # print(tick_labels)
+        # ax.set_xticks(ticks)
+        # ax.set_xticklabels(tick_labels)
+        
+        if col == 1:
+            col = 0
+            row += 1
+        else:
+            col +=1
+    # fig.show()
+    
+#%% make plots for all samples
+
+make_plots(outputs_df,'Filtered and Unfiltered Samples')
+# make_plots(outputs_df_fil,'Filtered Samples')
+# make_plots(outputs_df_unf,'Unfiltered Samples')
+
+#%% Save output file
+
+outputs_df.to_csv(output_dir+'streams_DL_B1_results.csv',index=False)
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+# Testing
 
 output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
@@ -338,5 +449,13 @@ for out in range(len(output_names)):
             print(s)
             print(iteration)
             
-        
+#%%
+
+v = abs_wq_df['TKN']
+eval('v.index')
+
+#%%
+
+v = v.values
+v = v.repeat(2,axis = 0)
 
