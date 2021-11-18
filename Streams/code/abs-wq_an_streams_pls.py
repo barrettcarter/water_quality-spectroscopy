@@ -162,7 +162,7 @@ abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 #%% Create function for writing outputs
 
-def create_outputs(input_df):
+def create_outputs(input_df,iterations = 1):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -228,127 +228,132 @@ def create_outputs(input_df):
     
     species = input_df.columns[1:6]
     
+    
+    
     for s in species:
-        Y = input_df[s]
-        keep = pd.notna(Y)
-        X = input_df.loc[keep,'band_1':'band_1024']
-        Y = Y[keep]
-        
-        # name_dum = pd.get_dummies(abs_wq_df['Name'])
-        # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
-        # X = abs_wq_df.loc[keep,:]
-        # Y = abs_wq_df.Nitrate[keep].to_numpy()
-        # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
-        # X = pd.concat([name_dum,X],axis=1).to_numpy()
-        # X = name_dum
-        
-        
-        X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
-                                                            test_size = 0.3)
-        # test_names = X_test.Name.reset_index(drop=True)
-        # test_filt = X_test.Filtered.reset_index(drop=True)
-        
-        # X_train = X_train.loc[:,'band_1':'band_1024']
-        # X_test = X_test.loc[:,'band_1':'band_1024']
-        param_grid = [{'n_components':np.arange(1,20)}]
-        pls = PLSRegression()
-        clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
-        # clf.cv_results_
-        # clf = GridSearchCV(pls,param_grid)
-        clf.fit(X_train,y_train)
-        n_comp = float(clf.best_params_['n_components'])
-        pls_opt = clf.best_estimator_
-        Y_hat = list(pls_opt.predict(X_test)[:,0])
-        Y_hat_train = list(pls_opt.predict(X_train)[:,0])
-        
-        r_sq = float(pls_opt.score(X_test,y_test))
-        r_sq_train = float(pls_opt.score(X_train,y_train))
-        
-        MSE_test = MSE(y_test,Y_hat)
-        RMSE_test = float(np.sqrt(MSE_test))
-        
-        MSE_train = MSE(y_train,Y_hat_train)
-        RMSE_train = float(np.sqrt(MSE_train))
-        
-        abs_test_errors = abs(y_test-Y_hat)
-        APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
-        MAPE_test = float(np.mean(APE_test)*100) # this is percentage
-        
-        abs_train_errors = abs(y_train-Y_hat_train)
-        APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
-        MAPE_train = float(np.mean(APE_train)*100) # this is percentage
-        
-        
-        # y_hat_test_dict[s].extend(list(Y_hat))
-        # y_hat_train_dict[s].extend(list(Y_hat_train))
-        # test_ind_dict[s].extend(list(X_test.index))
-        # train_ind_dict[s].extend(list(X_train.index))
-        # test_rsq_dict[s].append(float(r_sq))
-        # train_rsq_dict[s].append(float(r_sq_train))
-        # test_rmse_dict[s].append(float(RMSE_test))
-        # train_rmse_dict[s].append(float(RMSE_train))
-        # test_mape_dict[s].append(float(MAPE_test))
-        # train_mape_dict[s].append(float(MAPE_train))
-        # n_comp_dict[s].append(float(n_comp))
-        
-        # sub_df = pd.DataFrame(columns= ['output','species','iteration','value'])
-        # sub_df['value']=r_sq
-        # sub_df['output']='test_rsq'
-        # sub_df['species']=s
-        # sub_df['iteration']=iteration
+        for iteration in range(iterations):
+            print('Analyzing '+s)
+            print('Iteration - '+str(iteration))
+            Y = input_df[s]
+            keep = pd.notna(Y)
+            X = input_df.loc[keep,'band_1':'band_1024']
+            Y = Y[keep]
             
-        # sub_df = write_output_df(r_sq, 'test_rsq', s, iteration)
-        # outputs_df = outputs_df.append(sub_df,ignore_index=True)
-        
-        for out in range(len(output_names)):
-            # print(out)
-            sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-            outputs_df = outputs_df.append(sub_df,ignore_index=True)
-        
-        # plt.plot(Y_hat,y_test,'b.')
-        
-        # line11 = np.linspace(min(np.concatenate((y_test,Y_hat))),
-        #                      max(np.concatenate((y_test,Y_hat))))
-        
-        # y_text1 = min(line11)+(max(line11)-min(line11))*0.05
-        # y_text2 = min(line11)+(max(line11)-min(line11))*0.15
-        # x_text = max(line11)-(max(line11)-min(line11))*0.3
-        
-        # # lr = LinearRegression().fit(Y_hat,y_test)
-        # # linelr = lr.predict(line11.reshape(-1,1))
-        
-        # plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
-        # plt.plot(line11,line11,label= '1:1 line')
-        # plt.title('Test Set')
-        # # plt.plot(line11,linelr,label = 'regression line')
-        # plt.xlabel('Lab Measured '+s+' (mg/L)')
-        # plt.ylabel('Predicted '+s+' (mg/L)')
-        # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
-        # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
-        # plt.legend()
-        # plt.show()
-        
-        # line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train))),
-        #                      max(np.concatenate((y_train,Y_hat_train))))
-        
-        # y_text1 = min(line11)+(max(line11)-min(line11))*0.05
-        # y_text2 = min(line11)+(max(line11)-min(line11))*0.15
-        
-        # x_text = max(line11)-(max(line11)-min(line11))*0.3
-        
-        # # lr = LinearRegression().fit(Y_hat,y_test)
-        # # linelr = lr.predict(line11.reshape(-1,1))
-        
-        # plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
-        # plt.plot(line11,line11,label= '1:1 line')
-        # plt.title('Training Set')
-        # # plt.plot(line11,linelr,label = 'regression line')
-        # plt.xlabel('Lab Measured '+s+' (mg/L)')
-        # plt.ylabel('Predicted '+s+' (mg/L)')
-        # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq_train,3)))
-        # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_train,1))+'%')
-        # plt.legend()
-        # plt.show()
+            # name_dum = pd.get_dummies(abs_wq_df['Name'])
+            # filtered_dum = pd.get_dummies(abs_wq_df['Filtered'])
+            # X = abs_wq_df.loc[keep,:]
+            # Y = abs_wq_df.Nitrate[keep].to_numpy()
+            # name_dum = pd.get_dummies(abs_wq_df['Name'][keep])
+            # X = pd.concat([name_dum,X],axis=1).to_numpy()
+            # X = name_dum
+            
+            
+            X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
+                                                                test_size = 0.3)
+            # test_names = X_test.Name.reset_index(drop=True)
+            # test_filt = X_test.Filtered.reset_index(drop=True)
+            
+            # X_train = X_train.loc[:,'band_1':'band_1024']
+            # X_test = X_test.loc[:,'band_1':'band_1024']
+            param_grid = [{'n_components':np.arange(1,20)}]
+            pls = PLSRegression()
+            clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
+            # clf.cv_results_
+            # clf = GridSearchCV(pls,param_grid)
+            clf.fit(X_train,y_train)
+            n_comp = float(clf.best_params_['n_components'])
+            pls_opt = clf.best_estimator_
+            Y_hat = list(pls_opt.predict(X_test)[:,0])
+            Y_hat_train = list(pls_opt.predict(X_train)[:,0])
+            
+            r_sq = float(pls_opt.score(X_test,y_test))
+            r_sq_train = float(pls_opt.score(X_train,y_train))
+            
+            MSE_test = MSE(y_test,Y_hat)
+            RMSE_test = float(np.sqrt(MSE_test))
+            
+            MSE_train = MSE(y_train,Y_hat_train)
+            RMSE_train = float(np.sqrt(MSE_train))
+            
+            abs_test_errors = abs(y_test-Y_hat)
+            APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
+            MAPE_test = float(np.mean(APE_test)*100) # this is percentage
+            
+            abs_train_errors = abs(y_train-Y_hat_train)
+            APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
+            MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+            
+            
+            # y_hat_test_dict[s].extend(list(Y_hat))
+            # y_hat_train_dict[s].extend(list(Y_hat_train))
+            # test_ind_dict[s].extend(list(X_test.index))
+            # train_ind_dict[s].extend(list(X_train.index))
+            # test_rsq_dict[s].append(float(r_sq))
+            # train_rsq_dict[s].append(float(r_sq_train))
+            # test_rmse_dict[s].append(float(RMSE_test))
+            # train_rmse_dict[s].append(float(RMSE_train))
+            # test_mape_dict[s].append(float(MAPE_test))
+            # train_mape_dict[s].append(float(MAPE_train))
+            # n_comp_dict[s].append(float(n_comp))
+            
+            # sub_df = pd.DataFrame(columns= ['output','species','iteration','value'])
+            # sub_df['value']=r_sq
+            # sub_df['output']='test_rsq'
+            # sub_df['species']=s
+            # sub_df['iteration']=iteration
+                
+            # sub_df = write_output_df(r_sq, 'test_rsq', s, iteration)
+            # outputs_df = outputs_df.append(sub_df,ignore_index=True)
+            
+            for out in range(len(output_names)):
+                # print(out)
+                sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
+                outputs_df = outputs_df.append(sub_df,ignore_index=True)
+            
+            # plt.plot(Y_hat,y_test,'b.')
+            
+            # line11 = np.linspace(min(np.concatenate((y_test,Y_hat))),
+            #                      max(np.concatenate((y_test,Y_hat))))
+            
+            # y_text1 = min(line11)+(max(line11)-min(line11))*0.05
+            # y_text2 = min(line11)+(max(line11)-min(line11))*0.15
+            # x_text = max(line11)-(max(line11)-min(line11))*0.3
+            
+            # # lr = LinearRegression().fit(Y_hat,y_test)
+            # # linelr = lr.predict(line11.reshape(-1,1))
+            
+            # plt.plot(y_test,Y_hat,'o',markersize = 4, label = 'predictions')
+            # plt.plot(line11,line11,label= '1:1 line')
+            # plt.title('Test Set')
+            # # plt.plot(line11,linelr,label = 'regression line')
+            # plt.xlabel('Lab Measured '+s+' (mg/L)')
+            # plt.ylabel('Predicted '+s+' (mg/L)')
+            # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
+            # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
+            # plt.legend()
+            # plt.show()
+            
+            # line11 = np.linspace(min(np.concatenate((y_train,Y_hat_train))),
+            #                      max(np.concatenate((y_train,Y_hat_train))))
+            
+            # y_text1 = min(line11)+(max(line11)-min(line11))*0.05
+            # y_text2 = min(line11)+(max(line11)-min(line11))*0.15
+            
+            # x_text = max(line11)-(max(line11)-min(line11))*0.3
+            
+            # # lr = LinearRegression().fit(Y_hat,y_test)
+            # # linelr = lr.predict(line11.reshape(-1,1))
+            
+            # plt.plot(y_train,Y_hat_train,'o',markersize = 4, label = 'predictions')
+            # plt.plot(line11,line11,label= '1:1 line')
+            # plt.title('Training Set')
+            # # plt.plot(line11,linelr,label = 'regression line')
+            # plt.xlabel('Lab Measured '+s+' (mg/L)')
+            # plt.ylabel('Predicted '+s+' (mg/L)')
+            # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq_train,3)))
+            # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_train,1))+'%')
+            # plt.legend()
+            # plt.show()
         
     return(outputs_df)
 
@@ -412,11 +417,15 @@ def make_plots(outputs_df, output_label):
         # plt.legend()
         # plt.show()
         
-        train_rsq = float(outputs_df['value'][(outputs_df.output == 'train_rsq')&
-                            (outputs_df.species==s)])
+        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
+                            (outputs_df.species==s)]
         
-        test_rsq = float(outputs_df['value'][(outputs_df.output == 'test_rsq')&
-                            (outputs_df.species==s)])
+        train_rsq = np.mean(train_rsq)
+        
+        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
+                            (outputs_df.species==s)]
+        
+        test_rsq = np.mean(test_rsq)
         
         ax = axs[row,col]
         
@@ -457,4 +466,17 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save plots
 
-outputs_df.to_csv(output_dir+'streams_PLS_B1_results.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_PLS_B10_results.csv',index=False)
+
+#%% make and save outputs
+
+def make_and_save_outputs(input_df,output_path,iterations = 1):
+    outputs_df = create_outputs(input_df,iterations)
+    outputs_df.to_csv(output_path,index=False)
+    
+#%% do it.
+
+make_and_save_outputs(abs_wq_df,output_dir+'streams_PLS_B1_results.csv')
+
+
+    
