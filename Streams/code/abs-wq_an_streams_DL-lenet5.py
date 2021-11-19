@@ -20,7 +20,7 @@ from keras.regularizers import l2
 from keras.optimizers import Adam
 # import skopt
 # from scipy.signal import savgol_filter
-from sklearn import linear_model
+# from sklearn import linear_model
 # from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error as MSE
@@ -74,10 +74,8 @@ def predict(models, input):
         output += model.predict(input).flatten()
     return output / len(models)
 
-#%% Create function for producing and writing model outputs
+#%% Creat function for writing output files
 
-def create_outputs(input_df,num_epochs = 1000,iterations = 1):
-    
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
         if isinstance(the_output,float):
@@ -92,6 +90,10 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
         else:
             print('Error: outputs must be of type list or float')
         return(sub_df)
+
+#%% Create function for producing and writing model outputs
+
+def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     
     ### Create a model for every species
     # s = 'Molybdenum'
@@ -326,7 +328,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 2)
+outputs_df = create_outputs(abs_wq_df,num_epochs=5000,iterations = 1)
 
 #%% Define function for making plots
 
