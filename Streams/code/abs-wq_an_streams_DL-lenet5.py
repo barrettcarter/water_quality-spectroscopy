@@ -105,7 +105,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
                     'train_rmse','test_mape','train_mape']
     
     variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
-                      'list(y_test.index)','list(y_train.index)','r_sq','r_sq_train','RMSE_test',
+                      'y_test_ind','y_train_ind','r_sq','r_sq_train','RMSE_test',
                       'RMSE_train','MAPE_test','MAPE_train']
 ################################################################################ PROCESS
 
@@ -155,36 +155,10 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     for s in species:
         
         for iteration in range(iterations):
-        
-            ds_y=df.loc[df[s]>0,s].values
-            # ds_y=df[[s]][df[[s]]>0].values
-            ds_y.shape=(len(ds_y),1)
-            y_train=ds_y
-            
-            """## Augmentation TEST"""
-            
-            # x = X_train[0:1]
-            # x = np.repeat(x, 10, 0)
-            # x_aug = augment(x, .1, .3, .1)
-            
-            # plt.figure(figsize=(8, 6))
-            # plt.plot(x_aug.T)
-            # plt.plot(x.T, lw=3, c='b')
-            # #plt.ylim(0, 1)
-            # plt.xlabel('Wavelength Index')
-            # plt.ylabel('Reflectance (Normalized)')
-            # plt.title('Data Augmentation Sample (Exagerated Shifts)')
-            
-            """## Augmentation"""
             
             X_train=ds_x_smooth[df[s]>0,:]
-            multiplier = augmentRatio
-            X_train = X_train.repeat(multiplier, axis=0)
-            X_train = augment(X_train, .01, .01, .01)
-            
-            y_train = y_train.repeat(multiplier, axis=0)
-            
-            y_train = pd.Series(y_train[:,0])
+
+            y_train = df.loc[df[s]>0,s]
             
             # X_train = pd.DataFrame(X_train)
             
@@ -196,9 +170,22 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
             X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.20,
                                                                   random_state=iteration)
             
+            y_train_ind = list(y_train.index)
+            y_test_ind = list(y_test.index)
             
+            """## Augmentation"""
             
+            multiplier = augmentRatio
+
+            y_train = y_train.to_numpy()
+            y_train.shape=(len(y_train),1)
             
+            y_train = y_train.repeat(multiplier, axis=0)
+            
+            X_train = X_train.repeat(multiplier, axis=0)
+            X_train = augment(X_train, .01, .01, .01)
+            
+            print(s)
             print('Train set:',X_train.shape)
             print('Validation set:',X_val.shape)
             print('External set:',X_test.shape)
@@ -233,7 +220,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
             history = lenet.fit(
                 X_train, y_train,
                 epochs=num_epochs, batch_size=int(1e10),
-                verbose=2,
+                verbose=0,
                 validation_data=(X_val, y_val),
             )
         
@@ -242,6 +229,9 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
             
             r_sq = float(r2_score(y_test,Y_hat))
             r_sq_train = float(r2_score(y_train,Y_hat_train))
+            
+            print('Training r-squared: '+str(r_sq_train))
+            print('Test r-squared: '+str(r_sq))
             
             MSE_test = MSE(y_test,Y_hat)
             RMSE_test = float(np.sqrt(MSE_test))
