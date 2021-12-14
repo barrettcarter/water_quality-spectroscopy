@@ -110,7 +110,7 @@ wq_df2['ID2'] = wq_df2.Filtered.apply(lambda x: str(x))+wq_df2.ID
 
 ### Make dataframe with absorbances and water quality
 
-species = ['Ammonium-N','Nitrate-N','Phosphate-P','TP','TKN']
+species = ['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 # species = np.delete(species,0) #get rid of Ammonium
 new_cols = np.concatenate((species,['ID','ID2']))
 aw_df_cols = np.append(new_cols,abs_df.columns[0:1031])
@@ -137,6 +137,13 @@ for wq_ID in wq_df2.ID2:
     for s in ['TKN','TP','Phosphate-P']:
         if s in wq_df2.columns:
             abs_wq_df.loc[abs_wq_df.ID2==wq_ID,s] = float(wq_df2.loc[wq_df2.ID2==wq_ID,s].values)
+
+#%% Calculate ON, OP, and TN
+
+abs_wq_df.ON = abs_wq_df.TKN-abs_wq_df['Ammonium-N']
+abs_wq_df.OP = abs_wq_df.TP-abs_wq_df['Phosphate-P']
+abs_wq_df.TN = abs_wq_df.TKN+abs_wq_df['Nitrate-N']
+
 
 #%% Save data as csv
 
