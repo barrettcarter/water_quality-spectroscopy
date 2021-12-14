@@ -318,7 +318,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=5000,iterations = 1)
+outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 1)
 
 #%% Define function for making plots
 
@@ -357,7 +357,7 @@ def make_plots(outputs_df, output_label):
                                                  y_true_test,y_hat_test))))
         
         y_text = min(line11)+(max(line11)-min(line11))*0
-        x_text = max(line11)-(max(line11)-min(line11))*0.5
+        x_text = max(line11)-(max(line11)-min(line11))*0.6
         
         # lr = LinearRegression().fit(Y_hat,y_test)
         # linelr = lr.predict(line11.reshape(-1,1))
@@ -373,10 +373,10 @@ def make_plots(outputs_df, output_label):
         # plt.legend()
         # plt.show()
         
-        train_rsq = float(outputs_df['value'][(outputs_df.output == 'train_rsq')&
+        train_rmse = float(outputs_df['value'][(outputs_df.output == 'train_rmse')&
                             (outputs_df.species==s)])
         
-        test_rsq = float(outputs_df['value'][(outputs_df.output == 'test_rsq')&
+        test_rmse = float(outputs_df['value'][(outputs_df.output == 'test_rmse')&
                             (outputs_df.species==s)])
         
         ax = axs[row,col]
@@ -392,8 +392,8 @@ def make_plots(outputs_df, output_label):
         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
         # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
-                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
+        ax.text(x_text,y_text,r'$train\/rmse =$'+str(np.round(train_rmse,3))+'\n'
+                +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 16)
         # ticks = ax.get_yticks()
         # print(ticks)
         # # tick_labels = ax.get_yticklabels()
