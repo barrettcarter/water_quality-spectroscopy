@@ -76,20 +76,20 @@ def predict(models, input):
 
 #%% Creat function for writing output files
 
-    def write_output_df(the_output,output_name,species_name,iteration_num):
-    
-        if isinstance(the_output,float):
-            sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
-                                           columns= ['output','species','iteration','value'])
-        elif isinstance(the_output,list):
-            sub_df = pd.DataFrame(columns= ['output','species','iteration','value'])
-            sub_df['value']=the_output
-            sub_df['output']=output_name
-            sub_df['species']=species_name
-            sub_df['iteration']=iteration_num
-        else:
-            print('Error: outputs must be of type list or float')
-        return(sub_df)
+def write_output_df(the_output,output_name,species_name,iteration_num):
+
+    if isinstance(the_output,float):
+        sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
+                                       columns= ['output','species','iteration','value'])
+    elif isinstance(the_output,list):
+        sub_df = pd.DataFrame(columns= ['output','species','iteration','value'])
+        sub_df['value']=the_output
+        sub_df['output']=output_name
+        sub_df['species']=species_name
+        sub_df['iteration']=iteration_num
+    else:
+        print('Error: outputs must be of type list or float')
+    return(sub_df)
 
 #%% Create function for producing and writing model outputs
 
@@ -428,8 +428,8 @@ def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_B10_results.csv',
-                      its = 10, eps = 5000)
+make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It1_results.csv',
+                      its = 1, eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
