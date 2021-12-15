@@ -39,7 +39,7 @@ np.random.seed(7)
 
 #%%
 
-species=['Nitrate-N', 'Ammonium-N', 'Phosphate-P','TKN','TP']
+species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
 iEpochs=5000
 
@@ -326,8 +326,8 @@ def make_plots(outputs_df, output_label):
 
     ## make plots for both filtered and unfiltered samples
         
-    fig, axs = plt.subplots(3,2)
-    fig.set_size_inches(10,15)
+    fig, axs = plt.subplots(4,2)
+    fig.set_size_inches(10,20)
     fig.suptitle(output_label,fontsize = 18)
     fig.tight_layout(pad = 4)
     axs[2, 1].axis('off')
@@ -428,8 +428,8 @@ def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It1_results.csv',
-                      its = 1, eps = 5000)
+make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0-9_results.csv',
+                      its = 10, eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
