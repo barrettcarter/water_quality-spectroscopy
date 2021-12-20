@@ -8,9 +8,9 @@ Created on Mon Nov 22 08:50:22 2021
 import pandas as pd
 
 import os
-import numpy as np
-import pandas as pd
-from matplotlib import pyplot as plt
+# import numpy as np
+# import pandas as pd
+# from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
 # from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -24,8 +24,8 @@ from matplotlib import pyplot as plt
 # from scipy.signal import savgol_filter
 # from sklearn import linear_model
 # from sklearn.metrics import mean_squared_error, r2_score
-from sklearn.metrics import r2_score
-from sklearn.metrics import mean_squared_error as MSE
+# from sklearn.metrics import r2_score
+# from sklearn.metrics import mean_squared_error as MSE
 import seaborn as sns
 
 #%% Set parameters
@@ -33,12 +33,13 @@ import seaborn as sns
 user = os.getlogin() 
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
-results_pls_fn = 'streams_PLS_It10_results.csv'
+results_pls_fn = 'streams_PLS_It0-9_results.csv'
 results_dl_fn = 'streams_DL_It0-9_results.csv'
 results_path = os.path.join(path_to_wqs,output_dir)
 
-sns.set_style("ticks")
-sns.set_palette('colorblind')
+# sns.set_style("ticks")
+# sns.set_palette('colorblind')
+sns.set(style = 'ticks',font_scale=2, palette = 'colorblind')
 
 #%% Bring in data
 
@@ -64,6 +65,9 @@ species.sort(key = lambda x: x[-1])
 test_rmses = results_df.loc[results_df['output'] == 'test_rmse',:]
 test_rmses.reset_index(inplace = True)
 test_rmses.value = test_rmses.value.apply(lambda x: float(x))
+test_rmses.rename(columns = {'value':'test rmse (ppm)'},inplace = True)
 
-test_rmse_plot = sns.catplot(x='model',y='value',col = 'species',col_wrap=2,
+#%% make plot
+
+test_rmse_plot = sns.catplot(x='model',y='test rmse (ppm)',col = 'species',col_wrap=3,
                              data = test_rmses,kind = 'violin')
