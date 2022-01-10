@@ -93,7 +93,8 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 
 #%% Create a function for making the outputs
 
-def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration):
+def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
+                 variable_names):
 
     X_train=ds_x_smooth[df[s]>0,:]
 
@@ -200,6 +201,8 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration):
             print(e)
             import sys
             sys.exit(0)
+            
+    return(outputs_df)
     
     
 
@@ -324,19 +327,21 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     
     # v = species[12]
     # v="Molybdenum"
-    iteration = 1
+    # iteration = 1
     df = input_df
     for s in species:
         
         if type(iterations)==int:
             
-            make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration)
+            outputs_df = make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iterations,
+                         output_names,variable_names)
         
         else:
         
             for iteration in iterations:
                 
-                make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration)
+                outputs_df = make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,
+                             output_names,variable_names)
         
     return(outputs_df)
 
