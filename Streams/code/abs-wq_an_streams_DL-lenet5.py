@@ -91,6 +91,168 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
         print('Error: outputs must be of type list or float')
     return(sub_df)
 
+#%% Create a function for making the outputs
+
+def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration):
+
+    X_train=ds_x_smooth[df[s]>0,:]
+
+    y_train = df.loc[df[s]>0,s]
+    
+    # X_train = pd.DataFrame(X_train)
+    
+    """## Train/Val Split"""
+    print('Full set:',X_train.shape)
+    
+    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=.25,
+                                                      random_state= iteration)
+    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.20,
+                                                          random_state=iteration)
+    
+    y_train_ind = list(y_train.index)
+    y_test_ind = list(y_test.index)
+    
+    """## Augmentation"""
+    
+    multiplier = augmentRatio
+
+    y_train = y_train.to_numpy()
+    y_train.shape=(len(y_train),1)
+    
+    y_train = y_train.repeat(multiplier, axis=0)
+    
+    X_train = X_train.repeat(multiplier, axis=0)
+    X_train = augment(X_train, .01, .01, .01)
+    
+    print(s)
+    print('Train set:',X_train.shape)
+    print('Validation set:',X_val.shape)
+    print('External set:',X_test.shape)
+    
+    """## Add Dimension
+    """
+    X_train = add_dimension(X_train)
+    X_val = add_dimension(X_val)
+    X_test = add_dimension(X_test)
+    
+    """# Training Creation
+    
+    ## LeNet 5
+    """
+    
+    drop = 0.05
+    reg = .01
+    
+    lenet = Sequential()
+    lenet.add(Conv1D(6, 1,activation='selu',input_shape=(1, X_train.shape[2])))
+    lenet.add(Dropout(drop))
+    lenet.add(AveragePooling1D(1))
+    lenet.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+    lenet.add(Dropout(drop))
+    lenet.add(Flatten())
+    lenet.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+    lenet.add(Dropout(drop))
+    lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+    lenet.add(Dropout(drop))
+    lenet.add(Dense(1,activation = 'linear'))
+    lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
+    history = lenet.fit(
+        X_train, y_train,
+        epochs=num_epochs, batch_size=int(1e10),
+        verbose=0,
+        validation_data=(X_val, y_val),
+    )
+
+    Y_hat = list(predict([lenet], X_test))
+    Y_hat_train = list(predict([lenet], X_train))
+    
+    r_sq = float(r2_score(y_test,Y_hat))
+    r_sq_train = float(r2_score(y_train,Y_hat_train))
+    
+    print('Training r-squared: '+str(r_sq_train))
+    print('Test r-squared: '+str(r_sq))
+    
+    MSE_test = MSE(y_test,Y_hat)
+    RMSE_test = float(np.sqrt(MSE_test))
+    
+    MSE_train = MSE(y_train,Y_hat_train)
+    RMSE_train = float(np.sqrt(MSE_train))
+    
+    abs_test_errors = abs(y_test-Y_hat)
+    APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
+    MAPE_test = float(np.mean(APE_test)*100) # this is percentage
+    
+    abs_train_errors = abs(y_train-Y_hat_train)
+    APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
+    MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+    
+    ### Write outputs
+    
+    for out in range(len(output_names)):
+        print(type(out))
+        try:
+            print(variable_names[out])
+            print(type(variable_names[out]))
+            print(type(output_names[out]))
+            sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
+            outputs_df = outputs_df.append(sub_df,ignore_index=True)
+        except AttributeError as e:
+            print(e)
+            import sys
+            sys.exit(0)
+    
+    
+
+################################################################################ CHECK FITS
+
+    plt.figure(figsize=(12,8))
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    #plt.ylim((0, .05))
+    # plt.ylim(0, 0.05)
+    plt.legend(['Training', 'Validation'], loc='upper right')
+    plt.show()
+    
+    ################################################################################ PREDICT
+    
+    # val_i_y = predict([lenet], X_test)
+    # val_v_y = predict([lenet], X_val)
+    # val_m_y = predict([lenet], X_train)
+    
+    # mod_x, mod_y = (np.expand_dims(y_train.flatten(), axis=1),np.expand_dims(val_m_y.flatten(), axis=1))
+    # regr = linear_model.LinearRegression()
+    # regr.fit(mod_x, mod_y)
+    # y_pred = regr.predict(mod_x)
+    # print('Model calibration',r2_score(mod_y, y_pred))
+    
+    # int_x, int_y = (np.expand_dims(y_val.flatten(), axis=1),np.expand_dims(val_v_y.flatten(), axis=1))
+    # regr = linear_model.LinearRegression()
+    # regr.fit(int_x, int_y)
+    # y_pred = regr.predict(int_x)
+    # print('Internal validation',r2_score(int_y, y_pred))
+    
+    # ext_x, ext_y = (np.expand_dims(y_test.flatten(), axis=1),np.expand_dims(val_i_y.flatten(), axis=1))
+    # regr = linear_model.LinearRegression()
+    # regr.fit(ext_x, ext_y)
+    # y_pred = regr.predict(ext_x)
+    
+    # print('External validation',r2_score(ext_x, ext_y))
+    # plt.figure(figsize=(12,8))
+    # plt.scatter(ext_x, ext_y, c='red',alpha=0.5,s=200)
+    # plt.scatter(int_x, int_y, c='blue',alpha=0.5,s=200)
+    # plt.scatter(mod_x, mod_y, c='none',alpha=0.5,s=200,edgecolors='black')
+    # #plt.plot(x, y_pred, linewidth=3)
+    # plt.plot([np.min(mod_x),np.max(mod_x)], [np.min(mod_x),np.max(mod_x)], color='k', linestyle='--', linewidth=2)
+    
+    # #plt.ylim(0, 1)
+    # #plt.xlim(0, 1)
+    # plt.xlabel('Observed',fontsize=14)
+    # plt.ylabel('Predicted',fontsize=14)
+    # plt.title(s+f' model (R^2={round(r2_score(ext_x, ext_y), 2)})',fontsize=14)
+    # plt.show()
+
 #%% Create function for producing and writing model outputs
 """
 This function take in an input pandas data frame 'input_df', which has a column
@@ -166,171 +328,21 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     df = input_df
     for s in species:
         
-        for iteration in iterations:
+        if type(iterations)==int:
             
-            X_train=ds_x_smooth[df[s]>0,:]
-
-            y_train = df.loc[df[s]>0,s]
-            
-            # X_train = pd.DataFrame(X_train)
-            
-            """## Train/Val Split"""
-            print('Full set:',X_train.shape)
-            
-            X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=.25,
-                                                              random_state= iteration)
-            X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.20,
-                                                                  random_state=iteration)
-            
-            y_train_ind = list(y_train.index)
-            y_test_ind = list(y_test.index)
-            
-            """## Augmentation"""
-            
-            multiplier = augmentRatio
-
-            y_train = y_train.to_numpy()
-            y_train.shape=(len(y_train),1)
-            
-            y_train = y_train.repeat(multiplier, axis=0)
-            
-            X_train = X_train.repeat(multiplier, axis=0)
-            X_train = augment(X_train, .01, .01, .01)
-            
-            print(s)
-            print('Train set:',X_train.shape)
-            print('Validation set:',X_val.shape)
-            print('External set:',X_test.shape)
-            
-            """## Add Dimension
-            """
-            X_train = add_dimension(X_train)
-            X_val = add_dimension(X_val)
-            X_test = add_dimension(X_test)
-            
-            """# Training Creation
-            
-            ## LeNet 5
-            """
-            
-            drop = 0.05
-            reg = .01
-            
-            lenet = Sequential()
-            lenet.add(Conv1D(6, 1,activation='selu',input_shape=(1, X_train.shape[2])))
-            lenet.add(Dropout(drop))
-            lenet.add(AveragePooling1D(1))
-            lenet.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-            lenet.add(Dropout(drop))
-            lenet.add(Flatten())
-            lenet.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-            lenet.add(Dropout(drop))
-            lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-            lenet.add(Dropout(drop))
-            lenet.add(Dense(1,activation = 'linear'))
-            lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
-            history = lenet.fit(
-                X_train, y_train,
-                epochs=num_epochs, batch_size=int(1e10),
-                verbose=0,
-                validation_data=(X_val, y_val),
-            )
+            make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration)
         
-            Y_hat = list(predict([lenet], X_test))
-            Y_hat_train = list(predict([lenet], X_train))
-            
-            r_sq = float(r2_score(y_test,Y_hat))
-            r_sq_train = float(r2_score(y_train,Y_hat_train))
-            
-            print('Training r-squared: '+str(r_sq_train))
-            print('Test r-squared: '+str(r_sq))
-            
-            MSE_test = MSE(y_test,Y_hat)
-            RMSE_test = float(np.sqrt(MSE_test))
-            
-            MSE_train = MSE(y_train,Y_hat_train)
-            RMSE_train = float(np.sqrt(MSE_train))
-            
-            abs_test_errors = abs(y_test-Y_hat)
-            APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
-            MAPE_test = float(np.mean(APE_test)*100) # this is percentage
-            
-            abs_train_errors = abs(y_train-Y_hat_train)
-            APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
-            MAPE_train = float(np.mean(APE_train)*100) # this is percentage
-            
-            ### Write outputs
-            
-            for out in range(len(output_names)):
-                print(type(out))
-                try:
-                    print(variable_names[out])
-                    print(type(variable_names[out]))
-                    print(type(output_names[out]))
-                    sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-                    outputs_df = outputs_df.append(sub_df,ignore_index=True)
-                except AttributeError as e:
-                    print(e)
-                    import sys
-                    sys.exit(0)
-            
-            
+        else:
         
-        ################################################################################ CHECK FITS
-        
-            plt.figure(figsize=(12,8))
-            plt.plot(history.history['loss'])
-            plt.plot(history.history['val_loss'])
-            plt.ylabel('Loss')
-            plt.xlabel('Epoch')
-            #plt.ylim((0, .05))
-            # plt.ylim(0, 0.05)
-            plt.legend(['Training', 'Validation'], loc='upper right')
-            plt.show()
-            
-            ################################################################################ PREDICT
-            
-            # val_i_y = predict([lenet], X_test)
-            # val_v_y = predict([lenet], X_val)
-            # val_m_y = predict([lenet], X_train)
-            
-            # mod_x, mod_y = (np.expand_dims(y_train.flatten(), axis=1),np.expand_dims(val_m_y.flatten(), axis=1))
-            # regr = linear_model.LinearRegression()
-            # regr.fit(mod_x, mod_y)
-            # y_pred = regr.predict(mod_x)
-            # print('Model calibration',r2_score(mod_y, y_pred))
-            
-            # int_x, int_y = (np.expand_dims(y_val.flatten(), axis=1),np.expand_dims(val_v_y.flatten(), axis=1))
-            # regr = linear_model.LinearRegression()
-            # regr.fit(int_x, int_y)
-            # y_pred = regr.predict(int_x)
-            # print('Internal validation',r2_score(int_y, y_pred))
-            
-            # ext_x, ext_y = (np.expand_dims(y_test.flatten(), axis=1),np.expand_dims(val_i_y.flatten(), axis=1))
-            # regr = linear_model.LinearRegression()
-            # regr.fit(ext_x, ext_y)
-            # y_pred = regr.predict(ext_x)
-            
-            # print('External validation',r2_score(ext_x, ext_y))
-            # plt.figure(figsize=(12,8))
-            # plt.scatter(ext_x, ext_y, c='red',alpha=0.5,s=200)
-            # plt.scatter(int_x, int_y, c='blue',alpha=0.5,s=200)
-            # plt.scatter(mod_x, mod_y, c='none',alpha=0.5,s=200,edgecolors='black')
-            # #plt.plot(x, y_pred, linewidth=3)
-            # plt.plot([np.min(mod_x),np.max(mod_x)], [np.min(mod_x),np.max(mod_x)], color='k', linestyle='--', linewidth=2)
-            
-            # #plt.ylim(0, 1)
-            # #plt.xlim(0, 1)
-            # plt.xlabel('Observed',fontsize=14)
-            # plt.ylabel('Predicted',fontsize=14)
-            # plt.title(s+f' model (R^2={round(r2_score(ext_x, ext_y), 2)})',fontsize=14)
-            # plt.show()
+            for iteration in iterations:
+                
+                make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration)
         
     return(outputs_df)
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 1)
+outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
 
 #%% Define function for making plots
 
