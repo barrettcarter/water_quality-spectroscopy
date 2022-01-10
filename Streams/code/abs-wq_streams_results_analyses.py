@@ -46,15 +46,13 @@ sns.set(style = 'ticks',font_scale=2, palette = 'colorblind')
 results_pls_df=pd.read_csv(os.path.join(results_path,results_pls_fn))
 results_dl_df=pd.read_csv(os.path.join(results_path,results_dl_fn))
 
-
-
-
 #%% combine data frames
 
 # add model columns
 results_pls_df['model'] = 'pls'
 results_dl_df['model'] = 'dl'
 results_df = pd.concat([results_pls_df,results_dl_df],ignore_index=True)
+results_df.loc[:,'value']=results_df.loc[:,'value'].apply(lambda x: float(x))
 
 species = results_df['species'].unique()
 species = list(species)
@@ -64,10 +62,28 @@ species.sort(key = lambda x: x[-1])
 
 test_rmses = results_df.loc[results_df['output'] == 'test_rmse',:]
 test_rmses.reset_index(inplace = True)
-test_rmses.value = test_rmses.value.apply(lambda x: float(x))
+# test_rmses.value = test_rmses.value.apply(lambda x: float(x))
 test_rmses.rename(columns = {'value':'test rmse (ppm)'},inplace = True)
 
-#%% make plot
+#%% make rmse violin plot plot
 
 test_rmse_plot = sns.catplot(x='model',y='test rmse (ppm)',col = 'species',col_wrap=3,
                              data = test_rmses,kind = 'violin')
+
+#%% data wrangling for 1:1 plots
+
+y_hat_tests = results_df.loc[results_df.output=='y_hat_test',:].reset_index(drop=True)
+y_true_tests = results_df.loc[results_df.output=='y_true_test',:].reset_index(drop=True)
+
+#%% make dataframe for plot
+
+fit_plot_df = pd.DataFrame(columns = ['True Concentration','Predicted Concentration','Model','Species'])
+fit_plot_df['True Concentration']=y_true_tests.value
+fit_plot_df['Predicted Concentration']=y_hat_tests.value
+fit_plot_df['Model']=y_hat_tests.model
+fit_plot_df['Species']=y_hat_tests.species
+
+#%% make plot
+
+sns.relplot(data = fit_plot_df, x = 'Predicted Concentration',y = 'True Concentration',
+            hue = 'Model', col = 'Species',col_wrap = 3)
