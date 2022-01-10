@@ -92,8 +92,20 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
     return(sub_df)
 
 #%% Create function for producing and writing model outputs
+"""
+This function take in an input pandas data frame 'input_df', which has a column
+for each species' concentrations and a column for absorbance at each wavelength.
 
+'num_epochs' is an integer used in the artificial neural network algorithm.
+
+'iterations' specifies the values to be used as the random seed for the
+resampling procedure. The length of 'iterations' determines the number of times
+resampling is performed. 'iterations' can be an integer, float, string, range,
+or 1-D numpy array.
+
+"""
 def create_outputs(input_df,num_epochs = 1000,iterations = 1):
+    
     
     ### Create a model for every species
     # s = 'Molybdenum'
@@ -154,7 +166,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     df = input_df
     for s in species:
         
-        for iteration in range(iterations):
+        for iteration in iterations:
             
             X_train=ds_x_smooth[df[s]>0,:]
 
