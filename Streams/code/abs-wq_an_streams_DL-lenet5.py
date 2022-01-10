@@ -281,7 +281,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
                     'train_rmse','test_mape','train_mape']
     
-    variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
+    variable_names = ['Y_hat','Y_hat_train','list(y_train[:,0])', 'list(y_test)',
                       'y_test_ind','y_train_ind','r_sq','r_sq_train','RMSE_test',
                       'RMSE_train','MAPE_test','MAPE_train']
 ################################################################################ PROCESS
