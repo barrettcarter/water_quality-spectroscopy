@@ -10,7 +10,7 @@ import pandas as pd
 import os
 # import numpy as np
 # import pandas as pd
-# from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
 # from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -60,6 +60,8 @@ species = results_df['species'].unique()
 species = list(species)
 species.sort(key = lambda x: x[-1])
 
+species_sub = [s for s in species if s not in ['Ammonium-N','OP']]
+
 iterations = results_df.iteration.unique()
 
 models = results_df.model.unique()
@@ -89,10 +91,57 @@ fit_plot_df['Predicted Concentration']=y_hat_tests.value
 fit_plot_df['Model']=y_hat_tests.model
 fit_plot_df['Species']=y_hat_tests.species
 
-#%% make plot
+#%% make 1:1 fit plot
 
 sns.relplot(data = fit_plot_df, x = 'Predicted Concentration',y = 'True Concentration',
-            hue = 'Model', col = 'Species',col_wrap = 3)
+            hue = 'Model', col = 'Species',col_wrap = 4)
+
+#%% make scaled fit plot
+
+y_h_te_scaled = y_hat_tests.copy().loc[y_hat_tests['species'].isin(species_sub),:]
+y_t_te_scaled = y_true_tests.copy().loc[y_true_tests['species'].isin(species_sub),:]
+
+for s in species_sub:
+    
+    max_val = max([max(y_hat_tests.loc[y_hat_tests.species==s,'value']),
+                   max(y_true_tests.loc[y_true_tests.species==s,'value'])])
+    
+    y_h_te_scaled.loc[y_h_te_scaled.species==s,'value'] = \
+        y_h_te_scaled.loc[y_h_te_scaled.species==s,'value']/max_val
+        
+    
+    y_t_te_scaled.loc[y_t_te_scaled.species==s,'value'] = \
+        y_t_te_scaled.loc[y_t_te_scaled.species==s,'value']/max_val
+        
+    
+fit_plot_sc_df = pd.DataFrame(columns = ['True','Predicted','Model','Species'])
+fit_plot_sc_df['True']=y_t_te_scaled.value
+fit_plot_sc_df['Predicted']=y_h_te_scaled.value
+fit_plot_sc_df['Model']=y_h_te_scaled.model
+fit_plot_sc_df['Species']=y_h_te_scaled.species
+
+fit_plot_sc = sns.FacetGrid(fit_plot_sc_df,hue = 'Model', col = 'Species',
+                            col_wrap = 3,height = 4)
+
+fit_plot_sc.map(sns.scatterplot, 'Predicted','True',alpha = 0.7)
+
+for ax in fit_plot_sc.axes_dict.values():
+    ax.axline((0, 0), slope=1,c='black', ls="--", zorder=0)
+fit_plot_sc.set(xlim=(-0.5, 1.5), ylim=(-0.5, 1.5))
+
+fit_plot_sc.add_legend()
+
+#%% calculate errors for dist plot
+
+errors_df = fit_plot_df.copy()
+errors_df['error'] = errors_df['Predicted Concentration']-errors_df['True Concentration']
+errors_sub_df = errors_df.copy().loc[errors_df['Species'].isin(species_sub),:]
+
+#%% make dis plots
+
+sns.displot(data=errors_df, x="error", hue="Model", col="Species", kind="kde",col_wrap=3)
+sns.displot(data=errors_sub_df, x="error", hue="Model", col="Species", kind="kde",
+            col_wrap=3,linewidth=4,height=4)
 
 #%% make normalized rmses
 
@@ -145,7 +194,8 @@ rmse_av_norm = rmses_norm_test_av.value.mean()
 rmses_norm_test.rename(columns = {'value':'normalized test rmse'},inplace = True)
 norm_test_rmse_plot = sns.catplot(x='model',y='normalized test rmse',
                                   col = 'species',col_wrap=3,
-                             data = rmses_norm_test,kind = 'violin')
+                             data = rmses_norm_test.loc[rmses_norm_test['species'].isin(species_sub),:],
+                             kind = 'violin',height = 4)
 rmses_norm_test.rename(columns = {'normalized test rmse (ppm)':'value'},inplace = True)  
 
 #%% calculate NSEs
@@ -191,8 +241,8 @@ for s in species:
 NSEs_test.rename(columns = {'value':'NSE'},inplace = True)
 NSEs_test_plot = sns.catplot(x='model',y='NSE',
                                   col = 'species',col_wrap=3,
-                             data = NSEs_test.loc[NSEs_test.species != 'Ammonium-N',:],
-                             kind = 'violin')
+                             data = NSEs_test.loc[NSEs_test['species'].isin(species_sub),:],
+                             kind = 'violin',height = 4)
 NSEs_test.rename(columns = {'NSE':'value'},inplace = True)  
 
 #%% save average NSEs
