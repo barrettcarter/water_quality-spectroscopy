@@ -26,102 +26,20 @@ from sklearn.ensemble import RandomForestRegressor
 import sklearn.metrics
 sorted(sklearn.metrics.SCORERS.keys())
 
+#%% bring in data
+
 # IMPORTANT: Don't have the baseDir and saveDir be the same
 user = os.getlogin() 
-abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
-wq_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/wq/'
+path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
+output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
 
-wq_df_fn = 'wq_HNSr_df.csv'
-abs_df_fn = 'abs_df_u2d.csv'
+abs_wq_df = pd.read_csv(inter_dir+abs_wq_df_fn)
 
-# Bring in data
-abs_df=pd.read_csv(abs_df_dir+abs_df_fn)
-wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
-
-# Select only HNSr  diluted by 30 or 27
-
-abs_df = abs_df.loc[(abs_df.Name == 'HNSr1d30') | (abs_df.Name == 'HNSr2d30')|
-                    (abs_df.Name == 'HNSr1d27') | (abs_df.Name == 'HNSr2d27')|
-                    (abs_df.Name == 'HNSr3d27')| (abs_df.Name == 'HNSr2d30b')|
-                    (abs_df.Name == 'HNSr3d30')|(abs_df.Name == 'HNSr2d30c')|
-                    (abs_df.Name == 'HNSr2d30d'),:]
-abs_df = abs_df.reset_index(drop = True)
-
-# Make species names consistent
-
-wq_df.Species.unique()
-
-wq_df.Species[wq_df.Species=='Ammonia-Nitrogen']='Ammonium-N'
-wq_df.Species[wq_df.Species=='Nitrate-Nitrogen']='Nitrate-N'
-
-# Makes dates match
-
-# wq_dates = wq_df.Date_col.unique()
-# print(wq_dates)
-# abs_dates = abs_df.Date_col.unique()
-# print(abs_dates)
-# abs_df['Date_col'][abs_df.Date_col=='4/5/2021']='4/2/2021'
-# abs_dates = abs_df.Date_col.unique()
-# print(wq_dates)
-# print(abs_dates)
-
-# Create sample IDs for combining two dataframes
-# wq_cols = list(wq_df.columns[0:4])
-# wq_cols.append('Name')
-# wq_df.columns=wq_cols
-wq_df.rename(columns={'Sample_num':'Name'},inplace=True)
-wq_df['ID']=wq_df.Name+wq_df.Date_col
-
-# concs_ind = range(int((wq_df.shape[0]-1)/3))
-# concs_df = wq_df.pivot(index = range(268),columns = 'Species',values = 'Conc')
-
-species = wq_df.Species.unique()
-add_cols = np.append(species,['ID','dilution'])
-aw_df_cols = np.append(add_cols,abs_df.columns)
-abs_wq_df = abs_df.copy()
-
-abs_wq_df.loc[:,species] = -0.1
-
-for r in range(abs_wq_df.shape[0]):
-    if abs_wq_df.Name[r][8]==str(2):
-        abs_wq_df.loc[r,'dilution']=27
-    else:
-        abs_wq_df.loc[r,'dilution']=30
-    abs_wq_df.loc[r,'Name']=abs_wq_df.Name[r][0:7]
-
-
-# This is based on modeling results. May not be correct.
-# abs_wq_df.loc[5,'Name']='HNSr2'
-# abs_wq_df.loc[11,'Name']='HNSr1'
-# abs_wq_df.loc[12,'Name']='HNSr1'
-# abs_wq_df.loc[13,'Name']='HNSr2'
-
-abs_wq_df['ID']=abs_wq_df.Name+abs_wq_df.Date_col
-
-abs_wq_df = abs_wq_df[aw_df_cols]
-
-for wq_row in range(wq_df.shape[0]):
-    for abs_row in range(abs_wq_df.shape[0]):
-        if wq_df.ID[wq_row]==abs_wq_df.ID[abs_row]:
-            for s in species:
-                if wq_df.Species[wq_row] == s:
-                    abs_wq_df.loc[abs_row,s]=wq_df.Value[wq_row]/\
-                    abs_wq_df.loc[abs_row,'dilution']
-  
-concs = abs_wq_df.loc[:,'Nitrate-N':'Conductivity'] 
-concs.mask(concs<0,inplace = True)
-abs_wq_df.loc[:,'Nitrate-N':'Conductivity']=concs
-
-#################################################################
-
-
-### Tuning the models
-
-## Nitrate
+#%% Tuning a model for single species
 ## PlSR
-
-# Best r_sq achieved by not including name or filtered with abs
 
 # train model on all but last three rows (mislabeled)
 
@@ -286,7 +204,7 @@ plt.xlabel('Lab Measured Nitrate (mg/L)')
 plt.ylabel('Predicted Nitrate (mg/L)')
 plt.text(0.5,2,r'$r^2 =$'+str(np.round(r_sq,3)))
 
-# do all species
+#%% do all species
 
 param_grid = [{'n_components':np.arange(1,10)}]
 
