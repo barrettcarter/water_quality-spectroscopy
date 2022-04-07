@@ -36,6 +36,7 @@ abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+abs_wq_df = abs_wq_df.loc[0:40,:]
 
 #%% Some useful variables
 
