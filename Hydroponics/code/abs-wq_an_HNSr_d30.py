@@ -214,7 +214,7 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 
 iteration = 1 # this is for testing
 
-species = abs_wq_df.columns[1:14]
+species = abs_wq_df.columns[0:14]
 
 for s in species:
     Y = abs_wq_df[s]
