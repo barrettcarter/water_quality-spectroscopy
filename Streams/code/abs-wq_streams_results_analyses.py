@@ -96,7 +96,42 @@ fit_plot_df['Species']=y_hat_tests.species
 sns.relplot(data = fit_plot_df, x = 'Predicted Concentration',y = 'True Concentration',
             hue = 'Model', col = 'Species',col_wrap = 4)
 
-#%% make scaled fit plot
+#%% make scaled fit plot 
+
+y_h_te_scaled = y_hat_tests.copy()
+y_t_te_scaled = y_true_tests.copy()
+
+for s in species:
+    
+    max_val = max([max(y_hat_tests.loc[y_hat_tests.species==s,'value']),
+                   max(y_true_tests.loc[y_true_tests.species==s,'value'])])
+    
+    y_h_te_scaled.loc[y_h_te_scaled.species==s,'value'] = \
+        y_h_te_scaled.loc[y_h_te_scaled.species==s,'value']/max_val
+        
+    
+    y_t_te_scaled.loc[y_t_te_scaled.species==s,'value'] = \
+        y_t_te_scaled.loc[y_t_te_scaled.species==s,'value']/max_val
+        
+    
+fit_plot_sc_df = pd.DataFrame(columns = ['True','Predicted','Model','Species'])
+fit_plot_sc_df['True']=y_t_te_scaled.value
+fit_plot_sc_df['Predicted']=y_h_te_scaled.value
+fit_plot_sc_df['Model']=y_h_te_scaled.model
+fit_plot_sc_df['Species']=y_h_te_scaled.species
+
+fit_plot_sc = sns.FacetGrid(fit_plot_sc_df,hue = 'Model', col = 'Species',
+                            col_wrap = 3,height = 4)
+
+fit_plot_sc.map(sns.scatterplot, 'Predicted','True',alpha = 0.7)
+
+for ax in fit_plot_sc.axes_dict.values():
+    ax.axline((0, 0), slope=1,c='black', ls="--", zorder=0)
+fit_plot_sc.set(xlim=(-0.5, 1.5), ylim=(-0.5, 1.5))
+
+fit_plot_sc.add_legend()
+
+#%% make scaled fit plot without Ammonium or OP
 
 y_h_te_scaled = y_hat_tests.copy().loc[y_hat_tests['species'].isin(species_sub),:]
 y_t_te_scaled = y_true_tests.copy().loc[y_true_tests['species'].isin(species_sub),:]
@@ -139,9 +174,9 @@ errors_sub_df = errors_df.copy().loc[errors_df['Species'].isin(species_sub),:]
 
 #%% make dis plots
 
-sns.displot(data=errors_df, x="error", hue="Model", col="Species", kind="kde",col_wrap=3)
+#sns.displot(data=errors_df, x="error", hue="Model", col="Species", kind="kde",col_wrap=3)
 sns.displot(data=errors_sub_df, x="error", hue="Model", col="Species", kind="kde",
-            col_wrap=3,linewidth=4,height=4)
+            col_wrap=3,linewidth=3,height=4,common_norm = False)
 
 #%% make normalized rmses
 
@@ -189,14 +224,26 @@ for s in species:
 
 rmse_av_norm = rmses_norm_test_av.value.mean()
                 
-#%% make plot of normalized rmses
+#%% make violin plot of normalized rmses
 
 rmses_norm_test.rename(columns = {'value':'normalized test rmse'},inplace = True)
 norm_test_rmse_plot = sns.catplot(x='model',y='normalized test rmse',
                                   col = 'species',col_wrap=3,
                              data = rmses_norm_test.loc[rmses_norm_test['species'].isin(species_sub),:],
                              kind = 'violin',height = 4)
-rmses_norm_test.rename(columns = {'normalized test rmse (ppm)':'value'},inplace = True)  
+rmses_norm_test.rename(columns = {'normalized test rmse':'value'},inplace = True)  
+
+#%% make nrmse dis plots
+
+#sns.displot(data=errors_df, x="error", hue="Model", col="Species", kind="kde",col_wrap=3)
+sns.displot(data=rmses_norm_test, x="value", hue="model", col="species", kind="kde",
+            col_wrap=3,linewidth=3,height=4,common_norm = False)
+g = sns.displot(data=rmses_norm_test.loc[rmses_norm_test['species'].isin(species_sub),:],
+            x="value", hue="model", col="species", kind="kde",
+            col_wrap=3,linewidth=3,height=4,common_norm = False)
+
+g.set_axis_labels('Normalized RMSE','Density')
+g.set(xticks =[0,0.5,1])
 
 #%% calculate NSEs
 
