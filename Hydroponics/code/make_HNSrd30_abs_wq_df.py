@@ -16,7 +16,7 @@ user = os.getlogin()
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 abs_df_dir=os.path.join(path_to_wqs,'Data/spectra/')
 wq_df_dir=os.path.join(path_to_wqs,'Hydroponics/inputs/water_quality/')
-
+inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 
 wq_df_fn = 'wq_HNSr_df.csv'
 abs_df_fn = 'abs_df_u2d.csv'
@@ -31,16 +31,17 @@ wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
 
 # Select only HNSr samples
 
-abs_df = abs_df.loc[(abs_df.Name == 'HNSr1') | (abs_df.Name == 'HNSr2')\
-                    | (abs_df.Name == 'HNSr3'),:]
+abs_df = abs_df.loc[(abs_df.Name == 'HNSr1d30') | (abs_df.Name == 'HNSr2d30')\
+                    | (abs_df.Name == 'HNSr3d30'),:]
 abs_df = abs_df.reset_index(drop = True)
-abs_df.loc[7,'Name']='HNSr1' # this sample was labelled incorrectly (probably)
+#abs_df.loc[7,'Name']='HNSr1' # this sample was labelled incorrectly (probably)
 # Make species names consistent
 
 wq_df.Species.unique()
 
 wq_df.Species[wq_df.Species=='Ammonia-Nitrogen']='Ammonium-N'
 wq_df.Species[wq_df.Species=='Nitrate-Nitrogen']='Nitrate-N'
+
 
 # Makes dates match
 
@@ -57,6 +58,7 @@ print(abs_dates)
 # wq_df.columns=wq_cols
 
 wq_df.rename(columns={'Sample_num':'Name'},inplace=True)
+wq_df.Name = wq_df.Name+'d30'
 wq_df['ID']=wq_df.Name+wq_df.Date_col
 
 # concs_ind = range(int((wq_df.shape[0]-1)/3))
@@ -88,4 +90,4 @@ for wq_row in range(wq_df.shape[0]):
 
 #%% Export dataframe
 
-abs_wq_df.to_csv(wq_df_dir+'abs-wq_HNSr_df.csv',index=False)
+abs_wq_df.to_csv(inter_dir+'abs-wq_HNSrd30_df.csv',index=False)
