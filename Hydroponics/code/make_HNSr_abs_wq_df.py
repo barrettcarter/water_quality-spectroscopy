@@ -16,7 +16,7 @@ user = os.getlogin()
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 abs_df_dir=os.path.join(path_to_wqs,'Data/spectra/')
 wq_df_dir=os.path.join(path_to_wqs,'Hydroponics/inputs/water_quality/')
-
+inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 
 wq_df_fn = 'wq_HNSr_df.csv'
 abs_df_fn = 'abs_df_u2d.csv'
@@ -88,4 +88,4 @@ for wq_row in range(wq_df.shape[0]):
 
 #%% Export dataframe
 
-abs_wq_df.to_csv(wq_df_dir+'abs-wq_HNSr_df.csv',index=False)
+abs_wq_df.to_csv(inter_dir+'abs-wq_HNSr_df.csv',index=False)
