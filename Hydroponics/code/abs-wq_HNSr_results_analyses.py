@@ -10,7 +10,7 @@ import pandas as pd
 import os
 # import numpy as np
 # import pandas as pd
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
 # from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -27,13 +27,14 @@ from matplotlib import pyplot as plt
 # from sklearn.metrics import r2_score
 # from sklearn.metrics import mean_squared_error as MSE
 import seaborn as sns
+from scipy import stats
 
 #%% Set parameters
 
 user = os.getlogin() 
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
-results_pls_fn = 'HNSr_PLS_It0-9_results.csv'
+results_pls_fn = 'HNSr_PLS_It0-9_results_ALL-DATA.csv'
 results_dl_fn = 'HNSr_DL_It0-9_results.csv'
 results_path = os.path.join(path_to_wqs,output_dir)
 
@@ -60,7 +61,9 @@ species = results_df['species'].unique()
 species = list(species)
 species.sort(key = lambda x: x[-1])
 
-species_sub = [s for s in species if s not in ['Ammonium-N','OP']]
+# # remove unwanted parameters
+# species_sub = [s for s in species if s not in ['Ammonium-N','OP']]
+species_sub = species
 
 iterations = results_df.iteration.unique()
 
@@ -103,15 +106,26 @@ y_t_te_scaled = y_true_tests.copy()
 
 for s in species:
     
-    max_val = max([max(y_hat_tests.loc[y_hat_tests.species==s,'value']),
-                   max(y_true_tests.loc[y_true_tests.species==s,'value'])])
+    # max_val = max([max(y_hat_tests.loc[y_hat_tests.species==s,'value']),
+    #                max(y_true_tests.loc[y_true_tests.species==s,'value'])])
+    
+    # min_val = min([min(y_hat_tests.loc[y_hat_tests.species==s,'value']),
+    #                min(y_true_tests.loc[y_true_tests.species==s,'value'])])
+    
+    max_val = max(y_true_tests.loc[y_true_tests.species==s,'value'])
+    
+    min_val = min(y_true_tests.loc[y_true_tests.species==s,'value'])
+    
+    #min_scaled = min_val/max_val
     
     y_h_te_scaled.loc[y_h_te_scaled.species==s,'value'] = \
-        y_h_te_scaled.loc[y_h_te_scaled.species==s,'value']/max_val
+        (y_h_te_scaled.loc[y_h_te_scaled.species==s,'value']-min_val)\
+            /(max_val - min_val)
         
     
     y_t_te_scaled.loc[y_t_te_scaled.species==s,'value'] = \
-        y_t_te_scaled.loc[y_t_te_scaled.species==s,'value']/max_val
+        (y_t_te_scaled.loc[y_t_te_scaled.species==s,'value']-min_val)\
+            /(max_val - min_val)
         
     
 fit_plot_sc_df = pd.DataFrame(columns = ['True','Predicted','Model','Species'])
@@ -127,7 +141,7 @@ fit_plot_sc.map(sns.scatterplot, 'Predicted','True',alpha = 0.7)
 
 for ax in fit_plot_sc.axes_dict.values():
     ax.axline((0, 0), slope=1,c='black', ls="--", zorder=0)
-fit_plot_sc.set(xlim=(-0.5, 1.5), ylim=(-0.5, 1.5))
+fit_plot_sc.set(xlim=(-0.25, 1.25), ylim=(-0.25, 1.25))
 
 fit_plot_sc.add_legend()
 
@@ -228,22 +242,34 @@ rmse_av_norm = rmses_norm_test_av.value.mean()
 
 rmses_norm_test.rename(columns = {'value':'normalized test rmse'},inplace = True)
 norm_test_rmse_plot = sns.catplot(x='model',y='normalized test rmse',
-                                  col = 'species',col_wrap=3,
+                                  col = 'species',col_wrap=4,
                              data = rmses_norm_test.loc[rmses_norm_test['species'].isin(species_sub),:],
                              kind = 'violin',height = 4)
 rmses_norm_test.rename(columns = {'normalized test rmse':'value'},inplace = True)  
 
+#%% perform t-test on nrmses
+# s = 'Nitrate-N' # for testing
+nrmse_ttest_ps = pd.DataFrame(columns = ['species','value'])
+for s in species:
+    pls_rows = (rmses_norm_test.species == s)&(rmses_norm_test.model == 'pls')
+    dl_rows = (rmses_norm_test.species == s)&(rmses_norm_test.model == 'dl')
+    pls = rmses_norm_test.loc[pls_rows,'value']
+    dl = rmses_norm_test.loc[dl_rows,'value']
+    p = stats.ttest_ind(pls,dl).pvalue
+    df = pd.DataFrame(data = {'species':[s],'value':[p]})
+    nrmse_ttest_ps = pd.concat([nrmse_ttest_ps,df])
+
 #%% make nrmse dis plots
 
 #sns.displot(data=errors_df, x="error", hue="Model", col="Species", kind="kde",col_wrap=3)
-sns.displot(data=rmses_norm_test, x="value", hue="model", col="species", kind="kde",
-            col_wrap=3,linewidth=3,height=4,common_norm = False)
+# sns.displot(data=rmses_norm_test, x="value", hue="model", col="species", kind="kde",
+#             col_wrap=3,linewidth=3,height=4,common_norm = False)
 g = sns.displot(data=rmses_norm_test.loc[rmses_norm_test['species'].isin(species_sub),:],
             x="value", hue="model", col="species", kind="kde",
             col_wrap=3,linewidth=3,height=4,common_norm = False)
 
 g.set_axis_labels('Normalized RMSE','Density')
-g.set(xticks =[0,0.5,1])
+# g.set(xticks =[0,0.5,1])
 
 #%% calculate NSEs
 
