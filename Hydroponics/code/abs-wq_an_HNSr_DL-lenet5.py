@@ -30,22 +30,25 @@ from sklearn.metrics import mean_squared_error as MSE
 
 user = os.getlogin() 
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-spectra_path = os.path.join(path_to_wqs,'Streams/intermediates/')
-output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
-abs_wq_fn = 'abs_wq_df_streams.csv'
-spectra_path = os.path.join(spectra_path,abs_wq_fn)
-os.path.exists(spectra_path)
+inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
+output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
+
+abs_wq_df_fn = 'abs-wq_HNSr_df.csv'
+
+# Bring in data
+abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+abs_wq_df = abs_wq_df.loc[0:62,:]
 np.random.seed(7)
 
 #%%
 
-species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
+#species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
 iEpochs=5000
 
 augmentRatio=7
 
-abs_wq_df=pd.read_csv(spectra_path)
+species = abs_wq_df.columns[0:14]
 
 specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
 
@@ -322,7 +325,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     for i in range(ds_x_smooth.shape[0]):
         plt.plot(ds_x_smooth[i])
     plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Reflectance (Normalized)')
+    plt.ylabel('Absorbance (Normalized)')
     plt.show()
     
     # v = species[12]
@@ -351,15 +354,101 @@ outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
 
 #%% Define function for making plots
 
-def make_plots(outputs_df, output_label):
+# def make_plots(outputs_df, output_label):
 
-    ## make plots for both filtered and unfiltered samples
+#     ## make plots for both filtered and unfiltered samples
         
-    fig, axs = plt.subplots(4,2)
-    fig.set_size_inches(10,20)
-    fig.suptitle(output_label,fontsize = 18)
-    fig.tight_layout(pad = 4)
-    axs[2, 1].axis('off')
+#     fig, axs = plt.subplots(4,2)
+#     fig.set_size_inches(10,20)
+#     fig.suptitle(output_label,fontsize = 18)
+#     fig.tight_layout(pad = 4)
+#     axs[2, 1].axis('off')
+#     row = 0
+#     col = 0
+#     species = outputs_df.species.unique()
+#     for s in species:
+#         y_true_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_train')),
+#                                        'value']
+        
+#         y_hat_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_train')),
+#                                        'value']
+        
+#         y_true_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_test')),
+#                                        'value']
+        
+#         y_hat_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_test')),
+#                                        'value']
+        
+#         line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))),
+#                               max(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))))
+        
+#         y_text = min(line11)+(max(line11)-min(line11))*0
+#         x_text = max(line11)-(max(line11)-min(line11))*0.6
+        
+#         # lr = LinearRegression().fit(Y_hat,y_test)
+#         # linelr = lr.predict(line11.reshape(-1,1))
+        
+#         # plt.plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'predictions')
+#         # plt.plot(line11,line11,label= '1:1 line')
+#         # plt.title(s)
+#         # # plt.plot(line11,linelr,label = 'regression line')
+#         # plt.xlabel('Lab Measured '+s+' (mg/L)')
+#         # plt.ylabel('Predicted '+s+' (mg/L)')
+#         # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
+#         # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
+#         # plt.legend()
+#         # plt.show()
+        
+#         train_rmse = float(outputs_df['value'][(outputs_df.output == 'train_rmse')&
+#                             (outputs_df.species==s)])
+        
+#         test_rmse = float(outputs_df['value'][(outputs_df.output == 'test_rmse')&
+#                             (outputs_df.species==s)])
+        
+#         ax = axs[row,col]
+        
+#         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+#             label.set_fontsize(16)
+        
+#         axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
+#         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
+#         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
+#         # axs[row,col].set_title(s)
+#         axs[row,col].legend(loc = 'upper left',fontsize = 16)
+#         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
+#         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
+#         # axs[row,col].get_xaxis().set_visible(False)
+#         ax.text(x_text,y_text,r'$train\/rmse =$'+str(np.round(train_rmse,3))+'\n'
+#                 +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 16)
+#         # ticks = ax.get_yticks()
+#         # print(ticks)
+#         # # tick_labels = ax.get_yticklabels()
+#         # tick_labels =[str(round(x,1)) for x in ticks]
+#         # tick_labels = tick_labels[1:-1]
+#         # print(tick_labels)
+#         # ax.set_xticks(ticks)
+#         # ax.set_xticklabels(tick_labels)
+        
+#         if col == 1:
+#             col = 0
+#             row += 1
+#         else:
+#             col +=1
+#     # fig.show()
+
+def make_plots(outputs_df, output_label):
+        
+    fig, axs = plt.subplots(5,3)
+    fig.set_size_inches(20,30)
+    fig.suptitle(output_label,fontsize = 16)
+    fig.tight_layout(pad = 2)
+    axs[4, 2].axis('off')
     row = 0
     col = 0
     species = outputs_df.species.unique()
@@ -386,27 +475,17 @@ def make_plots(outputs_df, output_label):
                                                  y_true_test,y_hat_test))))
         
         y_text = min(line11)+(max(line11)-min(line11))*0
-        x_text = max(line11)-(max(line11)-min(line11))*0.6
+        x_text = max(line11)-(max(line11)-min(line11))*0.5
         
-        # lr = LinearRegression().fit(Y_hat,y_test)
-        # linelr = lr.predict(line11.reshape(-1,1))
+        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
+                            (outputs_df.species==s)]
         
-        # plt.plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'predictions')
-        # plt.plot(line11,line11,label= '1:1 line')
-        # plt.title(s)
-        # # plt.plot(line11,linelr,label = 'regression line')
-        # plt.xlabel('Lab Measured '+s+' (mg/L)')
-        # plt.ylabel('Predicted '+s+' (mg/L)')
-        # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
-        # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
-        # plt.legend()
-        # plt.show()
+        train_rsq = np.mean(train_rsq)
         
-        train_rmse = float(outputs_df['value'][(outputs_df.output == 'train_rmse')&
-                            (outputs_df.species==s)])
+        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
+                            (outputs_df.species==s)]
         
-        test_rmse = float(outputs_df['value'][(outputs_df.output == 'test_rmse')&
-                            (outputs_df.species==s)])
+        test_rsq = np.mean(test_rsq)
         
         ax = axs[row,col]
         
@@ -417,12 +496,13 @@ def make_plots(outputs_df, output_label):
         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
         # axs[row,col].set_title(s)
-        axs[row,col].legend(loc = 'upper left',fontsize = 16)
+        if (row == 0 and col == 0):
+            axs[row,col].legend(loc = 'upper left',fontsize = 16)
         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
         # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/rmse =$'+str(np.round(train_rmse,3))+'\n'
-                +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 16)
+        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
+                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
         # ticks = ax.get_yticks()
         # print(ticks)
         # # tick_labels = ax.get_yticklabels()
@@ -432,22 +512,21 @@ def make_plots(outputs_df, output_label):
         # ax.set_xticks(ticks)
         # ax.set_xticklabels(tick_labels)
         
-        if col == 1:
+        if col == 2:
             col = 0
             row += 1
         else:
             col +=1
-    # fig.show()
     
 #%% make plots for all samples
 
-make_plots(outputs_df,'Filtered and Unfiltered Samples')
+make_plots(outputs_df,'Hydroponic Samples')
 # make_plots(outputs_df_fil,'Filtered Samples')
 # make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% Save output file
 
-outputs_df.to_csv(output_dir+'streams_DL_B1_results.csv',index=False)
+outputs_df.to_csv(output_dir+'HNSr_DL_It1_results.csv',index=False)
 
 #%% make and save outputs
 
@@ -457,8 +536,8 @@ def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0-9_results.csv',
-                      its = 10, eps = 5000)
+make_and_save_outputs(abs_wq_df,output_dir+'HNSr_DL_It0-9_results.csv',
+                      its = range(10), eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
