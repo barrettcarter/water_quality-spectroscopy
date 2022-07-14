@@ -10,7 +10,7 @@ import pandas as pd
 import os
 # import numpy as np
 # import pandas as pd
-from matplotlib import pyplot as plt
+#from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
 # from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -27,6 +27,7 @@ from matplotlib import pyplot as plt
 # from sklearn.metrics import r2_score
 # from sklearn.metrics import mean_squared_error as MSE
 import seaborn as sns
+from scipy import stats
 
 #%% Set parameters
 
@@ -232,6 +233,18 @@ norm_test_rmse_plot = sns.catplot(x='model',y='normalized test rmse',
                              data = rmses_norm_test.loc[rmses_norm_test['species'].isin(species_sub),:],
                              kind = 'violin',height = 4)
 rmses_norm_test.rename(columns = {'normalized test rmse':'value'},inplace = True)  
+
+#%% perform t-test on nrmses
+# s = 'Nitrate-N' # for testing
+nrmse_ttest_ps = pd.DataFrame(columns = ['species','value'])
+for s in species:
+    pls_rows = (rmses_norm_test.species == s)&(rmses_norm_test.model == 'pls')
+    dl_rows = (rmses_norm_test.species == s)&(rmses_norm_test.model == 'dl')
+    pls = rmses_norm_test.loc[pls_rows,'value']
+    dl = rmses_norm_test.loc[dl_rows,'value']
+    p = stats.ttest_ind(pls,dl).pvalue
+    df = pd.DataFrame(data = {'species':[s],'value':[p]})
+    nrmse_ttest_ps = pd.concat([nrmse_ttest_ps,df])
 
 #%% make nrmse dis plots
 
