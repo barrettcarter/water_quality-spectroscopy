@@ -84,7 +84,7 @@ def create_outputs(input_df,iterations = 1):
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             Y = input_df[s]
-            keep = pd.notna(Y)
+            keep = (pd.notna(Y)) & (Y>0)
             X = input_df.loc[keep,'band_1':'band_1024']
             Y = Y[keep]
             
@@ -131,11 +131,11 @@ def create_outputs(input_df,iterations = 1):
 
 def make_plots(outputs_df, output_label):
         
-    fig, axs = plt.subplots(3,5)
-    fig.set_size_inches(10,15)
-    fig.suptitle(output_label,fontsize = 12)
-    fig.tight_layout(pad = 4)
-    axs[2, 4].axis('off')
+    fig, axs = plt.subplots(5,3)
+    fig.set_size_inches(20,30)
+    fig.suptitle(output_label,fontsize = 16)
+    fig.tight_layout(pad = 2)
+    axs[4, 2].axis('off')
     row = 0
     col = 0
     species = outputs_df.species.unique()
@@ -183,7 +183,8 @@ def make_plots(outputs_df, output_label):
         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
         # axs[row,col].set_title(s)
-        axs[row,col].legend(loc = 'upper left',fontsize = 16)
+        if (row == 0 and col == 0):
+            axs[row,col].legend(loc = 'upper left',fontsize = 16)
         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
         # axs[row,col].get_xaxis().set_visible(False)
@@ -198,18 +199,19 @@ def make_plots(outputs_df, output_label):
         # ax.set_xticks(ticks)
         # ax.set_xticklabels(tick_labels)
         
-        if col == 1:
+        if col == 2:
             col = 0
             row += 1
         else:
             col +=1
-    # fig.show()
 
 #%% make and save outputs
 
 def make_and_save_outputs(input_df,output_path,iterations = 1):
     outputs_df = create_outputs(input_df,iterations)
     outputs_df.to_csv(output_path,index=False)
+    make_plots(outputs_df,'Hydroponics')
+    return(outputs_df)
 
 #%% Run create_outputs function for testing
 
