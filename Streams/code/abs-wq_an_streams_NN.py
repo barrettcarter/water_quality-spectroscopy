@@ -46,38 +46,47 @@ abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
 abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
-                             
-#%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1):
-    
-    def write_output_df(the_output,output_name,species_name,iteration_num):
-    
+#%% Define function for creating rows for output_df
+
+def write_output_df(the_output,output_name,species_name,iteration_num):
+        print(output_name+' is '+str(type(the_output)))
         if isinstance(the_output,float):
+            
             sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
                                            columns= ['output','species','iteration','value'])
         elif isinstance(the_output,list):
+
             sub_df = pd.DataFrame(columns= ['output','species','iteration','value'])
             sub_df['value']=the_output
             sub_df['output']=output_name
             sub_df['species']=species_name
             sub_df['iteration']=iteration_num
+            
+        elif isinstance(the_output,tuple):
+
+            sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
+                                           columns= ['output','species','iteration','value'])
         else:
             print('Error: outputs must be of type list or float')
         return(sub_df)
+                             
+#%% Define function for creating outputs_df
+
+def create_outputs(input_df,iterations = 1):
     
     ### Create a model for every species
-    s = 'Molybdenum'
+    #s = 'Molybdenum' # for testing
     
     outputs_df = pd.DataFrame(columns= ['output','species','iteration','value']) #save outputs in dataframe
     
     output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
-                    'train_rmse','test_mape','train_mape','n_comp']
+                    'train_rmse','test_mape','train_mape','layers']
     
     variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
-                      'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
-                      'RMSE_train','MAPE_test','MAPE_train','n_comp']
+                      'list(y_test.index)','list(y_train.index)','r_sq','r_sq_train','RMSE_test',
+                      'RMSE_train','MAPE_test','MAPE_train','layers']
     
     
     
@@ -85,8 +94,7 @@ def create_outputs(input_df,iterations = 1):
     
     species = input_df.columns[1:9]
     
-    
-    
+
     for s in species:
         for iteration in range(iterations):
             print('Analyzing '+s)
@@ -96,20 +104,23 @@ def create_outputs(input_df,iterations = 1):
             X = input_df.loc[keep,'band_1':'band_1024']
             scaler = StandardScaler()
             X = scaler.fit_transform(X)
+            #X = pd.DataFrame(X)
             Y = Y[keep]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
                                                                 test_size = 0.3)
+            
+            hidden_layers_sizes = [(10,10,10),(50,50,50),(100,100,100)]
 
-            param_grid = [{'hidden_layer_sizes':np.arange(1,20)}]
+            param_grid = [{'hidden_layer_sizes':hidden_layers_sizes}]
             model = MLPRegressor()
             clf = GridSearchCV(model,param_grid,scoring = 'neg_mean_absolute_error')
 
             clf.fit(X_train,y_train)
-            n_comp = float(clf.best_params_['n_components'])
+            layers = clf.best_params_['hidden_layer_sizes']
             model_opt = clf.best_estimator_
-            Y_hat = list(model_opt.predict(X_test)[:,0])
-            Y_hat_train = list(model_opt.predict(X_train)[:,0])
+            Y_hat = list(model_opt.predict(X_test))
+            Y_hat_train = list(model_opt.predict(X_train))
             
             r_sq = float(model_opt.score(X_test,y_test))
             r_sq_train = float(model_opt.score(X_train,y_train))
@@ -132,9 +143,7 @@ def create_outputs(input_df,iterations = 1):
                 # print(out)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = outputs_df.append(sub_df,ignore_index=True)
-            
-
-        
+             
     return(outputs_df)
 
 #%% Define function for making plots
@@ -143,11 +152,11 @@ def make_plots(outputs_df, output_label):
 
     ## make plots for both filtered and unfiltered samples
         
-    fig, axs = plt.subplots(3,2)
-    fig.set_size_inches(10,15)
+    fig, axs = plt.subplots(3,3)
+    fig.set_size_inches(15,15)
     fig.suptitle(output_label,fontsize = 18)
     fig.tight_layout(pad = 4)
-    axs[2, 1].axis('off')
+    axs[2, 2].axis('off')
     row = 0
     col = 0
     species = outputs_df.species.unique()
@@ -210,7 +219,7 @@ def make_plots(outputs_df, output_label):
         # ax.set_xticks(ticks)
         # ax.set_xticklabels(tick_labels)
         
-        if col == 1:
+        if col == 2:
             col = 0
             row += 1
         else:
