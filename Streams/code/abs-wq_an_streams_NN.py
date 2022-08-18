@@ -27,6 +27,7 @@ from sklearn.preprocessing import StandardScaler
 #for looking up available scorers
 import sklearn.metrics
 sorted(sklearn.metrics.SCORERS.keys())
+import itertools
 
 #%%
 
@@ -67,13 +68,36 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 
             sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
                                            columns= ['output','species','iteration','value'])
+        elif isinstance(the_output,int):
+
+            sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
+                                           columns= ['output','species','iteration','value'])
         else:
             print('Error: outputs must be of type list or float')
         return(sub_df)
                              
+#%% Create parameter sets for tuning
+
+# layers: 1 - 10 hidden layers ranging in size from 10 to 100
+
+#hidden_layers_sizes = [(10,10,10),(50,50,50),(100,100,100)]
+hidden_layers_sizes = []
+
+for num_layers in range(1,4):
+    #print(num_layers)
+    #sizes = np.linspace(10,100,num = 10, endpoint = True)
+    #sizes = list(sizes)
+    sizes = [10,50,100]
+    new_layers = list(itertools.combinations_with_replacement(sizes,num_layers))
+    for layer in new_layers:
+        hidden_layers_sizes.append(layer)
+    
+model_params = [{'hidden_layer_sizes':hidden_layers_sizes}]
+model_params = [{'hidden_layer_sizes':[(10),(10,10),(10,10,10),(10,10,10,10)]}] # for manual assignment
+
 #%% Define function for creating outputs_df
 
-def create_outputs(input_df,iterations = 1):
+def create_outputs(input_df,param_grid, iterations = 1):
     
     ### Create a model for every species
     #s = 'Molybdenum' # for testing
@@ -110,12 +134,10 @@ def create_outputs(input_df,iterations = 1):
             X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
                                                                 test_size = 0.3)
             
-            hidden_layers_sizes = [(10,10,10),(50,50,50),(100,100,100)]
-
-            param_grid = [{'hidden_layer_sizes':hidden_layers_sizes}]
+            
             model = MLPRegressor()
             clf = GridSearchCV(model,param_grid,scoring = 'neg_mean_absolute_error')
-
+            print('fitting_model')
             clf.fit(X_train,y_train)
             layers = clf.best_params_['hidden_layer_sizes']
             model_opt = clf.best_estimator_
@@ -234,9 +256,9 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-outputs_df = create_outputs(abs_wq_df) # all samples
-outputs_df_fil = create_outputs(abs_wq_df_fil) # all samples
-outputs_df_unf = create_outputs(abs_wq_df_unf) # all samples
+outputs_df = create_outputs(abs_wq_df,model_params) # all samples
+outputs_df_fil = create_outputs(abs_wq_df_fil,model_params) # all samples
+outputs_df_unf = create_outputs(abs_wq_df_unf,model_params) # all samples
  
 #%% make plots for all samples
 
