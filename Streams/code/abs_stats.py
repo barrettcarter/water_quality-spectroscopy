@@ -8,58 +8,130 @@ Created on Thu Apr  8 10:36:58 2021
 import pandas as pd
 import numpy as np
 import os
-import datetime as dt
+# import datetime as dt
 import matplotlib.pyplot as plt
-import scipy
-from scipy import stats
-import seaborn as sns
-# IMPORTANT: Don't have the baseDir and saveDir be the same
-user = os.getlogin() 
-abs_df_dir='C:/Users/'+user+'/OneDrive/Documents/Data/Inputs/abs/'
+# import scipy
+# from scipy import stats
+# import seaborn as sns
+#from sklearn.cross_decomposition import PLSRegression
+# from sklearn.neural_network import MLPRegressor
+# from sklearn.metrics import r2_score
+# from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import GridSearchCV
+# from sklearn.linear_model import LinearRegression
+# from sklearn.utils import resample
+# from sklearn.metrics import mean_squared_error as MSE
+# from sklearn.ensemble import RandomForestRegressor
+# from sklearn.preprocessing import StandardScaler
 
-abs_df_fn = 'abs_df_u2d.csv'
+#for looking up available scorers
+# import sklearn.metrics
+# sorted(sklearn.metrics.SCORERS.keys())
+# import itertools
+from sklearn.decomposition import PCA
+from sklearn.metrics import r2_score
+from scipy import stats
+
+#%% Set paths and bring in data
+
+user = os.getlogin() 
+path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
+output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
+
+abs_wq_df_fn = 'abs_wq_df_streams.csv'
 
 # Bring in data
-abs_df=pd.read_csv(abs_df_dir+abs_df_fn)
+abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
 
-hat = abs_df.loc[abs_df.Name=='hat',:]
-hat = hat.reset_index(drop=True)
+#%% Get abs values
 
-swb = abs_df.loc[abs_df.Name=='swb',:]
-swb = swb.reset_index(drop=True)
+abs_df = abs_wq_df.loc[:,'band_1':'band_1024']
 
-hogdn = abs_df.loc[abs_df.Name=='hogdn',:]
-hogdn = hogdn.reset_index(drop=True)
+#%% make function for regular subsetting by factor of n
 
-abs_small = abs_df.loc[(abs_df.Name=='hat') | (abs_df.Name=='swb'),:]
-abs_small = abs_small.reset_index(drop=True)
 
-bands = np.linspace(184.2, 667.6,num = 1024)
-bands = np.around(bands,2)
-cols = abs_small.columns.to_numpy()
-cols[7:1031]=bands
+def reg_sub(input_df,factor):
+    
+    inds = np.linspace(1,1024,num=1024,dtype = int)
+    inds = inds%factor==0
+    output_df = input_df.loc[:,inds]
+    return(output_df)
 
-abs_small.columns=cols
+#%% make abs_df_sub
+red_fact = 6
+abs_df_sub = reg_sub(abs_df,red_fact)
 
-abs_long_name = pd.melt(abs_small,id_vars=['Name'],value_vars=list(bands),
-                        var_name='wavelength',value_name='absorbance')
+#%% perform pca on abs_df and abs_df_sub
 
-abs_long_filt = pd.melt(abs_small,id_vars=['Filtered'],value_vars=list(bands),
-                        var_name='wavelength',value_name='absorbance')
+pca = PCA(n_components = 20)
 
-abs_long_small = abs_long_name
+abs_df_red = pca.fit_transform(abs_df)
+abs_df_sub_red = pca.fit_transform(abs_df_sub)
 
-abs_long_small['Filtered']=abs_long_filt['Filtered']
+#%% plot corresponding componets
 
-sns.set_theme(font_scale = 1.25,style='ticks')
-abs_plots = sns.relplot(
-    data=abs_long_small, kind="line",
-    x="wavelength", y="absorbance", col="Name",
-    hue="Filtered", style="Filtered",
-)
-
-abs_plots.set_axis_labels(x_var='Wavelength (nm)',y_var='Absorbance')
-
-sns.set_theme(font_scale = 1.25)
-ex_plot = sns.relplot(data=abs_long_small)
-ex_plot.set_axis_labels(x_var='wavelength (nm)')
+fig, axs = plt.subplots(5,4)
+fig.set_size_inches(18,18)
+fig.suptitle('Reduction factor = '+str(red_fact),fontsize = 28)
+fig.tight_layout(h_pad = 4,w_pad = 6)
+#axs[2, 2].axis('off')
+row = 0
+col = 0
+cols = range(abs_df_red.shape[1])
+for c in cols:
+    abs_red = abs_df_red[:,c]
+    
+    abs_sub_red = abs_df_sub_red[:,c]
+    
+    slope, intercept, r, p, se = stats.linregress(abs_red,abs_sub_red)
+    
+    line11 = np.linspace(min(np.concatenate((abs_red,abs_sub_red))),
+                          max(np.concatenate((abs_red,abs_sub_red))))
+    
+    x_line = np.array([min(abs_red),max(abs_red)])
+    y_line = x_line*slope+intercept      
+    
+    # y_text = min(line11)+(max(line11)-min(line11))*0
+    # x_text = max(line11)-(max(line11)-min(line11))*0.5
+    
+    y_text = min(abs_sub_red)+(max(abs_sub_red)-min(abs_sub_red))*0
+    
+    if slope>0:
+        
+        x_text = max(abs_red)-(max(abs_red)-min(abs_red))*0.5
+        
+    else:
+        
+        x_text = min(abs_red)+(max(abs_red)-min(abs_red))*0.1
+    
+    rsq = r2_score(abs_red,abs_sub_red)
+    
+    ax = axs[row,col]
+    
+    for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+        label.set_fontsize(16)
+    
+    axs[row,col].plot(abs_red,abs_sub_red,'o',markersize = 4)
+    # axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
+    axs[row,col].plot(x_line,y_line,'k-',label= 'fitted line')
+    # axs[row,col].set_title('component '+str(c))
+    #axs[row,col].legend(loc = 'upper left',fontsize = 16)
+    axs[row,col].set_xlabel('Abs. PC'+str(c),fontsize = 16,labelpad = 2)
+    axs[row,col].set_ylabel('Abs. Sub. PC'+str(c),fontsize = 16,labelpad = 2)
+    # axs[row,col].get_xaxis().set_visible(False)
+    ax.text(x_text,y_text,r'$\/r^2 =$'+str(np.round(rsq,3)), fontsize = 16)
+    # ticks = ax.get_yticks()
+    # print(ticks)
+    # # tick_labels = ax.get_yticklabels()
+    # tick_labels =[str(round(x,1)) for x in ticks]
+    # tick_labels = tick_labels[1:-1]
+    # print(tick_labels)
+    # ax.set_xticks(ticks)
+    # ax.set_xticklabels(tick_labels)
+    
+    if col == 3:
+        col = 0
+        row += 1
+    else:
+        col +=1
