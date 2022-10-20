@@ -7,6 +7,7 @@ Created on Wed Nov 17 15:50:49 2021
 
 #%%
 #########################################################################
+
 #%%
 
 my_list = [1.2,3.4,5.6]
@@ -1295,3 +1296,25 @@ sns.set_theme(font_scale = 1.25)
 ex_plot = sns.relplot(data=abs_long_small)
 ex_plot.set_axis_labels(x_var='wavelength (nm)')
 
+#%% Playing around with augmentation
+import numpy as np
+import pandas as pd
+
+def augment(x, betashift, slopeshift, multishift):
+    beta = np.random.random(size=(x.shape[0],1))*2*betashift-betashift
+    slope = np.random.random(size=(x.shape[0],1))*2*slopeshift-slopeshift + 1
+    axis = np.array(range(x.shape[1]))/float(x.shape[1])
+    offset = slope*(axis) + beta - axis - slope/2 + 0.5
+    multi = np.random.random(size=(x.shape[0],1))*2*multishift-multishift + 1
+    return multi*x + offset
+#%% Make example dataframe
+
+my_df = pd.DataFrame({'A':[1,2,3],'B':[4,5,6]})
+my_df_aug = augment(my_df,0.1,0.1,0.1)
+x = my_df
+betashift = 0.1
+slopeshift = 0.1
+multishift = 0.1
+
+A = np.array([1,2])
+B = np.array([[1,2],[3,4]])
