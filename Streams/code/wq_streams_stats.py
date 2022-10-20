@@ -387,8 +387,29 @@ print(table)
 
 #%% Kruskal-Wallis
 
-dmatrices('Conc ~ Name + Date_col + Filtered + Species + Lab',
-                 data = wq_df_anova)
+# dmatrices('Conc ~ Name + Date_col + Filtered + Species + Lab',
+#                  data = wq_df_anova)
+
+#%% Histogram for Nitrate < threshold
+
+thresh = 0.2
+
+c = 'Nitrate-N'
+c1 = c
+c2 = c
+
+Nit1_fil = Lab1_fil[c1][Lab1_fil[c1]<thresh]
+Nit2_fil = Lab2_fil[c2][Lab1_fil[c1]<thresh]
+
+Nit1_unf = Lab1_unf[c1][Lab1_unf[c1]<thresh]
+Nit2_unf = Lab2_unf[c2][Lab1_unf[c1]<thresh]
+
+plt.figure()
+plt.hist(Nit1_fil,label = 'Lab 1',alpha = 0.5)
+plt.hist(Nit2_fil,label = 'Lab 2',alpha = 0.5)
+plt.title('Nitrate-Filtered')
+plt.legend()
+
 
 
 
