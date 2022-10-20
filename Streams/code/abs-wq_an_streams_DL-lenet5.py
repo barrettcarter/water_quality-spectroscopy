@@ -43,7 +43,7 @@ species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
 iEpochs=5000
 
-augmentRatio=7
+augmentRatio=10
 
 abs_wq_df=pd.read_csv(spectra_path)
 
@@ -315,7 +315,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     
     
     """"DROPPING OUT EVERY N'th WAVELENGTH"""
-    n_drop = 2
+    n_drop = 6
     ds_x_smooth = ds_x_smooth[:,range(0,ds_x_smooth.shape[1],n_drop)]
     
     plt.figure(figsize=(12, 8))
@@ -347,7 +347,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
+outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
 #%% Define function for making plots
 
