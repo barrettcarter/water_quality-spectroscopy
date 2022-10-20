@@ -53,6 +53,7 @@ abs_wq_df=abs_wq_df.dropna(axis=0)
 
 # ds_x=df.loc[:,specCols].values
 
+abs_wq_df.loc[abs_wq_df['Phosphate-P']<0.15,['Phosphate-P','TP','OP']]=-0.1
 
 #%%
 ################################################################################ FUNCTIONS
@@ -105,9 +106,9 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
     """## Train/Val Split"""
     print('Full set:',X_train.shape)
     
-    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=.25,
+    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.25,
                                                       random_state= iteration)
-    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.20,
+    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=.20,
                                                           random_state=iteration)
     
     y_train_ind = list(y_train.index)
@@ -315,7 +316,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     
     
     """"DROPPING OUT EVERY N'th WAVELENGTH"""
-    n_drop = 6
+    n_drop = 4
     ds_x_smooth = ds_x_smooth[:,range(0,ds_x_smooth.shape[1],n_drop)]
     
     plt.figure(figsize=(12, 8))
@@ -356,10 +357,10 @@ def make_plots(outputs_df, output_label):
     ## make plots for both filtered and unfiltered samples
         
     fig, axs = plt.subplots(4,2)
-    fig.set_size_inches(10,20)
+    fig.set_size_inches(15,20)
     fig.suptitle(output_label,fontsize = 18)
     fig.tight_layout(pad = 4)
-    axs[2, 1].axis('off')
+    #axs[2, 1].axis('off')
     row = 0
     col = 0
     species = outputs_df.species.unique()
