@@ -10,6 +10,7 @@ import numpy as np
 import os
 # import datetime as dt
 import matplotlib.pyplot as plt
+import matplotlib
 # import scipy
 # from scipy import stats
 # import seaborn as sns
@@ -86,6 +87,54 @@ for clusts in [0,1,2]:
     plt.ylabel('PC2')
     ax.set_zlabel('PC3')
 
+#%%
+matplotlib.rcParams.update({'font.size': 20})
+df = abs_wq_df
+
+sites = df['Name'].unique()
+
+
+
+for c in range(3):
+
+    fig, axs = plt.subplots(3,3)
+    fig.set_size_inches(15,15)
+    #fig.suptitle(output_label,fontsize = 18)
+    #fig.tight_layout(pad = 1)
+    axs[2, 0].axis('off')
+    axs[2, 2].axis('off')
+    row = 0
+    col = 0
+    
+    for s in sites:
+        
+        site_clusters = df.loc[df['Name']==s,df.columns[c]]
+        cluster_set = np.sort(site_clusters.unique())
+        
+        ax = axs[row,col]
+        
+        # for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+        #     label.set_fontsize(16)
+        
+        n, bins, patches = axs[row,col].hist(site_clusters,c+2,(0,c+2),align = 'left')
+        ax.set_xticks(cluster_set)
+        ax.set_xticklabels(cluster_set)
+        #print(patches)
+        #plt.setp(patches[3],'facecolor','C2')
+        for p in range(c+2):
+            clr = 'C'+str(int(p))
+            plt.setp(patches[p],'facecolor',clr)
+        axs[row,col].set_title(s)
+        
+        if col == 2 and row!=1:
+            col = 0
+            row += 1
+        elif col==2 and row == 1:
+            col = 1
+            row += 1
+        else:
+            col +=1
+
 #%% make new dataframe with clusters
 
 # abs_wq_clust_df = abs_wq_df.copy()
@@ -95,10 +144,14 @@ for clusts in [0,1,2]:
 
 #%% insert columns in dataframe
 
-abs_wq_df.drop(labels = 'Unnamed: 0',axis=1,inplace=True)
-abs_wq_df.insert(0,'2-Cluster-Cat',clusters[:,0])
-abs_wq_df.insert(1,'3-Cluster-Cat',clusters[:,1])
-abs_wq_df.insert(2,'4-Cluster-Cat',clusters[:,2])
-#%% save dataframe
+# abs_wq_df.drop(labels = 'Unnamed: 0',axis=1,inplace=True)
+# abs_wq_df.insert(0,'2-Cluster-Cat',clusters[:,0])
+# abs_wq_df.insert(1,'3-Cluster-Cat',clusters[:,1])
+# abs_wq_df.insert(2,'4-Cluster-Cat',clusters[:,2])
+# #%% save dataframe
 
-abs_wq_df.to_csv(inter_dir+'abs_wq_df_streams.csv',index=False)
+# abs_wq_df.to_csv(inter_dir+'abs_wq_df_streams.csv',index=False)
+
+for p in range(3): 
+    for n in range(p+1): 
+        print(n)
