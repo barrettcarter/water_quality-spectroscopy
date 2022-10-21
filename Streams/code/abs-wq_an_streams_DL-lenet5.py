@@ -24,6 +24,7 @@ from keras.optimizers import Adam
 # from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error as MSE
+from sklearn.decomposition import PCA
 
 #%%
 ################################################################################ DEFAULTS
@@ -289,6 +290,8 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
     scaler_x = MinMaxScaler()
     ds_x = input_df.loc[:,specCols].values
+    # pca = PCA(n_components = 10)
+    # ds_x = pca.fit_transform(ds_x)
     ds_x = scaler_x.fit_transform(ds_x)
     # scaler_y = MinMaxScaler()
     #ds_y = scaler_y.fit_transform(ds_y)
