@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib
+import seaborn as sns
 
 #%% Bring in Data
 
@@ -57,3 +58,31 @@ plt.figure()
 plt.boxplot(g4_df,notch=True,medianprops = {'color': 'red'})
 plt.ylabel('Concentration (mg/L)')
 plt.xticks([1,2,3,4,5],group4)
+
+#%% make 3D plot
+
+fig = plt.figure()
+ax = plt.axes(projection = '3d')
+ax.scatter3D(HNSs_df['Ca'],HNSs_df['K'],HNSs_df['NO3N'])
+plt.xlabel('Ca (mg/L)')
+plt.ylabel('K (mg/L)')
+ax.set_zlabel('NO3N (mg/L)')
+
+#%% make heatmap
+
+HNSs_df.drop('TKN',axis = 1,inplace = True)
+HNSs = HNSs_df.loc[:,'B':]
+HNSs_ar = HNSs.to_numpy()
+#HNSs_corrs = np.empty([HNSs.shape[1],HNSs.shape[1]])
+HNSs_corrs = np.corrcoef(HNSs_ar,rowvar = False)
+HNSs_map = np.empty(HNSs_corrs.shape)
+
+for r in range(HNSs_map.shape[0]):
+    for c in range(HNSs_map.shape[1]):
+        if r>c:
+            HNSs_map[r,c]=False
+        else:
+            HNSs_map[r,c]=True
+            
+sns.heatmap(HNSs_corrs,mask = HNSs_map,xticklabels = HNSs.columns,yticklabels = HNSs.columns,
+            vmin = -1, vmax = 1,center =0, cmap = 'coolwarm')
