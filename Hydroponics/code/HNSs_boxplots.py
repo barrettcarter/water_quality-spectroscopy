@@ -76,6 +76,7 @@ HNSs_ar = HNSs.to_numpy()
 #HNSs_corrs = np.empty([HNSs.shape[1],HNSs.shape[1]])
 HNSs_corrs = np.corrcoef(HNSs_ar,rowvar = False)
 HNSs_map = np.empty(HNSs_corrs.shape)
+#mean_sq_corr = np.mean(HNSs_corrs**2)
 
 for r in range(HNSs_map.shape[0]):
     for c in range(HNSs_map.shape[1]):
@@ -83,6 +84,13 @@ for r in range(HNSs_map.shape[0]):
             HNSs_map[r,c]=False
         else:
             HNSs_map[r,c]=True
-            
+ 
+HNSs_map2 = (HNSs_map-1)**2
+#HNSs_corrs2 = HNSs_corrs*HNSs_map2
+HNSs_corrs2 = HNSs_corrs.flatten()
+HNSs_corrs2 = HNSs_corrs2[HNSs_corrs2**2<0.99]
+mean_corr = np.mean(HNSs_corrs2)
+mean_sq_corr = np.mean(HNSs_corrs2**2)
 sns.heatmap(HNSs_corrs,mask = HNSs_map,xticklabels = HNSs.columns,yticklabels = HNSs.columns,
             vmin = -1, vmax = 1,center =0, cmap = 'coolwarm')
+
