@@ -4,6 +4,7 @@ Created on Tue Mar 23 16:39:55 2021
 
 @author: jbarrett.carter
 """
+#%% import libraries
 
 import pandas as pd
 import numpy as np
@@ -26,9 +27,9 @@ from sklearn.metrics import mean_squared_error as MSE
 import sklearn.metrics
 sorted(sklearn.metrics.SCORERS.keys())
 
-#%%
+from joblib import dump
 
-### Set paths and bring in data
+#%% Set paths and bring in data
 
 user = os.getlogin() 
 path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
@@ -77,13 +78,10 @@ def create_outputs(input_df,iterations = 1):
                       'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
                       'RMSE_train','MAPE_test','MAPE_train','n_comp']
     
-    
-    
+       
     iteration = 1 # this is for testing
     
-    species = input_df.columns[1:9]
-    
-    
+    species = input_df.columns[0:9]
     
     for s in species:
         for iteration in range(iterations):
@@ -128,9 +126,11 @@ def create_outputs(input_df,iterations = 1):
                 # print(out)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = outputs_df.append(sub_df,ignore_index=True)
-            
-
-        
+                
+            filename = f'pls_{s}_It{iteration}.joblib'
+            pickle_path = os.path.join(output_dir,'picklejar',filename)
+            dump(clf,pickle_path)
+                  
     return(outputs_df)
 
 #%% Define function for making plots
@@ -213,7 +213,7 @@ def make_plots(outputs_df, output_label):
             col +=1
     # fig.show()
 
-#%% make and save outputs
+#%% function for make and save outputs
 
 def make_and_save_outputs(input_df,output_path,iterations = 1):
     outputs_df = create_outputs(input_df,iterations)
