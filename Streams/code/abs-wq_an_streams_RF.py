@@ -109,7 +109,7 @@ def create_outputs(input_df,iterations = 1):
             param_grid = {'max_features':stats.uniform(scale = 0.01),
                           'ccp_alpha':stats.uniform(scale=0.01)}
             
-            clf = RandomizedSearchCV(RF(n_estimators = 100,random_state=iteration),
+            clf = RandomizedSearchCV(RF(n_estimators = 1000,random_state=iteration),
                                      param_grid,n_iter = 20,
                                      scoring = 'neg_mean_absolute_error',
                                      random_state = iteration)
