@@ -106,8 +106,8 @@ def create_outputs(input_df,iterations = 1):
             X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
                                                                 test_size = 0.3)
 
-            param_grid = {'max_features':stats.uniform(scale = 0.1),
-                          'ccp_alpha':stats.uniform(scale=0.1)}
+            param_grid = {'max_features':stats.uniform(scale = 0.01),
+                          'ccp_alpha':stats.uniform(scale=0.01)}
             
             clf = RandomizedSearchCV(RF(n_estimators = 100,random_state=iteration),
                                      param_grid,n_iter = 20,
@@ -249,7 +249,7 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_RF_It0_results_2.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_RF_It0_results_3.csv',index=False)
    
 #%% make and save output.
 
