@@ -64,7 +64,7 @@ plt.xlabel('True')
 #%% Look at model tuning parameters
 
 tuning_results = clf.cv_results_
-scores = np.array(tuning_results['mean_test_score'])
+scores = np.array(tuning_results['mean_test_score']*-1)
 alphas = np.array(tuning_results['param_ccp_alpha'])
 max_feats = np.array(tuning_results['param_max_features'])
 max_feats = max_feats*1024
@@ -74,7 +74,7 @@ max_feats = max_feats*1024
 fig, axs = plt.subplots(1,2)
 axs[0].plot(alphas,scores,'o')
 axs[0].set_xlabel('pruning alpha values')
-axs[0].set_ylabel('negative SSE')
+axs[0].set_ylabel('SSE')
 
 axs[1].plot(max_feats,scores,'o')
 axs[1].set_xlabel('number of wavelengths')
@@ -90,9 +90,13 @@ X_lm = pd.DataFrame({'alphas':alphas,'max_feats':max_feats})
 X_lm['alphas']=X_lm['alphas'].apply(lambda x: float(x))
 X_lm['max_feats']=X_lm['max_feats'].apply(lambda x: float(x))
 X_lm = sm.add_constant(X_lm)
+#X_lm['axm']=X_lm.alphas*X_lm.max_feats
 
 y = pd.DataFrame({'scores':scores})
 
 lr_1 = sm.OLS(y, X_lm).fit()
 
-lr_1.summary()
+print(lr_1.summary())
+
+#%%
+plt.scatter(alphas*max_feats,scores)
