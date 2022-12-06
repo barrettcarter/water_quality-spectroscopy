@@ -99,4 +99,5 @@ lr_1 = sm.OLS(y, X_lm).fit()
 print(lr_1.summary())
 
 #%%
-plt.scatter(alphas*max_feats,scores)
+# plt.scatter(alphas*max_feats,scores)
+# plt.scatter(alphas,max_feats)
