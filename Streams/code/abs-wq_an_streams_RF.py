@@ -93,7 +93,14 @@ def create_outputs(input_df,iterations = 1):
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             Y = input_df[s]
+            
             keep = pd.notna(Y)
+            
+            # keep = pd.notna(Y) & (Y>0.15)
+            
+            # if sum(keep)<10:
+            #     keep = pd.notna(Y)
+        
             X = input_df.loc[keep,'band_1':'band_1024']
             
             # dimensional reduction
@@ -103,13 +110,14 @@ def create_outputs(input_df,iterations = 1):
             
             Y = Y[keep]
             
-            X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
+            X_train, X_test, y_train, y_test = train_test_split(X, Y, 
+                                                                random_state=iteration,
                                                                 test_size = 0.3)
 
-            param_grid = {'max_features':stats.uniform(scale = 0.01),
+            param_grid = {'max_features':stats.uniform(loc = 1/1024,scale = 20/1024),
                           'ccp_alpha':stats.uniform(scale=0.01)}
             
-            clf = RandomizedSearchCV(RF(n_estimators = 1000,random_state=iteration),
+            clf = RandomizedSearchCV(RF(n_estimators = 100,random_state=iteration),
                                      param_grid,n_iter = 20,
                                      scoring = 'neg_mean_absolute_error',
                                      random_state = iteration)
@@ -249,7 +257,7 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_RF_It0_results_3.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_RF_It0_results_4.csv',index=False)
    
 #%% make and save output.
 
