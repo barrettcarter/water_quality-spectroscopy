@@ -90,7 +90,7 @@ X_lm = pd.DataFrame({'alphas':alphas,'max_feats':max_feats})
 X_lm['alphas']=X_lm['alphas'].apply(lambda x: float(x))
 X_lm['max_feats']=X_lm['max_feats'].apply(lambda x: float(x))
 X_lm = sm.add_constant(X_lm)
-#X_lm['axm']=X_lm.alphas*X_lm.max_feats
+X_lm['axm']=X_lm.alphas*X_lm.max_feats
 
 y = pd.DataFrame({'scores':scores})
 
@@ -99,5 +99,7 @@ lr_1 = sm.OLS(y, X_lm).fit()
 print(lr_1.summary())
 
 #%%
-# plt.scatter(alphas*max_feats,scores)
-# plt.scatter(alphas,max_feats)
+plt.figure()
+plt.scatter(alphas*max_feats,scores)
+plt.figure()
+plt.scatter(alphas,max_feats)
