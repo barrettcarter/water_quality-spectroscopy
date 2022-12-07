@@ -245,7 +245,7 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(1,2,2,dtype=int)) # all samples
+outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 outputs_df_fil = create_outputs(abs_wq_df_fil) # all samples
 outputs_df_unf = create_outputs(abs_wq_df_unf) # all samples
  
@@ -257,14 +257,11 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_RF_It0_results_7.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_RF_It1-2_results.csv',index=False)
    
 #%% make and save output.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_RF_It0-9_results.csv',
-                      iterations = 10)
+make_and_save_outputs(abs_wq_df,output_dir+'streams_RF_It3-19_results.csv',
+                      iterations = np.linspace(3,19,17,dtype=int))
 
 #%%
-
-for i in np.linspace(5,10,5):
-    print(i)
