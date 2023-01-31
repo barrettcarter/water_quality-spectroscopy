@@ -66,32 +66,31 @@ plt.xlabel('True')
 
 tuning_results = clf.cv_results_
 scores = np.array(tuning_results['mean_test_score']*-1)
-alphas = np.array(tuning_results['param_ccp_alpha'])
-max_feats = np.array(tuning_results['param_max_features'])
-max_feats = max_feats*1024
+learning_rate = np.array(tuning_results['param_learning_rate'])
+max_depth = np.array(tuning_results['param_max_depth'])
 
 #%% Make plots
 
 fig, axs = plt.subplots(1,2)
-axs[0].plot(alphas,scores,'o')
-axs[0].set_xlabel('pruning alpha values')
-axs[0].set_ylabel('SSE')
+axs[0].plot(learning_rate,scores,'o')
+axs[0].set_xlabel('learning_rate (eta)')
+axs[0].set_ylabel('MAE (mg/L)')
 
-axs[1].plot(max_feats,scores,'o')
-axs[1].set_xlabel('number of wavelengths')
+axs[1].plot(max_depth,scores,'o')
+axs[1].set_xlabel('maximum tree depth')
 w = axs[1].get_yaxis() 
      
 Tick.set_visible(w, False)
 
-#plt.scatter(alphas,scores)
+#plt.scatter(learning_rate,scores)
 
 #%% test for significance
 
-X_lm = pd.DataFrame({'alphas':alphas,'max_feats':max_feats})
-X_lm['alphas']=X_lm['alphas'].apply(lambda x: float(x))
-X_lm['max_feats']=X_lm['max_feats'].apply(lambda x: float(x))
+X_lm = pd.DataFrame({'learning_rate':learning_rate,'max_depth':max_depth})
+X_lm['learning_rate']=X_lm['learning_rate'].apply(lambda x: float(x))
+X_lm['max_depth']=X_lm['max_depth'].apply(lambda x: float(x))
 X_lm = sm.add_constant(X_lm)
-X_lm['axm']=X_lm.alphas*X_lm.max_feats
+X_lm['axm']=X_lm.learning_rate*X_lm.max_depth
 
 y = pd.DataFrame({'scores':scores})
 
@@ -101,6 +100,6 @@ print(lr_1.summary())
 
 #%%
 plt.figure()
-plt.scatter(alphas*max_feats,scores)
+plt.scatter(learning_rate*max_depth,scores)
 plt.figure()
-plt.scatter(alphas,max_feats)
+plt.scatter(learning_rate,max_depth)
