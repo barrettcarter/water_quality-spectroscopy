@@ -35,7 +35,8 @@ from joblib import dump
 #%% Set paths and bring in data
 
 user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -79,11 +80,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
                                                     random_state=iteration,
                                                     test_size = 0.3)
 
-param_grid = {'max_depth':stats.randint(2,10),
-              'learning_rate':stats.uniform(scale=0.5)}
+param_grid = {'max_depth':stats.randint(2,100),
+              'learning_rate':stats.uniform(scale=1)}
 
 clf = RandomizedSearchCV(XGBR,
-                         param_grid,n_iter = 10,
+                         param_grid,n_iter = 20,
                          scoring = 'neg_mean_absolute_error',
                          random_state = iteration)
 
@@ -97,6 +98,27 @@ plt.figure()
 plt.scatter(y_test,Y_hat)
 plt.ylabel('Predicted')
 plt.xlabel('True')
+
+cv_results = pd.DataFrame(clf.cv_results_)
+cv_results['learning_rate']=cv_results.params.apply(lambda x: x['learning_rate'])
+cv_results['max_depth']=cv_results.params.apply(lambda x: x['max_depth'])
+
+fig = plt.figure()
+ax = fig.add_subplot(projection='3d')
+ax.scatter(cv_results.learning_rate,cv_results.max_depth,cv_results.mean_test_score)
+ax.set_xlabel('learning rate')
+ax.set_ylabel('max depth')
+ax.set_zlabel('negative MAE')
+
+plt.figure()
+plt.scatter(cv_results.learning_rate,cv_results.mean_test_score)
+plt.xlabel('learning rate')
+plt.ylabel('negative MAE')
+
+plt.figure()
+plt.scatter(cv_results.max_depth,cv_results.mean_test_score)
+plt.xlabel('max depth')
+plt.ylabel('negative MAE')
 
 filename = f'XGB_{s}_It{iteration}.joblib'
 pickle_path = os.path.join(output_dir,'picklejar',filename)
