@@ -17,7 +17,8 @@ from scipy import stats
 # from sklearn.cross_decomposition import PLSRegression
 # from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
-from sklearn.model_selection import RandomizedSearchCV
+# from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import GridSearchCV
 # from sklearn.linear_model import LinearRegression
 # from sklearn.utils import resample
 from sklearn.metrics import mean_squared_error as MSE
@@ -119,13 +120,18 @@ def create_outputs(input_df,iterations = 1):
                                                                 random_state=iteration,
                                                                 test_size = 0.3)
 
-            param_grid = {'max_depth':stats.randint(2,100),
-              'learning_rate':stats.uniform(scale=1)}
+            # param_grid = {'max_depth':stats.randint(2,10),
+            #   'learning_rate':stats.uniform(scale=0.2)}
             
-            clf = RandomizedSearchCV(XGBR,
-                         param_grid,n_iter = 20,
-                         scoring = 'neg_mean_absolute_error',
-                         random_state = iteration)
+            # clf = RandomizedSearchCV(XGBR,
+            #              param_grid,n_iter = 20,
+            #              scoring = 'neg_mean_absolute_error',
+            #              random_state = iteration)
+            
+            param_grid = [{'max_depth':np.arange(1,21,dtype=int),
+                           'learning_rate':np.arange(0.01,0.21,step=0.01)}]
+            
+            clf = GridSearchCV(XGBR,param_grid,scoring = 'neg_mean_absolute_error')
 
             clf.fit(X_train,y_train)
             max_depth = float(clf.best_params_['max_depth'])
@@ -263,7 +269,7 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_RF_It1-2_results.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_XGB_It1_md1-20_lr001-02_results.csv',index=False)
    
 #%% make and save output.
 
