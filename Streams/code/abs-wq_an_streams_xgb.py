@@ -12,7 +12,7 @@ import os
 # import datetime as dt
 import matplotlib.pyplot as plt
 # import scipy
-from scipy import stats
+# from scipy import stats
 # import seaborn as sns
 # from sklearn.cross_decomposition import PLSRegression
 # from sklearn.metrics import r2_score
@@ -35,7 +35,8 @@ from joblib import dump
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
