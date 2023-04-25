@@ -8,7 +8,7 @@ Created on Wed Dec  7 14:57:51 2022
 #%% import libraries
 
 import pandas as pd
-# import numpy as np
+import numpy as np
 import os
 import datetime as dt
 import matplotlib.pyplot as plt
@@ -57,7 +57,7 @@ input_df = abs_wq_df
 s = 'Nitrate-N'
 iteration = 0
 
-n_est = 500
+n_est = 100
 e_stop = 3
 
 XGBR = xgb.XGBRegressor(n_estimators = n_est,random_state=iteration,booster = 'gbtree',
@@ -89,7 +89,7 @@ X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train,
                                                     random_state=iteration,
                                                     test_size = 0.2)
 
-param_grid = {'max_depth':stats.randint(2,50),
+param_grid = {'max_depth':stats.randint(2,10),
               'learning_rate':stats.uniform(scale=0.2)}
 
 clf = RandomizedSearchCV(XGBR,
@@ -115,8 +115,23 @@ mod_opt = clf.best_estimator_
 Y_hat = list(mod_opt.predict(X_test))
 Y_hat_train = list(mod_opt.predict(X_train))
 
+res_tr = Y_hat_train - y_train
+sse_tr = sum(res_tr**2)
+mse_tr = np.mean(sse_tr)
+rmse_tr = np.sqrt(mse_tr)
+
+res_te = Y_hat - y_test
+sse_te = sum(res_te**2)
+mse_te = np.mean(sse_te)
+rmse_te = np.sqrt(mse_te)
+
+min11 = min([min(y_test),min(Y_hat)])
+max11 = max([max(y_test),max(Y_hat)])
+
 plt.figure()
+plt.scatter(y_train,Y_hat_train)
 plt.scatter(y_test,Y_hat)
+plt.plot([min11,max11],[min11,max11],'--k')
 plt.ylabel('Predicted')
 plt.xlabel('True')
 plt.title(s)
