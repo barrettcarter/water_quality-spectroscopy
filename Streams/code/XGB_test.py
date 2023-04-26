@@ -57,7 +57,7 @@ input_df = abs_wq_df
 s = 'Nitrate-N'
 iteration = 0
 
-n_est = 100
+n_est = 20
 e_stop = 3
 
 XGBR = xgb.XGBRegressor(n_estimators = n_est,random_state=iteration,booster = 'gbtree',
@@ -90,7 +90,7 @@ X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train,
                                                     test_size = 0.2)
 
 param_grid = {'max_depth':stats.randint(2,10),
-              'learning_rate':stats.uniform(scale=0.2)}
+              'learning_rate':stats.uniform(scale=1)}
 
 clf = RandomizedSearchCV(XGBR,
                          param_grid,n_iter = 20,
@@ -115,18 +115,27 @@ mod_opt = clf.best_estimator_
 Y_hat = list(mod_opt.predict(X_test))
 Y_hat_train = list(mod_opt.predict(X_train))
 
+learning_rate = mod_opt.learning_rate
+max_depth = mod_opt.max_depth
+n_est = mod_opt.n_estimators
+
 res_tr = Y_hat_train - y_train
-sse_tr = sum(res_tr**2)
-mse_tr = np.mean(sse_tr)
+se_tr = res_tr**2
+sse_tr = sum(se_tr)
+mse_tr = np.mean(se_tr)
 rmse_tr = np.sqrt(mse_tr)
 
 res_te = Y_hat - y_test
-sse_te = sum(res_te**2)
-mse_te = np.mean(sse_te)
+se_te = res_te**2
+sse_te = sum(se_te)
+mse_te = np.mean(se_te)
 rmse_te = np.sqrt(mse_te)
 
 min11 = min([min(y_test),min(Y_hat)])
 max11 = max([max(y_test),max(Y_hat)])
+
+y_text = min11+(max11-min11)*0
+x_text = max11+(max11-min11)*0.1
 
 plt.figure()
 plt.scatter(y_train,Y_hat_train)
@@ -135,6 +144,12 @@ plt.plot([min11,max11],[min11,max11],'--k')
 plt.ylabel('Predicted')
 plt.xlabel('True')
 plt.title(s)
+plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
+                +'$RMSE_{te} =$'+str(np.round(rmse_te,2))+'\n'
+                +'$LR =$'+str(np.round(learning_rate,2))+'\n'
+                +'$MD =$'+str(int(max_depth))+'\n'
+                +'$n_{est} =$'+str(int(n_est)), fontsize = 12)
+
 plt.savefig(os.path.join(figure_dir,f'XGB_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 cv_results = pd.DataFrame(clf.cv_results_)
@@ -147,6 +162,7 @@ ax.scatter(cv_results.learning_rate,cv_results.max_depth,cv_results.mean_test_sc
 ax.set_xlabel('learning rate')
 ax.set_ylabel('max depth')
 ax.set_zlabel('negative MSE')
+
 plt.savefig(os.path.join(figure_dir,f'XGB_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
             
 
@@ -154,12 +170,14 @@ plt.figure()
 plt.scatter(cv_results.learning_rate,cv_results.mean_test_score)
 plt.xlabel('learning rate')
 plt.ylabel('negative MSE')
+
 plt.savefig(os.path.join(figure_dir,f'XGB_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 plt.figure()
 plt.scatter(cv_results.max_depth,cv_results.mean_test_score)
 plt.xlabel('max depth')
 plt.ylabel('negative MSE')
+
 plt.savefig(os.path.join(figure_dir,f'XGB_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 filename = f'XGB_{s}_{train_stop_str}.joblib'
