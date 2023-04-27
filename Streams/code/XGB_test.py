@@ -57,7 +57,7 @@ input_df = abs_wq_df
 s = 'Nitrate-N'
 iteration = 0
 
-n_est = 20
+n_est = 100
 e_stop = 3
 
 XGBR = xgb.XGBRegressor(n_estimators = n_est,random_state=iteration,booster = 'gbtree',
@@ -89,8 +89,8 @@ X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train,
                                                     random_state=iteration,
                                                     test_size = 0.2)
 
-param_grid = {'max_depth':stats.randint(2,10),
-              'learning_rate':stats.uniform(scale=1)}
+param_grid = {'max_depth':stats.randint(2,3),
+              'learning_rate':stats.uniform(scale=0.2)}
 
 clf = RandomizedSearchCV(XGBR,
                          param_grid,n_iter = 20,
