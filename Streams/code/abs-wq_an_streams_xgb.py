@@ -281,7 +281,7 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_XGB_It1_md1-20_lr001-02_results.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_XGB_It1_md1-20_lr001-02_nest500_results.csv',index=False)
    
 #%% make and save output.
 
