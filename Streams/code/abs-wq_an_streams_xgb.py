@@ -35,8 +35,8 @@ from joblib import dump
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -96,7 +96,7 @@ def create_outputs(input_df,iterations = 1):
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             
-            XGBR = xgb.XGBRegressor(n_estimators = 100,random_state=iteration,booster = 'gbtree',
+            XGBR = xgb.XGBRegressor(n_estimators = 500,random_state=iteration,booster = 'gbtree',
                         tree_method = 'exact')
             
             Y = input_df[s]
@@ -132,7 +132,7 @@ def create_outputs(input_df,iterations = 1):
             param_grid = [{'max_depth':np.arange(1,21,dtype=int),
                            'learning_rate':np.arange(0.01,0.21,step=0.01)}]
             
-            clf = GridSearchCV(XGBR,param_grid,scoring = 'neg_mean_absolute_error')
+            clf = GridSearchCV(XGBR,param_grid,scoring = 'neg_mean_squared_error')
 
             clf.fit(X_train,y_train)
             max_depth = float(clf.best_params_['max_depth'])
@@ -208,15 +208,23 @@ def make_plots(outputs_df, output_label):
         y_text = min(line11)+(max(line11)-min(line11))*0
         x_text = max(line11)-(max(line11)-min(line11))*0.5
         
-        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
+        train_rmse = outputs_df['value'][(outputs_df.output == 'train_rmse')&
                             (outputs_df.species==s)]
         
-        train_rsq = np.mean(train_rsq)
+        train_rmse = np.mean(train_rmse)
         
-        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
+        test_rmse = outputs_df['value'][(outputs_df.output == 'test_rmse')&
                             (outputs_df.species==s)]
         
-        test_rsq = np.mean(test_rsq)
+        test_rmse = np.mean(test_rmse)
+        
+        learning_rate = outputs_df['value'][(outputs_df.output == 'learning_rate')&
+                            (outputs_df.species==s)]
+        
+        learning_rate = np.mean(learning_rate)
+        
+        max_depth = outputs_df['value'][(outputs_df.output == 'max_depth')&
+                            (outputs_df.species==s)]
         
         ax = axs[row,col]
         
@@ -227,12 +235,15 @@ def make_plots(outputs_df, output_label):
         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
         # axs[row,col].set_title(s)
-        axs[row,col].legend(loc = 'upper left',fontsize = 16)
+        if (row == 0) and (col == 0):
+            axs[row,col].legend(loc = 'upper left',fontsize = 16)
         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
         # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
-                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
+        ax.text(x_text,y_text,'$rmse_{tr} =$'+str(np.round(train_rmse,3))+'\n'
+                +'$rmse_{te} =$'+str(np.round(test_rmse,3))+'\n'
+                +'$lr =$'+str(np.round(learning_rate,2))+'\n'
+                +'$md =$'+str(int(max_depth)), fontsize = 16)
         # ticks = ax.get_yticks()
         # print(ticks)
         # # tick_labels = ax.get_yticklabels()
@@ -270,7 +281,7 @@ make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_XGB_It1_md1-20_lr001-02_results.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_XGB_It1_md1-20_lr001-02_nest500_results.csv',index=False)
    
 #%% make and save output.
 
