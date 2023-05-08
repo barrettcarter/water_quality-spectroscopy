@@ -54,7 +54,7 @@ abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 #%% Make example xgb model
 input_df = abs_wq_df
-s = 'Nitrate-N'
+s = 'Phosphate-P'
 iteration = 0
 
 n_est = 100
@@ -67,10 +67,10 @@ Y = input_df[s]
             
 keep = pd.notna(Y)
 
-# keep = pd.notna(Y) & (Y>0.15)
+keep = pd.notna(Y) & (Y>0.15)
 
-# if sum(keep)<10:
-#     keep = pd.notna(Y)
+if sum(keep)<10:
+    keep = pd.notna(Y)
 
 X = input_df.loc[keep,'band_1':'band_1024']
 
@@ -89,8 +89,8 @@ X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train,
                                                     random_state=iteration,
                                                     test_size = 0.2)
 
-param_grid = {'max_depth':stats.randint(2,3),
-              'learning_rate':stats.uniform(scale=0.2)}
+param_grid = {'max_depth':stats.randint(5,10),
+              'learning_rate':stats.uniform(scale=0.004)}
 
 clf = RandomizedSearchCV(XGBR,
                          param_grid,n_iter = 20,
@@ -146,7 +146,7 @@ plt.xlabel('True')
 plt.title(s)
 plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
                 +'$RMSE_{te} =$'+str(np.round(rmse_te,2))+'\n'
-                +'$LR =$'+str(np.round(learning_rate,2))+'\n'
+                +'$LR =$'+'{:.2e}'.format(learning_rate)+'\n'
                 +'$MD =$'+str(int(max_depth))+'\n'
                 +'$n_{est} =$'+str(int(n_est)), fontsize = 12)
 
