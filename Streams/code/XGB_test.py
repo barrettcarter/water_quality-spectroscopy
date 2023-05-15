@@ -336,11 +336,11 @@ mod = pca_xgb(random_state=iteration)
 
 param_grid = {'max_depth':stats.randint(1,20),
               'learning_rate':stats.uniform(loc=0.02,scale=0.5),
-              'n_components':stats.randint(10,100),
-              'detect_lim':stats.uniform(scale=0.1)}
+              'n_components':stats.randint(10,200),
+              'detect_lim':stats.uniform(scale=0.4)}
 
 clf = RandomizedSearchCV(mod,
-                         param_grid,n_iter = 100,
+                         param_grid,n_iter = 1000,
                          scoring = 'neg_mean_squared_error',
                          random_state = iteration)
 
@@ -349,14 +349,6 @@ train_start = dt.datetime.now()
 clf.fit(X_train,y_train)
 
 train_stop = dt.datetime.now()
-
-train_stop_str = str(train_stop)
-stop_date = train_stop_str.split(sep = ' ')[0]
-stop_time = train_stop_str.split(sep = ' ')[1]
-stop_time = str(float(stop_time.split(':')[0])+float(stop_time.split(':')[1])/60+float(stop_time.split(':')[2])/3600)
-train_stop_str = stop_date+'_'+stop_time
-
-train_time = train_stop - train_start
 
 #%% post-processing
 
