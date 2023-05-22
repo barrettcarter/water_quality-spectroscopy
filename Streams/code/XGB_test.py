@@ -238,8 +238,10 @@ class pca_xgb(BaseEstimator):
         
         X = pd.DataFrame(self.pca_fitted.transform(X))
         X = MinMaxScaler().fit_transform(X)
+        y_hat = pd.Series(self.XGBR_fitted.predict(X))
+        y_hat[y_hat<self.detect_lim]=0
         
-        return(self.XGBR_fitted.predict(X))
+        return(y_hat)
     
     
     def set_params(self, **params):
@@ -308,7 +310,7 @@ plt.ylabel('Predicted')
 #%% calibrate combined model
 
 input_df = abs_wq_df
-s = 'Phosphate-P'
+s = 'TKN'
 iteration = 0
 
 Y = input_df[s]
@@ -334,13 +336,13 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
 
 mod = pca_xgb(random_state=iteration)
 
-param_grid = {'max_depth':stats.randint(1,20),
-              'learning_rate':stats.uniform(loc=0.02,scale=0.5),
-              'n_components':stats.randint(10,200),
-              'detect_lim':stats.uniform(scale=0.4)}
+param_grid = {'max_depth':stats.randint(1,4),
+              'learning_rate':stats.uniform(loc=0.02,scale=0.3),
+              'n_components':stats.randint(10,50),
+              'detect_lim':stats.uniform(scale=0.5*max(y_train))}
 
 clf = RandomizedSearchCV(mod,
-                         param_grid,n_iter = 1000,
+                         param_grid,n_iter = 100,
                          scoring = 'neg_mean_squared_error',
                          random_state = iteration)
 
