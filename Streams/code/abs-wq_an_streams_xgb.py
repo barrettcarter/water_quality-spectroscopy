@@ -9,34 +9,38 @@ Created on Tue Mar 23 16:39:55 2021
 import pandas as pd
 import numpy as np
 import os
-# import datetime as dt
+import datetime as dt
 import matplotlib.pyplot as plt
 # import scipy
-# from scipy import stats
+from scipy import stats
 # import seaborn as sns
 # from sklearn.cross_decomposition import PLSRegression
 # from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
-# from sklearn.model_selection import RandomizedSearchCV
-from sklearn.model_selection import GridSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 # from sklearn.linear_model import LinearRegression
 # from sklearn.utils import resample
 from sklearn.metrics import mean_squared_error as MSE
 import xgboost as xgb
-
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import MinMaxScaler
 
 #for looking up available scorers
 import sklearn.metrics
 sorted(sklearn.metrics.SCORERS.keys())
 
+from sklearn.metrics import r2_score
+
 from joblib import dump
+
+from sklearn.base import BaseEstimator
 
 #%% Set paths and bring in data
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -49,6 +53,72 @@ abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
 abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
+
+#%% make custom estimator combining PCA and XGB
+
+class pca_xgb(BaseEstimator):
+    
+    def __init__(self, max_depth=None, learning_rate=None, 
+                 n_components=None, detect_lim=None,
+                 random_state=None):
+        
+        self.max_depth = max_depth
+        self.learning_rate = learning_rate
+        self.n_components = n_components
+        self.random_state = random_state
+        self.detect_lim = detect_lim
+        
+    def fit(self, X, y):
+        
+        self.pca=PCA(n_components=self.n_components,
+                     random_state=self.random_state)
+        self.XGBR = xgb.XGBRegressor(n_estimators = 100,
+                                     booster = 'gbtree',
+                                     tree_method = 'exact',
+                                     random_state=self.random_state,
+                                     learning_rate=self.learning_rate,
+                                     max_depth=self.max_depth)
+        
+        self.pca_fitted = self.pca.fit(X)
+        
+        keep = y>self.detect_lim
+        
+        y = y[keep]
+        
+        X = X.loc[keep,:]
+        
+        X = pd.DataFrame(self.pca.fit_transform(X))
+        X = MinMaxScaler().fit_transform(X)
+        
+        self.XGBR_fitted=self.XGBR.fit(X,y)
+        
+        return self
+    
+    
+    def predict(self, X):
+        
+        X = pd.DataFrame(self.pca_fitted.transform(X))
+        X = MinMaxScaler().fit_transform(X)
+        y_hat = pd.Series(self.XGBR_fitted.predict(X))
+        y_hat[y_hat<self.detect_lim]=0
+        
+        return(y_hat)
+    
+    
+    def set_params(self, **params):
+        # if not params:
+        #     return self
+    
+        # for key, value in params.items():
+        #     if hasattr(self, key):
+        #         setattr(self, key, value)
+        #     else:
+        #         self.kwargs[key] = value
+        
+        for param, value in params.items():
+            setattr(self, param, value)
+                
+        return self
                              
 #%% Create function for writing outputs
 
@@ -77,11 +147,13 @@ def create_outputs(input_df,iterations = 1):
     
     output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
-                    'train_rmse','test_mape','train_mape','max_depth','learning_rate']
+                    'train_rmse','test_mape','train_mape','max_depth','learning_rate',
+                    'n_comp','detect_lim']
     
     variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
                       'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
-                      'RMSE_train','MAPE_test','MAPE_train','max_depth','learning_rate']
+                      'RMSE_train','MAPE_test','MAPE_train','max_depth','learning_rate',
+                      'n_comp','detect_lim']
     
        
     iteration = 1 # this is for testing
@@ -96,53 +168,52 @@ def create_outputs(input_df,iterations = 1):
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             
-            XGBR = xgb.XGBRegressor(n_estimators = 500,random_state=iteration,booster = 'gbtree',
-                        tree_method = 'exact')
-            
             Y = input_df[s]
             
             keep = pd.notna(Y)
             
-            # keep = pd.notna(Y) & (Y>0.15)
+            # keep = pd.notna(Y) & (Y>0.2)
             
             # if sum(keep)<10:
             #     keep = pd.notna(Y)
-        
+                
             X = input_df.loc[keep,'band_1':'band_1024']
-            
-            # dimensional reduction
-            # pca = PCA(n_components = 20)
-            # X = pd.DataFrame(pca.fit_transform(X))
-            # X = MinMaxScaler(X)
             
             Y = Y[keep]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, 
                                                                 random_state=iteration,
                                                                 test_size = 0.3)
-
-            # param_grid = {'max_depth':stats.randint(2,10),
-            #   'learning_rate':stats.uniform(scale=0.2)}
             
-            # clf = RandomizedSearchCV(XGBR,
-            #              param_grid,n_iter = 20,
-            #              scoring = 'neg_mean_absolute_error',
-            #              random_state = iteration)
+            # X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train, 
+            #                                                     random_state=iteration,
+            #                                                     test_size = 0.2)
             
-            param_grid = [{'max_depth':np.arange(1,21,dtype=int),
-                           'learning_rate':np.arange(0.01,0.21,step=0.01)}]
+            mod = pca_xgb(random_state=iteration)
             
-            clf = GridSearchCV(XGBR,param_grid,scoring = 'neg_mean_squared_error')
+            param_grid = {'max_depth':stats.randint(1,4),
+                          'learning_rate':stats.uniform(loc=0.02,scale=0.3),
+                          'n_components':stats.randint(10,50),
+                          'detect_lim':stats.uniform(scale=0.5*max(y_train))}
+            
+            clf = RandomizedSearchCV(mod,
+                                     param_grid,n_iter = 1000,
+                                     scoring = 'neg_mean_squared_error',
+                                     random_state = iteration)
 
             clf.fit(X_train,y_train)
-            max_depth = float(clf.best_params_['max_depth'])
-            learning_rate = float(clf.best_params_['learning_rate'])
+
             mod_opt = clf.best_estimator_
+            learning_rate = float(mod_opt.learning_rate)
+            max_depth = float(mod_opt.max_depth)
+            n_comp=float(mod_opt.n_components)
+            # n_est = mod_opt.n_estimators
+            detect_lim = float(mod_opt.detect_lim)
             Y_hat = list(mod_opt.predict(X_test))
             Y_hat_train = list(mod_opt.predict(X_train))
             
-            r_sq = float(mod_opt.score(X_test,y_test))
-            r_sq_train = float(mod_opt.score(X_train,y_train))
+            r_sq = float(r2_score(y_test,Y_hat))
+            r_sq_train = float(r2_score(y_train,Y_hat_train))
             
             MSE_test = MSE(y_test,Y_hat)
             RMSE_test = float(np.sqrt(MSE_test))
@@ -268,10 +339,17 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
+train_start = dt.datetime.now()
+
 outputs_df = create_outputs(abs_wq_df,iterations = 1) # all samples
-outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
-outputs_df_fil = create_outputs(abs_wq_df_fil) # all samples
-outputs_df_unf = create_outputs(abs_wq_df_unf) # all samples
+
+# outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
+
+# outputs_df_fil = create_outputs(abs_wq_df_fil) # filtered samples
+
+# outputs_df_unf = create_outputs(abs_wq_df_unf) # unfiltered samples
+
+train_stop = dt.datetime.now()
  
 #%% make plots for all samples
 

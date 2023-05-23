@@ -310,7 +310,7 @@ plt.ylabel('Predicted')
 #%% calibrate combined model
 
 input_df = abs_wq_df
-s = 'TKN'
+s = 'OP'
 iteration = 0
 
 Y = input_df[s]
@@ -319,8 +319,8 @@ keep = pd.notna(Y)
 
 # keep = pd.notna(Y) & (Y>0.2)
 
-if sum(keep)<10:
-    keep = pd.notna(Y)
+# if sum(keep)<10:
+#     keep = pd.notna(Y)
     
 X = input_df.loc[keep,'band_1':'band_1024']
 
@@ -338,7 +338,7 @@ mod = pca_xgb(random_state=iteration)
 
 param_grid = {'max_depth':stats.randint(1,4),
               'learning_rate':stats.uniform(loc=0.02,scale=0.3),
-              'n_components':stats.randint(10,50),
+              'n_components':stats.randint(10,50)
               'detect_lim':stats.uniform(scale=0.5*max(y_train))}
 
 clf = RandomizedSearchCV(mod,
