@@ -311,10 +311,12 @@ def make_plots(outputs_df, output_label):
         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
         # axs[row,col].get_xaxis().set_visible(False)
+        # ax.text(x_text,y_text,'$rmse_{tr} =$'+str(np.round(train_rmse,3))+'\n'
+        #         +'$rmse_{te} =$'+str(np.round(test_rmse,3))+'\n'
+        #         +'$lr =$'+str(np.round(learning_rate,2))+'\n'
+        #         +'$md =$'+str(int(max_depth)), fontsize = 16)
         ax.text(x_text,y_text,'$rmse_{tr} =$'+str(np.round(train_rmse,3))+'\n'
-                +'$rmse_{te} =$'+str(np.round(test_rmse,3))+'\n'
-                +'$lr =$'+str(np.round(learning_rate,2))+'\n'
-                +'$md =$'+str(int(max_depth)), fontsize = 16)
+                +'$rmse_{te} =$'+str(np.round(test_rmse,3)), fontsize = 16)
         # ticks = ax.get_yticks()
         # print(ticks)
         # # tick_labels = ax.get_yticklabels()
@@ -341,7 +343,7 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
 
 train_start = dt.datetime.now()
 
-outputs_df = create_outputs(abs_wq_df,iterations = 1) # all samples
+outputs_df = create_outputs(abs_wq_df,iterations = 20) # all samples
 
 # outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 
@@ -353,13 +355,13 @@ train_stop = dt.datetime.now()
  
 #%% make plots for all samples
 
-make_plots(outputs_df,'Filtered and Unfiltered Samples')
+make_plots(outputs_df,'Filtered and Unfiltered Stream Samples - XGB-PCA')
 make_plots(outputs_df_fil,'Filtered Samples')
 make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_XGB_It1_md1-20_lr001-02_nest500_results.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_XGB_It0-19_results.csv',index=False)
    
 #%% make and save output.
 
