@@ -43,7 +43,7 @@ user = os.getlogin()
 path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
-figure_dir = r'C:\Users\\'+ user + r'\OneDrive\Research\PhD\Communications\Images\Stream results\XGB'
+figure_dir = r'C:\Users\\'+ user + r'\OneDrive\Research\PhD\Communications\Images\Stream results\RF'
 
 abs_wq_df_fn = 'abs_wq_df_streams.csv'
 
@@ -92,12 +92,8 @@ for n_comp in [10,20,30]:
                                                         random_state=iteration,
                                                         test_size = 0.3)
     
-    X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train, 
-                                                        random_state=iteration,
-                                                        test_size = 0.2)
-    
-    param_grid = {'max_features':stats.randint(1,4),
-                  'ccp_alpha':stats.uniform(scale=0.2)}
+    param_grid = {'max_features':stats.uniform(loc = 10/1024,scale = 500/1024),
+                          'ccp_alpha':stats.uniform(scale=0.0001)}
     
     clf = RandomizedSearchCV(reg,
                              param_grid,n_iter = 20,
@@ -106,7 +102,7 @@ for n_comp in [10,20,30]:
     
     train_start = dt.datetime.now()
     
-    clf.fit(X_train,y_train,eval_set = [(X_eval,y_eval)])
+    clf.fit(X_train,y_train)
     
     train_stop = dt.datetime.now()
     
@@ -154,11 +150,11 @@ for n_comp in [10,20,30]:
     plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
                     +'$RMSE_{te} =$'+str(np.round(rmse_te,2))+'\n'
                     +'$alpha =$'+'{:.2e}'.format(ccp_alpha)+'\n'
-                    +'$MF =$'+str(int(max_features))+'\n'
+                    +'$MF =$'+str(int(max_features*1024))+'\n'
                     +'$n_{est} =$'+str(int(n_est))+'\n'
                     +'$n_{comp} =$'+str(int(n_comp)), fontsize = 12)
     
-    plt.savefig(os.path.join(figure_dir,f'XGB_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     cv_results = pd.DataFrame(clf.cv_results_)
     cv_results['ccp_alpha']=cv_results.params.apply(lambda x: x['ccp_alpha'])
@@ -171,7 +167,7 @@ for n_comp in [10,20,30]:
     ax.set_ylabel('max depth')
     ax.set_zlabel('negative MSE')
     
-    plt.savefig(os.path.join(figure_dir,f'XGB_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
                 
     
     plt.figure()
@@ -179,22 +175,22 @@ for n_comp in [10,20,30]:
     plt.xlabel('learning rate')
     plt.ylabel('negative MSE')
     
-    plt.savefig(os.path.join(figure_dir,f'XGB_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     plt.figure()
     plt.scatter(cv_results.max_features,cv_results.mean_test_score)
     plt.xlabel('max depth')
     plt.ylabel('negative MSE')
     
-    plt.savefig(os.path.join(figure_dir,f'XGB_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
-    filename = f'XGB_{s}_{train_stop_str}.joblib'
+    filename = f'RF_{s}_{train_stop_str}.joblib'
     pickle_path = os.path.join(output_dir,'picklejar',filename)
     dump(clf,pickle_path)
     
-#%% make custom estimator combining PCA and XGB
+#%% make custom estimator combining PCA and RF
 
-class pca_xgb(BaseEstimator):
+class pca_RF(BaseEstimator):
     
     def __init__(self, max_features=None, ccp_alpha=None, 
                  n_components=None, detect_lim=None,
@@ -210,14 +206,11 @@ class pca_xgb(BaseEstimator):
         
         self.pca=PCA(n_components=self.n_components,
                      random_state=self.random_state)
-        self.reg = RF(n_estimators = 100,random_state=self.random_state)
-        
-        xgb.XGBRegressor(n_estimators = 100,
-                                     booster = 'gbtree',
-                                     tree_method = 'exact',
-                                     random_state=self.random_state,
-                                     ccp_alpha=self.ccp_alpha,
-                                     max_features=self.max_features)
+        self.reg = RF(n_estimators = 100,
+                      random_state=self.random_state,
+                      ccp_alpha=self.ccp_alpha,
+                      max_features=self.max_features)
+    
         
         self.pca_fitted = self.pca.fit(X)
         
@@ -271,29 +264,68 @@ Y = input_df[s]
             
 keep = pd.notna(Y)
 
-keep = pd.notna(Y) & (Y>0.2)
+# keep = pd.notna(Y) & (Y>0.2)
 
-if sum(keep)<10:
-    keep = pd.notna(Y)
+# if sum(keep)<10:
+#     keep = pd.notna(Y)
     
 Y = Y[keep]
     
 X = input_df.loc[keep,'band_1':'band_1024']
 
-X_train, X_test, y_train, y_test = train_test_split(X, Y, 
-                                                        random_state=iteration,
-                                                        test_size = 0.3)
+X_train, X_test, y_train, y_test = train_test_split(X, Y,
+                                                    random_state=iteration,
+                                                    test_size = 0.3)
 
-mod = pca_xgb(max_features = 3, ccp_alpha = 0.125,n_components = 20,random_state=0)
+max_features = 53/1024
+ccp_alpha = 0.0000071
+n_comp = 10
+n_est = 100
+
+mod = pca_RF(max_features = max_features, ccp_alpha = ccp_alpha,
+             n_components = n_comp,random_state=iteration,
+             detect_lim = 0)
 
 mod_fitted = mod.fit(X=X_train,y=y_train)
 
-y_hat = mod_fitted.predict(X_test)
-y_hat_train = mod_fitted.predict(X_train)
+Y_hat = mod_fitted.predict(X_test)
+Y_hat_train = mod_fitted.predict(X_train)
 
-plt.scatter(y_test,y_hat)
-plt.xlabel('True')
+res_tr = Y_hat_train - y_train
+se_tr = res_tr**2
+sse_tr = sum(se_tr)
+mse_tr = np.mean(se_tr)
+rmse_tr = np.sqrt(mse_tr)
+
+res_te = Y_hat - y_test
+se_te = res_te**2
+sse_te = sum(se_te)
+mse_te = np.mean(se_te)
+rmse_te = np.sqrt(mse_te)
+
+min11 = min([min(y_test),min(Y_hat),min(Y_hat_train)])
+max11 = max([max(y_test),max(Y_hat),max(Y_hat_train)])
+
+y_text = min11+(max11-min11)*0
+x_text = max11+(max11-min11)*0.1
+
+# plt.scatter(y_test,y_hat)
+# plt.xlabel('True')
+# plt.ylabel('Predicted')
+
+plt.figure()
+plt.scatter(y_train,Y_hat_train)
+plt.scatter(y_test,Y_hat)
+plt.plot([min11,max11],[min11,max11],'--k')
 plt.ylabel('Predicted')
+plt.xlabel('True')
+plt.title(s)
+plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
+                +'$RMSE_{te} =$'+str(np.round(rmse_te,2))+'\n'
+                +'$alpha =$'+'{:.2e}'.format(ccp_alpha)+'\n'
+                +'$MF =$'+str(int(max_features*1024))+'\n'
+                +'$n_{est} =$'+str(int(n_est))+'\n'
+                +'$n_{comp} =$'+str(int(n_comp)), fontsize = 12)
 
 #%% try changing parameters
 
@@ -335,7 +367,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
 #                                                     random_state=iteration,
 #                                                     test_size = 0.2)
 
-mod = pca_xgb(random_state=iteration)
+mod = pca_RF(random_state=iteration)
 
 param_grid = {'max_features':stats.randint(1,4),
               'ccp_alpha':stats.uniform(loc=0.02,scale=0.3),
@@ -405,7 +437,7 @@ plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
                 +'$n_{comp} =$'+str(int(n_comp))+'\n'
                 +'$detect lim =$'+str(np.round(detect_lim,2)), fontsize = 12)
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+plt.savefig(os.path.join(figure_dir,f'RF_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 cv_results = pd.DataFrame(clf.cv_results_)
 cv_results['ccp_alpha']=cv_results.params.apply(lambda x: x['ccp_alpha'])
@@ -420,7 +452,7 @@ ax.set_xlabel('learning rate')
 ax.set_ylabel('max depth')
 ax.set_zlabel('negative MSE')
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+plt.savefig(os.path.join(figure_dir,f'RF_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
             
 
 plt.figure()
@@ -428,14 +460,14 @@ plt.scatter(cv_results.ccp_alpha,cv_results.mean_test_score)
 plt.xlabel('learning rate')
 plt.ylabel('negative MSE')
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+plt.savefig(os.path.join(figure_dir,f'RF_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 plt.figure()
 plt.scatter(cv_results.max_features,cv_results.mean_test_score)
 plt.xlabel('max depth')
 plt.ylabel('negative MSE')
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 
 plt.figure()
@@ -443,16 +475,16 @@ plt.scatter(cv_results.n_components,cv_results.mean_test_score)
 plt.xlabel('n components')
 plt.ylabel('negative MSE')
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_nc_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+plt.savefig(os.path.join(figure_dir,f'RF_{s}_nc_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 plt.figure()
 plt.scatter(cv_results.detect_lim,cv_results.mean_test_score)
 plt.xlabel('detection limit')
 plt.ylabel('negative MSE')
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_dl_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+plt.savefig(os.path.join(figure_dir,f'RF_{s}_dl_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
-filename = f'XGB_{s}_{train_stop_str}.joblib'
+filename = f'RF_{s}_{train_stop_str}.joblib'
 pickle_path = os.path.join(output_dir,'picklejar',filename)
 dump(clf,pickle_path)
 
