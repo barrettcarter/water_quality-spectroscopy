@@ -281,10 +281,11 @@ max_features = 53/1024
 ccp_alpha = 0.0000071
 n_comp = 10
 n_est = 100
+detect_lim = 0.2
 
 mod = pca_RF(max_features = max_features, ccp_alpha = ccp_alpha,
              n_components = n_comp,random_state=iteration,
-             detect_lim = 0)
+             detect_lim = detect_lim)
 
 mod_fitted = mod.fit(X=X_train,y=y_train)
 
