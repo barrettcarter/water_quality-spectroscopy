@@ -63,36 +63,61 @@ iteration = 0
 
 n_est = 100
 e_stop = 3
+detect_lim = 0.2
 
 reg = RF(n_estimators = 100,random_state=iteration)
 
 Y = input_df[s]
-            
+
 keep = pd.notna(Y)
 
-keep = pd.notna(Y) & (Y>0.2)
+X = input_df.loc[keep,'band_1':'band_1024']
 
-if sum(keep)<10:
-    keep = pd.notna(Y)
+Y = Y[keep]
+
+X_train, X_test, y_train, y_test = train_test_split(X, Y, 
+                                                    random_state=iteration,
+                                                    test_size = 0.3)
+            
+# keep = pd.notna(Y) & (Y>detect_lim)
+
+# if sum(keep)<10:
+#     keep = pd.notna(Y)
+
+keep_tr = y_train > detect_lim
+keep_te = y_test > detect_lim
+
+y_train = y_train[keep_tr]
+y_test = y_test[keep_te]
+
+X_train = X_train.loc[keep_tr,:]
+X_test = X_test.loc[keep_te,:]
 
 # dimensional reduction
 n_comp = 20
 
-for n_comp in [10,20,30]:
+for n_comp in [10]:
     
-    X = input_df.loc[keep,'band_1':'band_1024']
+    # X = input_df.loc[keep,'band_1':'band_1024']
 
     pca = PCA(n_components = n_comp,random_state = iteration)
-    X = pd.DataFrame(pca.fit_transform(X))
-    X = MinMaxScaler().fit_transform(X)
+    # X = pd.DataFrame(pca.fit_transform(X))
+    # X = MinMaxScaler().fit_transform(X)
     
-    Y = Y[keep]
+    # Y = Y[keep]
     
-    X_train, X_test, y_train, y_test = train_test_split(X, Y, 
-                                                        random_state=iteration,
-                                                        test_size = 0.3)
+    # X_train, X_test, y_train, y_test = train_test_split(X, Y, 
+    #                                                     random_state=iteration,
+    #                                                     test_size = 0.3)
     
-    param_grid = {'max_features':stats.uniform(loc = 10/1024,scale = 500/1024),
+    X_train = pd.DataFrame(pca.fit_transform(X_train))
+    X_train = MinMaxScaler().fit_transform(X_train)
+    
+    
+    X_test = pd.DataFrame(pca.fit(X_train).transform(X_test))
+    X_test = MinMaxScaler().fit(X_train).transform(X_test)
+    
+    param_grid = {'max_features':stats.uniform(loc = 5/1024,scale = 200/1024),
                           'ccp_alpha':stats.uniform(scale=0.0001)}
     
     clf = RandomizedSearchCV(reg,
@@ -154,7 +179,7 @@ for n_comp in [10,20,30]:
                     +'$n_{est} =$'+str(int(n_est))+'\n'
                     +'$n_{comp} =$'+str(int(n_comp)), fontsize = 12)
     
-    plt.savefig(os.path.join(figure_dir,f'RF_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     cv_results = pd.DataFrame(clf.cv_results_)
     cv_results['ccp_alpha']=cv_results.params.apply(lambda x: x['ccp_alpha'])
@@ -167,7 +192,7 @@ for n_comp in [10,20,30]:
     ax.set_ylabel('max depth')
     ax.set_zlabel('negative MSE')
     
-    plt.savefig(os.path.join(figure_dir,f'RF_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
                 
     
     plt.figure()
@@ -175,18 +200,18 @@ for n_comp in [10,20,30]:
     plt.xlabel('learning rate')
     plt.ylabel('negative MSE')
     
-    plt.savefig(os.path.join(figure_dir,f'RF_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     plt.figure()
     plt.scatter(cv_results.max_features,cv_results.mean_test_score)
     plt.xlabel('max depth')
     plt.ylabel('negative MSE')
     
-    plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
-    filename = f'RF_{s}_{train_stop_str}.joblib'
-    pickle_path = os.path.join(output_dir,'picklejar',filename)
-    dump(clf,pickle_path)
+    # filename = f'RF_{s}_{train_stop_str}.joblib'
+    # pickle_path = os.path.join(output_dir,'picklejar',filename)
+    # dump(clf,pickle_path)
     
 #%% make custom estimator combining PCA and RF
 
@@ -206,19 +231,19 @@ class pca_RF(BaseEstimator):
         
         self.pca=PCA(n_components=self.n_components,
                      random_state=self.random_state)
+        
         self.reg = RF(n_estimators = 100,
                       random_state=self.random_state,
                       ccp_alpha=self.ccp_alpha,
                       max_features=self.max_features)
-    
-        
-        self.pca_fitted = self.pca.fit(X)
         
         keep = y>self.detect_lim
         
         y = y[keep]
         
         X = X.loc[keep,:]
+    
+        self.pca_fitted = self.pca.fit(X)
         
         X = pd.DataFrame(self.pca.fit_transform(X))
         X = MinMaxScaler().fit_transform(X)
@@ -277,8 +302,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
                                                     random_state=iteration,
                                                     test_size = 0.3)
 
-max_features = 53/1024
-ccp_alpha = 0.0000071
+max_features = 179/1024
+ccp_alpha = 0.0000778
 n_comp = 10
 n_est = 100
 detect_lim = 0.2
