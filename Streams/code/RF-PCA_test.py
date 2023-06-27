@@ -110,12 +110,17 @@ for n_comp in [10]:
     #                                                     random_state=iteration,
     #                                                     test_size = 0.3)
     
-    X_train = pd.DataFrame(pca.fit_transform(X_train))
-    X_train = MinMaxScaler().fit_transform(X_train)
+    pca_train = pca.fit(X_train)
+    
+    X_train = pd.DataFrame(pca_train.transform(X_train))
+    
+    scaler_train = MinMaxScaler().fit(X_train)
+    
+    X_train = scaler_train.transform(X_train)
     
     
-    X_test = pd.DataFrame(pca.fit(X_train).transform(X_test))
-    X_test = MinMaxScaler().fit(X_train).transform(X_test)
+    X_test = pd.DataFrame(pca_train.transform(X_test))
+    X_test = scaler_train.transform(X_test)
     
     param_grid = {'max_features':stats.uniform(loc = 5/1024,scale = 200/1024),
                           'ccp_alpha':stats.uniform(scale=0.0001)}
@@ -159,11 +164,11 @@ for n_comp in [10]:
     mse_te = np.mean(se_te)
     rmse_te = np.sqrt(mse_te)
     
-    min11 = min([min(y_test),min(Y_hat),min(Y_hat_train)])
-    max11 = max([max(y_test),max(Y_hat),max(Y_hat_train)])
+    min11 = min([min(y_test),min(y_train),min(Y_hat),min(Y_hat_train)])
+    max11 = max([max(y_test),max(y_train), max(Y_hat),max(Y_hat_train)])
     
     y_text = min11+(max11-min11)*0
-    x_text = max11+(max11-min11)*0.1
+    x_text = max11+(max11-min11)*0.05
     
     plt.figure()
     plt.scatter(y_train,Y_hat_train)
@@ -177,9 +182,10 @@ for n_comp in [10]:
                     +'$alpha =$'+'{:.2e}'.format(ccp_alpha)+'\n'
                     +'$MF =$'+str(int(max_features*1024))+'\n'
                     +'$n_{est} =$'+str(int(n_est))+'\n'
-                    +'$n_{comp} =$'+str(int(n_comp)), fontsize = 12)
+                    +'$n_{comp} =$'+str(int(n_comp))+'\n'
+                    +'$det lim =$'+str(np.round(detect_lim,2)), fontsize = 12)
     
-    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     cv_results = pd.DataFrame(clf.cv_results_)
     cv_results['ccp_alpha']=cv_results.params.apply(lambda x: x['ccp_alpha'])
@@ -192,7 +198,7 @@ for n_comp in [10]:
     ax.set_ylabel('max depth')
     ax.set_zlabel('negative MSE')
     
-    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_3dparams_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
                 
     
     plt.figure()
@@ -200,14 +206,14 @@ for n_comp in [10]:
     plt.xlabel('learning rate')
     plt.ylabel('negative MSE')
     
-    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_lr_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     plt.figure()
     plt.scatter(cv_results.max_features,cv_results.mean_test_score)
     plt.xlabel('max depth')
     plt.ylabel('negative MSE')
     
-    # plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+    plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
     # filename = f'RF_{s}_{train_stop_str}.joblib'
     # pickle_path = os.path.join(output_dir,'picklejar',filename)
@@ -246,7 +252,10 @@ class pca_RF(BaseEstimator):
         self.pca_fitted = self.pca.fit(X)
         
         X = pd.DataFrame(self.pca.fit_transform(X))
-        X = MinMaxScaler().fit_transform(X)
+        
+        self.scaler_fitted = MinMaxScaler().fit(X)
+        
+        X = self.scaler_fitted.transform(X)
         
         self.reg_fitted=self.reg.fit(X,y)
         
@@ -256,11 +265,11 @@ class pca_RF(BaseEstimator):
     def predict(self, X):
         
         X = pd.DataFrame(self.pca_fitted.transform(X))
-        X = MinMaxScaler().fit_transform(X)
-        y_hat = pd.Series(self.reg_fitted.predict(X))
-        y_hat[y_hat<self.detect_lim]=0
+        X = self.scaler_fitted.transform(X)
+        self.y_hat = pd.Series(self.reg_fitted.predict(X))
+        self.y_hat[self.y_hat<self.detect_lim]=np.nan
         
-        return(y_hat)
+        return(self.y_hat)
     
     
     def set_params(self, **params):
@@ -302,11 +311,14 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
                                                     random_state=iteration,
                                                     test_size = 0.3)
 
-max_features = 179/1024
-ccp_alpha = 0.0000778
-n_comp = 10
-n_est = 100
-detect_lim = 0.2
+# max_features = 179/1024
+# ccp_alpha = 0.0000778
+# n_comp = 10
+# n_est = 100
+# detect_lim = 0.2
+
+## create model object using parameters from previous example model
+## the results of this model object should be identical to the previous model
 
 mod = pca_RF(max_features = max_features, ccp_alpha = ccp_alpha,
              n_components = n_comp,random_state=iteration,
