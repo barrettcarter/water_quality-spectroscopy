@@ -96,7 +96,7 @@ X_test = X_test.loc[keep_te,:]
 # dimensional reduction
 n_comp = 20
 
-for n_comp in [10]:
+for n_comp in [10,20,30]:
     
     # X = input_df.loc[keep,'band_1':'band_1024']
 
@@ -106,9 +106,9 @@ for n_comp in [10]:
     
     # Y = Y[keep]
     
-    # X_train, X_test, y_train, y_test = train_test_split(X, Y, 
-    #                                                     random_state=iteration,
-    #                                                     test_size = 0.3)
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, 
+                                                        random_state=iteration,
+                                                        test_size = 0.3)
     
     pca_train = pca.fit(X_train)
     
@@ -122,7 +122,7 @@ for n_comp in [10]:
     X_test = pd.DataFrame(pca_train.transform(X_test))
     X_test = scaler_train.transform(X_test)
     
-    param_grid = {'max_features':stats.uniform(loc = 5/1024,scale = 200/1024),
+    param_grid = {'max_features':stats.uniform(loc = 0,scale = 1),
                           'ccp_alpha':stats.uniform(scale=0.0001)}
     
     clf = RandomizedSearchCV(reg,
@@ -180,7 +180,7 @@ for n_comp in [10]:
     plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
                     +'$RMSE_{te} =$'+str(np.round(rmse_te,2))+'\n'
                     +'$alpha =$'+'{:.2e}'.format(ccp_alpha)+'\n'
-                    +'$MF =$'+str(int(max_features*1024))+'\n'
+                    +'$MF =$'+str(int(max_features*n_comp))+'\n'
                     +'$n_{est} =$'+str(int(n_est))+'\n'
                     +'$n_{comp} =$'+str(int(n_comp))+'\n'
                     +'$det lim =$'+str(np.round(detect_lim,2)), fontsize = 12)
@@ -215,9 +215,9 @@ for n_comp in [10]:
     
     plt.savefig(os.path.join(figure_dir,f'RF_{s}_md_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
     
-    # filename = f'RF_{s}_{train_stop_str}.joblib'
-    # pickle_path = os.path.join(output_dir,'picklejar',filename)
-    # dump(clf,pickle_path)
+    filename = f'RF_{s}_{train_stop_str}.joblib'
+    pickle_path = os.path.join(output_dir,'picklejar',filename)
+    dump(clf,pickle_path)
     
 #%% make custom estimator combining PCA and RF
 
@@ -349,7 +349,7 @@ x_text = max11+(max11-min11)*0.05
 
 plt.figure()
 plt.scatter(y_train,Y_hat_train)
-plt.scatter(y_test,Y_hat)
+# plt.scatter(y_test,Y_hat)
 plt.plot([min11,max11],[min11,max11],'--k')
 plt.ylabel('Predicted')
 plt.xlabel('True')
