@@ -63,7 +63,7 @@ iteration = 0
 
 n_est = 100
 e_stop = 3
-detect_lim = 0.2
+detect_lim = 0
 
 reg = RF(n_estimators = 100,random_state=iteration)
 
@@ -341,15 +341,11 @@ sse_te = sum(se_te)
 mse_te = np.mean(se_te)
 rmse_te = np.sqrt(mse_te)
 
-min11 = min([min(y_test),min(Y_hat),min(Y_hat_train)])
-max11 = max([max(y_test),max(Y_hat),max(Y_hat_train)])
+min11 = min([min(y_test),min(y_train),min(Y_hat),min(Y_hat_train)])
+max11 = max([max(y_test),max(y_train), max(Y_hat),max(Y_hat_train)])
 
 y_text = min11+(max11-min11)*0
-x_text = max11+(max11-min11)*0.1
-
-# plt.scatter(y_test,y_hat)
-# plt.xlabel('True')
-# plt.ylabel('Predicted')
+x_text = max11+(max11-min11)*0.05
 
 plt.figure()
 plt.scatter(y_train,Y_hat_train)
@@ -363,7 +359,8 @@ plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
                 +'$alpha =$'+'{:.2e}'.format(ccp_alpha)+'\n'
                 +'$MF =$'+str(int(max_features*1024))+'\n'
                 +'$n_{est} =$'+str(int(n_est))+'\n'
-                +'$n_{comp} =$'+str(int(n_comp)), fontsize = 12)
+                +'$n_{comp} =$'+str(int(n_comp))+'\n'
+                +'$det lim =$'+str(np.round(detect_lim,2)), fontsize = 12)
 
 #%% try changing parameters
 
