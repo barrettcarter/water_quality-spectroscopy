@@ -378,7 +378,7 @@ plt.ylabel('Predicted')
 #%% calibrate combined model
 
 input_df = abs_wq_df
-s = 'OP'
+s = 'Nitrate-N'
 iteration = 0
 
 Y = input_df[s]
@@ -402,12 +402,18 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
 #                                                     random_state=iteration,
 #                                                     test_size = 0.2)
 
-mod = pca_RF(random_state=iteration)
+# mod = pca_RF(random_state=iteration)
 
-param_grid = {'max_features':stats.randint(1,4),
-              'ccp_alpha':stats.uniform(loc=0.02,scale=0.3),
-              'n_components':stats.randint(10,50)
-              'detect_lim':stats.uniform(scale=0.5*max(y_train))}
+# param_grid = {'max_features':stats.randint(1,4),
+#               'ccp_alpha':stats.uniform(loc=0.02,scale=0.3),
+#               'n_components':stats.randint(10,50)
+#               'detect_lim':stats.uniform(scale=0.5*max(y_train))}
+
+mod = pca_RF(random_state=iteration,detect_lim = 0)
+
+param_grid = {'max_features':stats.uniform(loc = 0,scale = 1),
+              'ccp_alpha':stats.uniform(scale=0.0005),
+              'n_components':stats.randint(10,50)}
 
 clf = RandomizedSearchCV(mod,
                          param_grid,n_iter = 100,
@@ -438,7 +444,7 @@ ccp_alpha = mod_opt.ccp_alpha
 max_features = mod_opt.max_features
 n_comp=mod_opt.n_components
 # n_est = mod_opt.n_estimators
-detect_lim = mod_opt.detect_lim
+# detect_lim = mod_opt.detect_lim
 
 res_tr = Y_hat_train - y_train
 se_tr = res_tr**2
@@ -478,7 +484,8 @@ cv_results = pd.DataFrame(clf.cv_results_)
 cv_results['ccp_alpha']=cv_results.params.apply(lambda x: x['ccp_alpha'])
 cv_results['max_features']=cv_results.params.apply(lambda x: x['max_features'])
 cv_results['n_components']=cv_results.params.apply(lambda x: x['n_components'])
-cv_results['detect_lim']=cv_results.params.apply(lambda x: x['detect_lim'])
+# cv_results['detect_lim']=cv_results.params.apply(lambda x: x['detect_lim'])
+cv_results['detect_lim']=detect_lim
 
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
