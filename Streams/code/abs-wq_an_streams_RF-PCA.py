@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from scipy import stats
 # import seaborn as sns
 # from sklearn.cross_decomposition import PLSRegression
-# from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import RandomizedSearchCV
 # from sklearn.linear_model import LinearRegression
@@ -31,11 +31,15 @@ sorted(sklearn.metrics.SCORERS.keys())
 
 from joblib import dump
 
+
+from sklearn.base import BaseEstimator
+
 #%% Set paths and bring in data
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -184,24 +188,28 @@ def create_outputs(input_df,iterations = 1):
             X_train, X_test, y_train, y_test = train_test_split(X, Y, 
                                                                 random_state=iteration,
                                                                 test_size = 0.3)
-
-            param_grid = {'max_features':stats.uniform(loc = 10/1024,scale = 200/1024),
-                          'ccp_alpha':stats.uniform(scale=0.0015)}
+                        
+            mod = pca_RF(random_state=iteration,detect_lim = 0)
             
-            clf = RandomizedSearchCV(RF(n_estimators = 100,random_state=iteration),
-                                     param_grid,n_iter = 20,
-                                     scoring = 'neg_mean_absolute_error',
-                                     random_state = iteration)
+            param_grid = {'max_features':stats.uniform(loc = 0,scale = 1),
+                          'ccp_alpha':stats.uniform(scale=0.001),
+                          'n_components':stats.randint(10,50)}
+            
+            clf = RandomizedSearchCV(mod,
+                         param_grid,n_iter = 100,
+                         scoring = 'neg_mean_squared_error',
+                         random_state = iteration)
 
             clf.fit(X_train,y_train)
             max_features = float(clf.best_params_['max_features'])
             ccp_alpha = float(clf.best_params_['ccp_alpha'])
+            n_comp = float(clf.best_params_['n_components'])
             mod_opt = clf.best_estimator_
             Y_hat = list(mod_opt.predict(X_test))
             Y_hat_train = list(mod_opt.predict(X_train))
             
-            r_sq = float(mod_opt.score(X_test,y_test))
-            r_sq_train = float(mod_opt.score(X_train,y_train))
+            r_sq = float(r2_score(y_test,Y_hat))
+            r_sq_train = float(r2_score(y_train,Y_hat_train))
             
             MSE_test = MSE(y_test,Y_hat)
             RMSE_test = float(np.sqrt(MSE_test))
@@ -222,7 +230,7 @@ def create_outputs(input_df,iterations = 1):
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = outputs_df.append(sub_df,ignore_index=True)
                 
-            filename = f'RF_{s}_It{iteration}.joblib'
+            filename = f'RF-PCA_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
                   
@@ -316,7 +324,7 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
+outputs_df = create_outputs(abs_wq_df,iterations = 19) # all samples
 outputs_df_fil = create_outputs(abs_wq_df_fil) # all samples
 outputs_df_unf = create_outputs(abs_wq_df_unf) # all samples
  
