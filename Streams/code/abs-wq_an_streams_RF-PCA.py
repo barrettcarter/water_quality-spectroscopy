@@ -340,7 +340,7 @@ outputs_df.to_csv(output_dir+'streams_RF_It1-2_results.csv',index=False)
    
 #%% make and save output.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_RF_It3-19_results.csv',
-                      iterations = np.linspace(3,19,17,dtype=int))
+outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'streams_RF-PCA_It0-19_results.csv',
+                      iterations = 20)
 
 #%%
