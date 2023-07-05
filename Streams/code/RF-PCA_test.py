@@ -267,7 +267,7 @@ class pca_RF(BaseEstimator):
         X = pd.DataFrame(self.pca_fitted.transform(X))
         X = self.scaler_fitted.transform(X)
         self.y_hat = pd.Series(self.reg_fitted.predict(X))
-        self.y_hat[self.y_hat<self.detect_lim]=np.nan
+        self.y_hat[self.y_hat<self.detect_lim]=self.detect_lim
         
         return(self.y_hat)
     

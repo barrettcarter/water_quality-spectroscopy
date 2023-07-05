@@ -38,8 +38,8 @@ from sklearn.base import BaseEstimator
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 figure_dir = r'C:\Users\\'+ user + r'\OneDrive\Research\PhD\Communications\Images\Stream results\XGB'
@@ -218,16 +218,19 @@ class pca_xgb(BaseEstimator):
                                      learning_rate=self.learning_rate,
                                      max_depth=self.max_depth)
         
-        self.pca_fitted = self.pca.fit(X)
-        
         keep = y>self.detect_lim
         
         y = y[keep]
         
         X = X.loc[keep,:]
+    
+        self.pca_fitted = self.pca.fit(X)
         
         X = pd.DataFrame(self.pca.fit_transform(X))
-        X = MinMaxScaler().fit_transform(X)
+        
+        self.scaler_fitted = MinMaxScaler().fit(X)
+        
+        X = self.scaler_fitted.transform(X)
         
         self.XGBR_fitted=self.XGBR.fit(X,y)
         
@@ -237,11 +240,11 @@ class pca_xgb(BaseEstimator):
     def predict(self, X):
         
         X = pd.DataFrame(self.pca_fitted.transform(X))
-        X = MinMaxScaler().fit_transform(X)
-        y_hat = pd.Series(self.XGBR_fitted.predict(X))
-        y_hat[y_hat<self.detect_lim]=0
+        X = self.scaler_fitted.transform(X)
+        self.y_hat = pd.Series(self.XGBR_fitted.predict(X))
+        self.y_hat[self.y_hat<self.detect_lim]=self.detect_lim
         
-        return(y_hat)
+        return(self.y_hat)
     
     
     def set_params(self, **params):
@@ -269,11 +272,6 @@ iteration = 0
 Y = input_df[s]
             
 keep = pd.notna(Y)
-
-keep = pd.notna(Y) & (Y>0.2)
-
-if sum(keep)<10:
-    keep = pd.notna(Y)
     
 Y = Y[keep]
     
@@ -283,7 +281,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
                                                         random_state=iteration,
                                                         test_size = 0.3)
 
-mod = pca_xgb(max_depth = 3, learning_rate = 0.125,n_components = 20,random_state=0)
+mod = pca_xgb(max_depth = 3, learning_rate = 0.125,n_components = 20,
+              detect_lim = 0, random_state=0)
 
 mod_fitted = mod.fit(X=X_train,y=y_train)
 
@@ -310,7 +309,7 @@ plt.ylabel('Predicted')
 #%% calibrate combined model
 
 input_df = abs_wq_df
-s = 'OP'
+s = 'Nitrate-N'
 iteration = 0
 
 Y = input_df[s]
@@ -334,12 +333,11 @@ X_train, X_test, y_train, y_test = train_test_split(X, Y,
 #                                                     random_state=iteration,
 #                                                     test_size = 0.2)
 
-mod = pca_xgb(random_state=iteration)
+mod = pca_xgb(random_state=iteration, detect_lim = 0)
 
-param_grid = {'max_depth':stats.randint(1,4),
-              'learning_rate':stats.uniform(loc=0.02,scale=0.3),
-              'n_components':stats.randint(10,50)
-              'detect_lim':stats.uniform(scale=0.5*max(y_train))}
+param_grid = {'max_depth':stats.randint(1,6),
+              'learning_rate':stats.uniform(loc=0,scale=0.3),
+              'n_components':stats.randint(10,50)}
 
 clf = RandomizedSearchCV(mod,
                          param_grid,n_iter = 100,
@@ -370,7 +368,7 @@ learning_rate = mod_opt.learning_rate
 max_depth = mod_opt.max_depth
 n_comp=mod_opt.n_components
 # n_est = mod_opt.n_estimators
-detect_lim = mod_opt.detect_lim
+# detect_lim = mod_opt.detect_lim
 
 res_tr = Y_hat_train - y_train
 se_tr = res_tr**2
@@ -401,8 +399,7 @@ plt.text(x_text,y_text,'$RMSE_{tr} =$'+str(np.round(rmse_tr,2))+'\n'
                 +'$RMSE_{te} =$'+str(np.round(rmse_te,2))+'\n'
                 +'$LR =$'+'{:.2e}'.format(learning_rate)+'\n'
                 +'$MD =$'+str(int(max_depth))+'\n'
-                +'$n_{comp} =$'+str(int(n_comp))+'\n'
-                +'$detect lim =$'+str(np.round(detect_lim,2)), fontsize = 12)
+                +'$n_{comp} =$'+str(int(n_comp)), fontsize = 12)
 
 plt.savefig(os.path.join(figure_dir,f'XGB_{s}_11_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
@@ -410,7 +407,7 @@ cv_results = pd.DataFrame(clf.cv_results_)
 cv_results['learning_rate']=cv_results.params.apply(lambda x: x['learning_rate'])
 cv_results['max_depth']=cv_results.params.apply(lambda x: x['max_depth'])
 cv_results['n_components']=cv_results.params.apply(lambda x: x['n_components'])
-cv_results['detect_lim']=cv_results.params.apply(lambda x: x['detect_lim'])
+# cv_results['detect_lim']=cv_results.params.apply(lambda x: x['detect_lim'])
 
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
@@ -444,12 +441,12 @@ plt.ylabel('negative MSE')
 
 plt.savefig(os.path.join(figure_dir,f'XGB_{s}_nc_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
-plt.figure()
-plt.scatter(cv_results.detect_lim,cv_results.mean_test_score)
-plt.xlabel('detection limit')
-plt.ylabel('negative MSE')
+# plt.figure()
+# plt.scatter(cv_results.detect_lim,cv_results.mean_test_score)
+# plt.xlabel('detection limit')
+# plt.ylabel('negative MSE')
 
-plt.savefig(os.path.join(figure_dir,f'XGB_{s}_dl_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
+# plt.savefig(os.path.join(figure_dir,f'XGB_{s}_dl_{train_stop_str}.png'),bbox_inches = 'tight',dpi = 300)
 
 filename = f'XGB_{s}_{train_stop_str}.joblib'
 pickle_path = os.path.join(output_dir,'picklejar',filename)
