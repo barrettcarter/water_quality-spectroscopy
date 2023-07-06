@@ -40,7 +40,8 @@ from sklearn.base import BaseEstimator
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -79,16 +80,19 @@ class pca_xgb(BaseEstimator):
                                      learning_rate=self.learning_rate,
                                      max_depth=self.max_depth)
         
-        self.pca_fitted = self.pca.fit(X)
-        
         keep = y>self.detect_lim
         
         y = y[keep]
         
         X = X.loc[keep,:]
+    
+        self.pca_fitted = self.pca.fit(X)
         
         X = pd.DataFrame(self.pca.fit_transform(X))
-        X = MinMaxScaler().fit_transform(X)
+        
+        self.scaler_fitted = MinMaxScaler().fit(X)
+        
+        X = self.scaler_fitted.transform(X)
         
         self.XGBR_fitted=self.XGBR.fit(X,y)
         
@@ -98,11 +102,11 @@ class pca_xgb(BaseEstimator):
     def predict(self, X):
         
         X = pd.DataFrame(self.pca_fitted.transform(X))
-        X = MinMaxScaler().fit_transform(X)
-        y_hat = pd.Series(self.XGBR_fitted.predict(X))
-        y_hat[y_hat<self.detect_lim]=0
+        X = self.scaler_fitted.transform(X)
+        self.y_hat = pd.Series(self.XGBR_fitted.predict(X))
+        self.y_hat[self.y_hat<self.detect_lim]=self.detect_lim
         
-        return(y_hat)
+        return(self.y_hat)
     
     
     def set_params(self, **params):
@@ -148,12 +152,12 @@ def create_outputs(input_df,iterations = 1):
     output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
                     'train_rmse','test_mape','train_mape','max_depth','learning_rate',
-                    'n_comp','detect_lim']
+                    'n_comp']
     
     variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
                       'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
                       'RMSE_train','MAPE_test','MAPE_train','max_depth','learning_rate',
-                      'n_comp','detect_lim']
+                      'n_comp']
     
        
     iteration = 1 # this is for testing
@@ -189,15 +193,14 @@ def create_outputs(input_df,iterations = 1):
             #                                                     random_state=iteration,
             #                                                     test_size = 0.2)
             
-            mod = pca_xgb(random_state=iteration)
+            mod = pca_xgb(random_state=iteration, detect_lim = 0)
             
-            param_grid = {'max_depth':stats.randint(1,4),
-                          'learning_rate':stats.uniform(loc=0.02,scale=0.3),
-                          'n_components':stats.randint(10,50),
-                          'detect_lim':stats.uniform(scale=0.5*max(y_train))}
+            param_grid = {'max_depth':stats.randint(1,6),
+                          'learning_rate':stats.uniform(loc=0,scale=0.2),
+                          'n_components':stats.randint(10,50)}
             
             clf = RandomizedSearchCV(mod,
-                                     param_grid,n_iter = 1000,
+                                     param_grid,n_iter = 100,
                                      scoring = 'neg_mean_squared_error',
                                      random_state = iteration)
 
@@ -208,7 +211,7 @@ def create_outputs(input_df,iterations = 1):
             max_depth = float(mod_opt.max_depth)
             n_comp=float(mod_opt.n_components)
             # n_est = mod_opt.n_estimators
-            detect_lim = float(mod_opt.detect_lim)
+            # detect_lim = float(mod_opt.detect_lim)
             Y_hat = list(mod_opt.predict(X_test))
             Y_hat_train = list(mod_opt.predict(X_train))
             
@@ -234,7 +237,7 @@ def create_outputs(input_df,iterations = 1):
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = outputs_df.append(sub_df,ignore_index=True)
                 
-            filename = f'XGB_{s}_It{iteration}.joblib'
+            filename = f'XGB-PCA_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
                   
@@ -338,6 +341,7 @@ def make_plots(outputs_df, output_label):
 def make_and_save_outputs(input_df,output_path,iterations = 1):
     outputs_df = create_outputs(input_df,iterations)
     outputs_df.to_csv(output_path,index=False)
+    return(outputs_df)
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
@@ -365,7 +369,7 @@ outputs_df.to_csv(output_dir+'streams_XGB_It0-19_results.csv',index=False)
    
 #%% make and save output.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_RF_It3-19_results.csv',
-                      iterations = np.linspace(3,19,17,dtype=int))
+outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'streams_XGB-PCA_It0-19_results.csv',
+                      iterations = 20)
 
 #%%
