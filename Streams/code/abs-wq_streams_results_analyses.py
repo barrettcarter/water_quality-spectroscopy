@@ -8,7 +8,7 @@ Created on Mon Nov 22 08:50:22 2021
 import pandas as pd
 
 import os
-# import numpy as np
+import numpy as np
 # import pandas as pd
 #from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
@@ -32,28 +32,57 @@ from scipy import stats
 #%% Set parameters
 
 user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 results_pls_fn = 'streams_PLS_It0-9_results.csv'
 results_dl_fn = 'streams_DL_It0-9_results.csv'
+results_rf_fn = 'streams_RF-PCA_It0-19_results.csv'
+results_xgb_fn = 'streams_XGB-PCA_It0-19_results.csv'
 results_path = os.path.join(path_to_wqs,output_dir)
 
 # sns.set_style("ticks")
 # sns.set_palette('colorblind')
 sns.set(style = 'ticks',font_scale=2, palette = 'colorblind')
 
-#%% Bring in data
+#%% Bring in data and make combined dataframe
 
-results_pls_df=pd.read_csv(os.path.join(results_path,results_pls_fn))
-results_dl_df=pd.read_csv(os.path.join(results_path,results_dl_fn))
+results_files = [results_pls_fn, results_dl_fn, results_rf_fn, results_xgb_fn]
 
-#%% combine data frames
+i = 0
 
-# add model columns
-results_pls_df['model'] = 'pls'
-results_dl_df['model'] = 'dl'
-results_df = pd.concat([results_pls_df,results_dl_df],ignore_index=True)
-results_df.loc[:,'value']=results_df.loc[:,'value'].apply(lambda x: float(x))
+for f in results_files:
+    
+    if i == 0:
+        
+        results_df=pd.read_csv(os.path.join(results_path,f))
+        
+        model = f.split(sep='_')[1]
+        
+        model = model.split(sep='-')[0]
+        
+        results_df['model']=model
+
+    else:
+        
+        df = pd.read_csv(os.path.join(results_path,f))
+        
+        model = f.split(sep='_')[1]
+        
+        model = model.split(sep='-')[0]
+        
+        df['model']=model
+        
+        results_df = pd.concat([results_df,df],ignore_index = True)
+        
+    i += 1
+
+
+results_df.loc[:,'value']=results_df.loc[:,'value'].apply(lambda x: np.double(x))
+
+# select only iterations 0 - 9 to make all models consistent
+
+results_df = results_df.loc[results_df.iteration.isin(np.arange(0,10)),:]
 
 #%% make some useful variables
 
