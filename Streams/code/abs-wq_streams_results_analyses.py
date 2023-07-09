@@ -10,7 +10,7 @@ import pandas as pd
 import os
 import numpy as np
 # import pandas as pd
-#from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
 # from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -33,7 +33,8 @@ from scipy import stats
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 results_pls_fn = 'streams_PLS_It0-9_results.csv'
 results_dl_fn = 'streams_DL_It0-9_results.csv'
@@ -107,6 +108,125 @@ test_rmses.rename(columns = {'value':'test rmse (ppm)'},inplace = True)
 
 test_rmse_plot = sns.catplot(x='model',y='test rmse (ppm)',col = 'species',col_wrap=3,
                              data = test_rmses,kind = 'violin')
+
+#%% get r_squared values
+
+test_rsqrs = results_df.loc[results_df['output'] == 'test_rsq',:]
+test_rsqrs.reset_index(inplace = True)
+# test_rsqrs.value = test_rmses.value.apply(lambda x: float(x))
+test_rsqrs.rename(columns = {'value':'test r-squared'},inplace = True)
+
+#%% make r_squared violin plot plot
+
+test_rqrs_plot = sns.catplot(x='model',y='test r-squared',col = 'species',col_wrap=3,
+                             data = test_rsqrs,kind = 'violin')
+
+#%% make 1:1 plots for PLS and XGB for on Nitrate-N and Phosphate-P
+
+models_sub = ['PLS','XGB']
+species_sub = ['Nitrate-N','Phosphate-P']
+
+fig, axs = plt.subplots(nrows = 2, ncols = 2, dpi = 300, figsize = (15,10))
+fig.tight_layout(pad = 2)
+
+col = 0
+row = 0
+
+for m in models_sub:
+    
+    for s in species_sub:
+        
+        ax = axs[row, col]
+        
+        true_vals = results_df.loc[(results_df.model == m)&
+                                   (results_df.species == s)&
+                                   (results_df.output=='y_true_test'),'value']
+        
+        pred_vals = results_df.loc[(results_df.model == m)&
+                                   (results_df.species == s)&
+                                   (results_df.output=='y_hat_test'),'value']
+        
+        min11 = min([true_vals.min(),pred_vals.min()])
+        max11 = max([true_vals.max(),pred_vals.max()])
+        
+        line11 = [min11,max11]
+        
+        ax.scatter(true_vals,pred_vals)
+        ax.plot(line11,line11,'k--')
+        
+        ax.set_xlabel(f'True {s}')
+        ax.set_ylabel(f'Prediced {s}')
+        ax.set_title(m)
+        
+        if col ==1:
+            
+            col = 0
+            row += 1
+            
+        else:
+            
+            col += 1
+            
+#%% make 1:1 plots for PLS and XGB for on Nitrate-N and Phosphate-P
+
+species_model = [['TN','PLS'],['TN','DL'],['TP','PLS'],['TP','XGB']]
+
+fig, axs = plt.subplots(nrows = 2, ncols = 2, dpi = 300, figsize = (15,10))
+fig.tight_layout(pad = 2)
+
+col = 0
+row = 0
+    
+for sm in species_model:
+    
+    m = sm[1]
+    
+    s = sm[0]
+    
+    ax = axs[row, col]
+    
+    true_vals = results_df.loc[(results_df.model == m)&
+                               (results_df.species == s)&
+                               (results_df.output=='y_true_test'),'value']
+    
+    pred_vals = results_df.loc[(results_df.model == m)&
+                               (results_df.species == s)&
+                               (results_df.output=='y_hat_test'),'value']
+    
+    min11 = min([true_vals.min(),pred_vals.min()])
+    max11 = max([true_vals.max(),pred_vals.max()])
+    
+    line11 = [min11,max11]
+    
+    ax.scatter(true_vals,pred_vals)
+    ax.plot(line11,line11,'k--')
+    
+    ax.set_xlabel(f'True {s}')
+    ax.set_ylabel(f'Prediced {s}')
+    ax.set_title(m)
+    
+    if col ==1:
+        
+        col = 0
+        row += 1
+        
+    else:
+        
+        col += 1
+
+#%% There are 2 DL-Ammonium value throwing off the plot. Will set to -1 for visualization purposes
+
+test_rsqrs.loc[(test_rsqrs.model=='DL')&
+               (test_rsqrs.species=='Ammonium-N')&
+               (test_rsqrs['test r-squared']<-1),'test r-squared']=-1
+
+# test_rsqrs.loc[(test_rsqrs.model=='DL')&
+#                (test_rsqrs.species=='Ammonium-N'),:]
+
+#%% make improved violin plot
+
+test_rqrs_plot = sns.catplot(x='model',y='test r-squared',col = 'species',col_wrap=3,
+                             data = test_rsqrs,kind = 'violin')
 
 #%% data wrangling for 1:1 plots
 
