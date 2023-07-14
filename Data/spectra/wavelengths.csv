@@ -1,0 +1,3037 @@
+wavelength,band,device
+184.2165527,band_1,Ocean Optics
+184.6663577,band_2,Ocean Optics
+185.1162027,band_3,Ocean Optics
+185.5660878,band_4,Ocean Optics
+186.0160131,band_5,Ocean Optics
+186.4659786,band_6,Ocean Optics
+186.9159842,band_7,Ocean Optics
+187.3660299,band_8,Ocean Optics
+187.8161159,band_9,Ocean Optics
+188.266242,band_10,Ocean Optics
+188.7164084,band_11,Ocean Optics
+189.166615,band_12,Ocean Optics
+189.6168618,band_13,Ocean Optics
+190.0671488,band_14,Ocean Optics
+190.5174761,band_15,Ocean Optics
+190.9678437,band_16,Ocean Optics
+191.4182516,band_17,Ocean Optics
+191.8686998,band_18,Ocean Optics
+192.3191883,band_19,Ocean Optics
+192.7697171,band_20,Ocean Optics
+193.2202862,band_21,Ocean Optics
+193.6708957,band_22,Ocean Optics
+194.1215455,band_23,Ocean Optics
+194.5722358,band_24,Ocean Optics
+195.0229664,band_25,Ocean Optics
+195.4737374,band_26,Ocean Optics
+195.9245488,band_27,Ocean Optics
+196.3754006,band_28,Ocean Optics
+196.8262929,band_29,Ocean Optics
+197.2772256,band_30,Ocean Optics
+197.7281988,band_31,Ocean Optics
+198.1792125,band_32,Ocean Optics
+198.6302666,band_33,Ocean Optics
+199.0813613,band_34,Ocean Optics
+199.5324964,band_35,Ocean Optics
+199.9836721,band_36,Ocean Optics
+200.4348883,band_37,Ocean Optics
+200.8861451,band_38,Ocean Optics
+201.3374424,band_39,Ocean Optics
+201.7887803,band_40,Ocean Optics
+202.2401588,band_41,Ocean Optics
+202.6915779,band_42,Ocean Optics
+203.1430376,band_43,Ocean Optics
+203.5945379,band_44,Ocean Optics
+204.0460789,band_45,Ocean Optics
+204.4976605,band_46,Ocean Optics
+204.9492827,band_47,Ocean Optics
+205.4009457,band_48,Ocean Optics
+205.8526493,band_49,Ocean Optics
+206.3043937,band_50,Ocean Optics
+206.7561787,band_51,Ocean Optics
+207.2080045,band_52,Ocean Optics
+207.659871,band_53,Ocean Optics
+208.1117783,band_54,Ocean Optics
+208.5637263,band_55,Ocean Optics
+209.0157151,band_56,Ocean Optics
+209.4677447,band_57,Ocean Optics
+209.9198151,band_58,Ocean Optics
+210.3719263,band_59,Ocean Optics
+210.8240783,band_60,Ocean Optics
+211.2762712,band_61,Ocean Optics
+211.7285049,band_62,Ocean Optics
+212.1807795,band_63,Ocean Optics
+212.633095,band_64,Ocean Optics
+213.0854513,band_65,Ocean Optics
+213.5378486,band_66,Ocean Optics
+213.9902868,band_67,Ocean Optics
+214.4427659,band_68,Ocean Optics
+214.8952859,band_69,Ocean Optics
+215.3478469,band_70,Ocean Optics
+215.8004488,band_71,Ocean Optics
+216.2530918,band_72,Ocean Optics
+216.7057757,band_73,Ocean Optics
+217.1585006,band_74,Ocean Optics
+217.6112665,band_75,Ocean Optics
+218.0640735,band_76,Ocean Optics
+218.5169215,band_77,Ocean Optics
+218.9698106,band_78,Ocean Optics
+219.4227407,band_79,Ocean Optics
+219.8757119,band_80,Ocean Optics
+220.3287242,band_81,Ocean Optics
+220.7817776,band_82,Ocean Optics
+221.2348721,band_83,Ocean Optics
+221.6880078,band_84,Ocean Optics
+222.1411845,band_85,Ocean Optics
+222.5944025,band_86,Ocean Optics
+223.0476616,band_87,Ocean Optics
+223.5009619,band_88,Ocean Optics
+223.9543033,band_89,Ocean Optics
+224.407686,band_90,Ocean Optics
+224.8611099,band_91,Ocean Optics
+225.314575,band_92,Ocean Optics
+225.7680814,band_93,Ocean Optics
+226.221629,band_94,Ocean Optics
+226.6752179,band_95,Ocean Optics
+227.1288481,band_96,Ocean Optics
+227.5825195,band_97,Ocean Optics
+228.0362323,band_98,Ocean Optics
+228.4899864,band_99,Ocean Optics
+228.9437818,band_100,Ocean Optics
+229.3976185,band_101,Ocean Optics
+229.8514966,band_102,Ocean Optics
+230.3054161,band_103,Ocean Optics
+230.759377,band_104,Ocean Optics
+231.2133792,band_105,Ocean Optics
+231.6674229,band_106,Ocean Optics
+232.121508,band_107,Ocean Optics
+232.5756345,band_108,Ocean Optics
+233.0298024,band_109,Ocean Optics
+233.4840118,band_110,Ocean Optics
+233.9382627,band_111,Ocean Optics
+234.392555,band_112,Ocean Optics
+234.8468889,band_113,Ocean Optics
+235.3012642,band_114,Ocean Optics
+235.7556811,band_115,Ocean Optics
+236.2101395,band_116,Ocean Optics
+236.6646395,band_117,Ocean Optics
+237.119181,band_118,Ocean Optics
+237.573764,band_119,Ocean Optics
+238.0283887,band_120,Ocean Optics
+238.4830549,band_121,Ocean Optics
+238.9377628,band_122,Ocean Optics
+239.3925123,band_123,Ocean Optics
+239.8473034,band_124,Ocean Optics
+240.3021361,band_125,Ocean Optics
+240.7570105,band_126,Ocean Optics
+241.2119266,band_127,Ocean Optics
+241.6668844,band_128,Ocean Optics
+242.1218839,band_129,Ocean Optics
+242.576925,band_130,Ocean Optics
+243.0320079,band_131,Ocean Optics
+243.4871325,band_132,Ocean Optics
+243.9422989,band_133,Ocean Optics
+244.397507,band_134,Ocean Optics
+244.8527569,band_135,Ocean Optics
+245.3080486,band_136,Ocean Optics
+245.7633821,band_137,Ocean Optics
+246.2187573,band_138,Ocean Optics
+246.6741744,band_139,Ocean Optics
+247.1296334,band_140,Ocean Optics
+247.5851342,band_141,Ocean Optics
+248.0406768,band_142,Ocean Optics
+248.4962613,band_143,Ocean Optics
+248.9518877,band_144,Ocean Optics
+249.407556,band_145,Ocean Optics
+249.8632662,band_146,Ocean Optics
+250.3190183,band_147,Ocean Optics
+250.7748124,band_148,Ocean Optics
+251.2306484,band_149,Ocean Optics
+251.6865264,band_150,Ocean Optics
+252.1424463,band_151,Ocean Optics
+252.5984082,band_152,Ocean Optics
+253.0544121,band_153,Ocean Optics
+253.5104581,band_154,Ocean Optics
+253.966546,band_155,Ocean Optics
+254.422676,band_156,Ocean Optics
+254.8788481,band_157,Ocean Optics
+255.3350622,band_158,Ocean Optics
+255.7913183,band_159,Ocean Optics
+256.2476166,band_160,Ocean Optics
+256.7039569,band_161,Ocean Optics
+257.1603394,band_162,Ocean Optics
+257.616764,band_163,Ocean Optics
+258.0732307,band_164,Ocean Optics
+258.5297396,band_165,Ocean Optics
+258.9862906,band_166,Ocean Optics
+259.4428838,band_167,Ocean Optics
+259.8995192,band_168,Ocean Optics
+260.3561968,band_169,Ocean Optics
+260.8129166,band_170,Ocean Optics
+261.2696786,band_171,Ocean Optics
+261.7264829,band_172,Ocean Optics
+262.1833294,band_173,Ocean Optics
+262.6402182,band_174,Ocean Optics
+263.0971492,band_175,Ocean Optics
+263.5541226,band_176,Ocean Optics
+264.0111382,band_177,Ocean Optics
+264.4681961,band_178,Ocean Optics
+264.9252964,band_179,Ocean Optics
+265.382439,band_180,Ocean Optics
+265.839624,band_181,Ocean Optics
+266.2968513,band_182,Ocean Optics
+266.754121,band_183,Ocean Optics
+267.2114331,band_184,Ocean Optics
+267.6687876,band_185,Ocean Optics
+268.1261845,band_186,Ocean Optics
+268.5836238,band_187,Ocean Optics
+269.0411056,band_188,Ocean Optics
+269.4986298,band_189,Ocean Optics
+269.9561965,band_190,Ocean Optics
+270.4138056,band_191,Ocean Optics
+270.8714573,band_192,Ocean Optics
+271.3291514,band_193,Ocean Optics
+271.7868881,band_194,Ocean Optics
+272.2446672,band_195,Ocean Optics
+272.702489,band_196,Ocean Optics
+273.1603532,band_197,Ocean Optics
+273.6182601,band_198,Ocean Optics
+274.0762095,band_199,Ocean Optics
+274.5342015,band_200,Ocean Optics
+274.9922361,band_201,Ocean Optics
+275.4503133,band_202,Ocean Optics
+275.9084332,band_203,Ocean Optics
+276.3665956,band_204,Ocean Optics
+276.8248008,band_205,Ocean Optics
+277.2830486,band_206,Ocean Optics
+277.7413391,band_207,Ocean Optics
+278.1996722,band_208,Ocean Optics
+278.6580481,band_209,Ocean Optics
+279.1164667,band_210,Ocean Optics
+279.574928,band_211,Ocean Optics
+280.0334321,band_212,Ocean Optics
+280.4919789,band_213,Ocean Optics
+280.9505684,band_214,Ocean Optics
+281.4092008,band_215,Ocean Optics
+281.8678759,band_216,Ocean Optics
+282.3265939,band_217,Ocean Optics
+282.7853546,band_218,Ocean Optics
+283.2441582,band_219,Ocean Optics
+283.7030047,band_220,Ocean Optics
+284.161894,band_221,Ocean Optics
+284.6208261,band_222,Ocean Optics
+285.0798011,band_223,Ocean Optics
+285.5388191,band_224,Ocean Optics
+285.9978799,band_225,Ocean Optics
+286.4569836,band_226,Ocean Optics
+286.9161303,band_227,Ocean Optics
+287.3753199,band_228,Ocean Optics
+287.8345525,band_229,Ocean Optics
+288.293828,band_230,Ocean Optics
+288.7531465,band_231,Ocean Optics
+289.2125081,band_232,Ocean Optics
+289.6719126,band_233,Ocean Optics
+290.1313601,band_234,Ocean Optics
+290.5908507,band_235,Ocean Optics
+291.0503843,band_236,Ocean Optics
+291.5099609,band_237,Ocean Optics
+291.9695806,band_238,Ocean Optics
+292.4292434,band_239,Ocean Optics
+292.8889493,band_240,Ocean Optics
+293.3486984,band_241,Ocean Optics
+293.8084905,band_242,Ocean Optics
+294.2683257,band_243,Ocean Optics
+294.7282041,band_244,Ocean Optics
+295.1881257,band_245,Ocean Optics
+295.6480904,band_246,Ocean Optics
+296.1080983,band_247,Ocean Optics
+296.5681494,band_248,Ocean Optics
+297.0282437,band_249,Ocean Optics
+297.4883812,band_250,Ocean Optics
+297.948562,band_251,Ocean Optics
+298.408786,band_252,Ocean Optics
+298.8690532,band_253,Ocean Optics
+299.3293637,band_254,Ocean Optics
+299.7897175,band_255,Ocean Optics
+300.2501146,band_256,Ocean Optics
+300.7105551,band_257,Ocean Optics
+301.1710388,band_258,Ocean Optics
+301.6315658,band_259,Ocean Optics
+302.0921362,band_260,Ocean Optics
+302.55275,band_261,Ocean Optics
+303.0134071,band_262,Ocean Optics
+303.4741076,band_263,Ocean Optics
+303.9348516,band_264,Ocean Optics
+304.3956389,band_265,Ocean Optics
+304.8564696,band_266,Ocean Optics
+305.3173438,band_267,Ocean Optics
+305.7782614,band_268,Ocean Optics
+306.2392225,band_269,Ocean Optics
+306.700227,band_270,Ocean Optics
+307.161275,band_271,Ocean Optics
+307.6223666,band_272,Ocean Optics
+308.0835016,band_273,Ocean Optics
+308.5446801,band_274,Ocean Optics
+309.0059022,band_275,Ocean Optics
+309.4671679,band_276,Ocean Optics
+309.928477,band_277,Ocean Optics
+310.3898298,band_278,Ocean Optics
+310.8512262,band_279,Ocean Optics
+311.3126661,band_280,Ocean Optics
+311.7741497,band_281,Ocean Optics
+312.2356768,band_282,Ocean Optics
+312.6972476,band_283,Ocean Optics
+313.1588621,band_284,Ocean Optics
+313.6205202,band_285,Ocean Optics
+314.082222,band_286,Ocean Optics
+314.5439675,band_287,Ocean Optics
+315.0057566,band_288,Ocean Optics
+315.4675895,band_289,Ocean Optics
+315.9294661,band_290,Ocean Optics
+316.3913865,band_291,Ocean Optics
+316.8533505,band_292,Ocean Optics
+317.3153584,band_293,Ocean Optics
+317.77741,band_294,Ocean Optics
+318.2395054,band_295,Ocean Optics
+318.7016446,band_296,Ocean Optics
+319.1638276,band_297,Ocean Optics
+319.6260545,band_298,Ocean Optics
+320.0883251,band_299,Ocean Optics
+320.5506397,band_300,Ocean Optics
+321.012998,band_301,Ocean Optics
+321.4754003,band_302,Ocean Optics
+321.9378464,band_303,Ocean Optics
+322.4003365,band_304,Ocean Optics
+322.8628704,band_305,Ocean Optics
+323.3254483,band_306,Ocean Optics
+323.7880701,band_307,Ocean Optics
+324.2507359,band_308,Ocean Optics
+324.7134456,band_309,Ocean Optics
+325.1761993,band_310,Ocean Optics
+325.638997,band_311,Ocean Optics
+326.1018387,band_312,Ocean Optics
+326.5647244,band_313,Ocean Optics
+327.0276541,band_314,Ocean Optics
+327.4906279,band_315,Ocean Optics
+327.9536457,band_316,Ocean Optics
+328.4167076,band_317,Ocean Optics
+328.8798135,band_318,Ocean Optics
+329.3429635,band_319,Ocean Optics
+329.8061577,band_320,Ocean Optics
+330.2693959,band_321,Ocean Optics
+330.7326783,band_322,Ocean Optics
+331.1960048,band_323,Ocean Optics
+331.6593755,band_324,Ocean Optics
+332.1227903,band_325,Ocean Optics
+332.5862493,band_326,Ocean Optics
+333.0497525,band_327,Ocean Optics
+333.5132999,band_328,Ocean Optics
+333.9768915,band_329,Ocean Optics
+334.4405273,band_330,Ocean Optics
+334.9042074,band_331,Ocean Optics
+335.3679317,band_332,Ocean Optics
+335.8317003,band_333,Ocean Optics
+336.2955132,band_334,Ocean Optics
+336.7593703,band_335,Ocean Optics
+337.2232718,band_336,Ocean Optics
+337.6872175,band_337,Ocean Optics
+338.1512076,band_338,Ocean Optics
+338.6152421,band_339,Ocean Optics
+339.0793209,band_340,Ocean Optics
+339.543444,band_341,Ocean Optics
+340.0076116,band_342,Ocean Optics
+340.4718235,band_343,Ocean Optics
+340.9360798,band_344,Ocean Optics
+341.4003805,band_345,Ocean Optics
+341.8647257,band_346,Ocean Optics
+342.3291153,band_347,Ocean Optics
+342.7935494,band_348,Ocean Optics
+343.2580279,band_349,Ocean Optics
+343.7225509,band_350,Ocean Optics
+344.1871184,band_351,Ocean Optics
+344.6517304,band_352,Ocean Optics
+345.1163869,band_353,Ocean Optics
+345.5810879,band_354,Ocean Optics
+346.0458335,band_355,Ocean Optics
+346.5106237,band_356,Ocean Optics
+346.9754584,band_357,Ocean Optics
+347.4403376,band_358,Ocean Optics
+347.9052615,band_359,Ocean Optics
+348.37023,band_360,Ocean Optics
+348.8352431,band_361,Ocean Optics
+349.3003008,band_362,Ocean Optics
+349.7654032,band_363,Ocean Optics
+350.2305502,band_364,Ocean Optics
+350.6957419,band_365,Ocean Optics
+351.1609782,band_366,Ocean Optics
+351.6262593,band_367,Ocean Optics
+352.0915851,band_368,Ocean Optics
+352.5569556,band_369,Ocean Optics
+353.0223708,band_370,Ocean Optics
+353.4878307,band_371,Ocean Optics
+353.9533354,band_372,Ocean Optics
+354.4188849,band_373,Ocean Optics
+354.8844792,band_374,Ocean Optics
+355.3501182,band_375,Ocean Optics
+355.8158021,band_376,Ocean Optics
+356.2815307,band_377,Ocean Optics
+356.7473042,band_378,Ocean Optics
+357.2131226,band_379,Ocean Optics
+357.6789858,band_380,Ocean Optics
+358.1448939,band_381,Ocean Optics
+358.6108468,band_382,Ocean Optics
+359.0768447,band_383,Ocean Optics
+359.5428874,band_384,Ocean Optics
+360.0089751,band_385,Ocean Optics
+360.4751077,band_386,Ocean Optics
+360.9412852,band_387,Ocean Optics
+361.4075077,band_388,Ocean Optics
+361.8737752,band_389,Ocean Optics
+362.3400877,band_390,Ocean Optics
+362.8064451,band_391,Ocean Optics
+363.2728476,band_392,Ocean Optics
+363.7392951,band_393,Ocean Optics
+364.2057876,band_394,Ocean Optics
+364.6723251,band_395,Ocean Optics
+365.1389077,band_396,Ocean Optics
+365.6055354,band_397,Ocean Optics
+366.0722082,band_398,Ocean Optics
+366.538926,band_399,Ocean Optics
+367.005689,band_400,Ocean Optics
+367.4724971,band_401,Ocean Optics
+367.9393503,band_402,Ocean Optics
+368.4062487,band_403,Ocean Optics
+368.8731922,band_404,Ocean Optics
+369.3401809,band_405,Ocean Optics
+369.8072148,band_406,Ocean Optics
+370.2742938,band_407,Ocean Optics
+370.7414181,band_408,Ocean Optics
+371.2085876,band_409,Ocean Optics
+371.6758024,band_410,Ocean Optics
+372.1430623,band_411,Ocean Optics
+372.6103676,band_412,Ocean Optics
+373.0777181,band_413,Ocean Optics
+373.5451139,band_414,Ocean Optics
+374.012555,band_415,Ocean Optics
+374.4800414,band_416,Ocean Optics
+374.9475731,band_417,Ocean Optics
+375.4151502,band_418,Ocean Optics
+375.8827726,band_419,Ocean Optics
+376.3504404,band_420,Ocean Optics
+376.8181535,band_421,Ocean Optics
+377.285912,band_422,Ocean Optics
+377.7537159,band_423,Ocean Optics
+378.2215653,band_424,Ocean Optics
+378.68946,band_425,Ocean Optics
+379.1574002,band_426,Ocean Optics
+379.6253859,band_427,Ocean Optics
+380.093417,band_428,Ocean Optics
+380.5614935,band_429,Ocean Optics
+381.0296156,band_430,Ocean Optics
+381.4977831,band_431,Ocean Optics
+381.9659962,band_432,Ocean Optics
+382.4342548,band_433,Ocean Optics
+382.9025589,band_434,Ocean Optics
+383.3709086,band_435,Ocean Optics
+383.8393038,band_436,Ocean Optics
+384.3077446,band_437,Ocean Optics
+384.776231,band_438,Ocean Optics
+385.244763,band_439,Ocean Optics
+385.7133406,band_440,Ocean Optics
+386.1819638,band_441,Ocean Optics
+386.6506327,band_442,Ocean Optics
+387.1193472,band_443,Ocean Optics
+387.5881074,band_444,Ocean Optics
+388.0569132,band_445,Ocean Optics
+388.5257648,band_446,Ocean Optics
+388.994662,band_447,Ocean Optics
+389.463605,band_448,Ocean Optics
+389.9325936,band_449,Ocean Optics
+390.4016281,band_450,Ocean Optics
+390.8707082,band_451,Ocean Optics
+391.3398341,band_452,Ocean Optics
+391.8090058,band_453,Ocean Optics
+392.2782233,band_454,Ocean Optics
+392.7474866,band_455,Ocean Optics
+393.2167957,band_456,Ocean Optics
+393.6861506,band_457,Ocean Optics
+394.1555514,band_458,Ocean Optics
+394.624998,band_459,Ocean Optics
+395.0944905,band_460,Ocean Optics
+395.5640289,band_461,Ocean Optics
+396.0336131,band_462,Ocean Optics
+396.5032432,band_463,Ocean Optics
+396.9729193,band_464,Ocean Optics
+397.4426413,band_465,Ocean Optics
+397.9124092,band_466,Ocean Optics
+398.3822231,band_467,Ocean Optics
+398.8520829,band_468,Ocean Optics
+399.3219887,band_469,Ocean Optics
+399.7919405,band_470,Ocean Optics
+400.2619384,band_471,Ocean Optics
+400.7319822,band_472,Ocean Optics
+401.202072,band_473,Ocean Optics
+401.6722079,band_474,Ocean Optics
+402.1423899,band_475,Ocean Optics
+402.6126179,band_476,Ocean Optics
+403.0828919,band_477,Ocean Optics
+403.5532121,band_478,Ocean Optics
+404.0235784,band_479,Ocean Optics
+404.4939908,band_480,Ocean Optics
+404.9644493,band_481,Ocean Optics
+405.434954,band_482,Ocean Optics
+405.9055048,band_483,Ocean Optics
+406.3761017,band_484,Ocean Optics
+406.8467449,band_485,Ocean Optics
+407.3174342,band_486,Ocean Optics
+407.7881698,band_487,Ocean Optics
+408.2589516,band_488,Ocean Optics
+408.7297795,band_489,Ocean Optics
+409.2006538,band_490,Ocean Optics
+409.6715743,band_491,Ocean Optics
+410.142541,band_492,Ocean Optics
+410.6135541,band_493,Ocean Optics
+411.0846134,band_494,Ocean Optics
+411.555719,band_495,Ocean Optics
+412.026871,band_496,Ocean Optics
+412.4980692,band_497,Ocean Optics
+412.9693139,band_498,Ocean Optics
+413.4406048,band_499,Ocean Optics
+413.9119422,band_500,Ocean Optics
+414.3833259,band_501,Ocean Optics
+414.854756,band_502,Ocean Optics
+415.3262325,band_503,Ocean Optics
+415.7977554,band_504,Ocean Optics
+416.2693248,band_505,Ocean Optics
+416.7409406,band_506,Ocean Optics
+417.2126029,band_507,Ocean Optics
+417.6843116,band_508,Ocean Optics
+418.1560668,band_509,Ocean Optics
+418.6278685,band_510,Ocean Optics
+419.0997167,band_511,Ocean Optics
+419.5716114,band_512,Ocean Optics
+420.0435527,band_513,Ocean Optics
+420.5155405,band_514,Ocean Optics
+420.9875749,band_515,Ocean Optics
+421.4596558,band_516,Ocean Optics
+421.9317833,band_517,Ocean Optics
+422.4039574,band_518,Ocean Optics
+422.8761781,band_519,Ocean Optics
+423.3484454,band_520,Ocean Optics
+423.8207594,band_521,Ocean Optics
+424.29312,band_522,Ocean Optics
+424.7655272,band_523,Ocean Optics
+425.2379811,band_524,Ocean Optics
+425.7104818,band_525,Ocean Optics
+426.1830291,band_526,Ocean Optics
+426.6556231,band_527,Ocean Optics
+427.1282638,band_528,Ocean Optics
+427.6009513,band_529,Ocean Optics
+428.0736855,band_530,Ocean Optics
+428.5464664,band_531,Ocean Optics
+429.0192942,band_532,Ocean Optics
+429.4921687,band_533,Ocean Optics
+429.96509,band_534,Ocean Optics
+430.4380581,band_535,Ocean Optics
+430.911073,band_536,Ocean Optics
+431.3841348,band_537,Ocean Optics
+431.8572434,band_538,Ocean Optics
+432.3303989,band_539,Ocean Optics
+432.8036013,band_540,Ocean Optics
+433.2768505,band_541,Ocean Optics
+433.7501466,band_542,Ocean Optics
+434.2234896,band_543,Ocean Optics
+434.6968796,band_544,Ocean Optics
+435.1703165,band_545,Ocean Optics
+435.6438003,band_546,Ocean Optics
+436.1173311,band_547,Ocean Optics
+436.5909089,band_548,Ocean Optics
+437.0645336,band_549,Ocean Optics
+437.5382054,band_550,Ocean Optics
+438.0119241,band_551,Ocean Optics
+438.4856899,band_552,Ocean Optics
+438.9595027,band_553,Ocean Optics
+439.4333626,band_554,Ocean Optics
+439.9072695,band_555,Ocean Optics
+440.3812235,band_556,Ocean Optics
+440.8552246,band_557,Ocean Optics
+441.3292728,band_558,Ocean Optics
+441.803368,band_559,Ocean Optics
+442.2775104,band_560,Ocean Optics
+442.7517,band_561,Ocean Optics
+443.2259367,band_562,Ocean Optics
+443.7002205,band_563,Ocean Optics
+444.1745516,band_564,Ocean Optics
+444.6489298,band_565,Ocean Optics
+445.1233552,band_566,Ocean Optics
+445.5978278,band_567,Ocean Optics
+446.0723476,band_568,Ocean Optics
+446.5469147,band_569,Ocean Optics
+447.021529,band_570,Ocean Optics
+447.4961906,band_571,Ocean Optics
+447.9708995,band_572,Ocean Optics
+448.4456556,band_573,Ocean Optics
+448.9204591,band_574,Ocean Optics
+449.3953098,band_575,Ocean Optics
+449.8702079,band_576,Ocean Optics
+450.3451533,band_577,Ocean Optics
+450.8201461,band_578,Ocean Optics
+451.2951862,band_579,Ocean Optics
+451.7702737,band_580,Ocean Optics
+452.2454086,band_581,Ocean Optics
+452.7205909,band_582,Ocean Optics
+453.1958206,band_583,Ocean Optics
+453.6710977,band_584,Ocean Optics
+454.1464223,band_585,Ocean Optics
+454.6217943,band_586,Ocean Optics
+455.0972138,band_587,Ocean Optics
+455.5726807,band_588,Ocean Optics
+456.0481952,band_589,Ocean Optics
+456.5237571,band_590,Ocean Optics
+456.9993666,band_591,Ocean Optics
+457.4750236,band_592,Ocean Optics
+457.9507281,band_593,Ocean Optics
+458.4264801,band_594,Ocean Optics
+458.9022798,band_595,Ocean Optics
+459.378127,band_596,Ocean Optics
+459.8540218,band_597,Ocean Optics
+460.3299642,band_598,Ocean Optics
+460.8059542,band_599,Ocean Optics
+461.2819918,band_600,Ocean Optics
+461.7580771,band_601,Ocean Optics
+462.23421,band_602,Ocean Optics
+462.7103906,band_603,Ocean Optics
+463.1866189,band_604,Ocean Optics
+463.6628948,band_605,Ocean Optics
+464.1392185,band_606,Ocean Optics
+464.6155899,band_607,Ocean Optics
+465.092009,band_608,Ocean Optics
+465.5684758,band_609,Ocean Optics
+466.0449904,band_610,Ocean Optics
+466.5215528,band_611,Ocean Optics
+466.9981629,band_612,Ocean Optics
+467.4748208,band_613,Ocean Optics
+467.9515266,band_614,Ocean Optics
+468.4282801,band_615,Ocean Optics
+468.9050815,band_616,Ocean Optics
+469.3819307,band_617,Ocean Optics
+469.8588278,band_618,Ocean Optics
+470.3357727,band_619,Ocean Optics
+470.8127655,band_620,Ocean Optics
+471.2898062,band_621,Ocean Optics
+471.7668948,band_622,Ocean Optics
+472.2440313,band_623,Ocean Optics
+472.7212158,band_624,Ocean Optics
+473.1984481,band_625,Ocean Optics
+473.6757285,band_626,Ocean Optics
+474.1530568,band_627,Ocean Optics
+474.6304331,band_628,Ocean Optics
+475.1078574,band_629,Ocean Optics
+475.5853296,band_630,Ocean Optics
+476.0628499,band_631,Ocean Optics
+476.5404183,band_632,Ocean Optics
+477.0180346,band_633,Ocean Optics
+477.4956991,band_634,Ocean Optics
+477.9734116,band_635,Ocean Optics
+478.4511721,band_636,Ocean Optics
+478.9289808,band_637,Ocean Optics
+479.4068376,band_638,Ocean Optics
+479.8847425,band_639,Ocean Optics
+480.3626955,band_640,Ocean Optics
+480.8406966,band_641,Ocean Optics
+481.3187459,band_642,Ocean Optics
+481.7968434,band_643,Ocean Optics
+482.2749891,band_644,Ocean Optics
+482.7531829,band_645,Ocean Optics
+483.231425,band_646,Ocean Optics
+483.7097153,band_647,Ocean Optics
+484.1880538,band_648,Ocean Optics
+484.6664405,band_649,Ocean Optics
+485.1448756,band_650,Ocean Optics
+485.6233588,band_651,Ocean Optics
+486.1018904,band_652,Ocean Optics
+486.5804702,band_653,Ocean Optics
+487.0590984,band_654,Ocean Optics
+487.5377749,band_655,Ocean Optics
+488.0164997,band_656,Ocean Optics
+488.4952728,band_657,Ocean Optics
+488.9740944,band_658,Ocean Optics
+489.4529642,band_659,Ocean Optics
+489.9318825,band_660,Ocean Optics
+490.4108491,band_661,Ocean Optics
+490.8898642,band_662,Ocean Optics
+491.3689277,band_663,Ocean Optics
+491.8480396,band_664,Ocean Optics
+492.3272,band_665,Ocean Optics
+492.8064088,band_666,Ocean Optics
+493.2856661,band_667,Ocean Optics
+493.7649718,band_668,Ocean Optics
+494.2443261,band_669,Ocean Optics
+494.7237289,band_670,Ocean Optics
+495.2031802,band_671,Ocean Optics
+495.68268,band_672,Ocean Optics
+496.1622284,band_673,Ocean Optics
+496.6418253,band_674,Ocean Optics
+497.1214708,band_675,Ocean Optics
+497.6011649,band_676,Ocean Optics
+498.0809076,band_677,Ocean Optics
+498.5606989,band_678,Ocean Optics
+499.0405388,band_679,Ocean Optics
+499.5204273,band_680,Ocean Optics
+500.0003645,band_681,Ocean Optics
+500.4803503,band_682,Ocean Optics
+500.9603849,band_683,Ocean Optics
+501.4404681,band_684,Ocean Optics
+501.9206,band_685,Ocean Optics
+502.4007806,band_686,Ocean Optics
+502.8810099,band_687,Ocean Optics
+503.361288,band_688,Ocean Optics
+503.8416148,band_689,Ocean Optics
+504.3219904,band_690,Ocean Optics
+504.8024147,band_691,Ocean Optics
+505.2828878,band_692,Ocean Optics
+505.7634098,band_693,Ocean Optics
+506.2439805,band_694,Ocean Optics
+506.7246001,band_695,Ocean Optics
+507.2052685,band_696,Ocean Optics
+507.6859857,band_697,Ocean Optics
+508.1667518,band_698,Ocean Optics
+508.6475668,band_699,Ocean Optics
+509.1284307,band_700,Ocean Optics
+509.6093434,band_701,Ocean Optics
+510.0903051,band_702,Ocean Optics
+510.5713157,band_703,Ocean Optics
+511.0523752,band_704,Ocean Optics
+511.5334837,band_705,Ocean Optics
+512.0146411,band_706,Ocean Optics
+512.4958475,band_707,Ocean Optics
+512.977103,band_708,Ocean Optics
+513.4584073,band_709,Ocean Optics
+513.9397608,band_710,Ocean Optics
+514.4211632,band_711,Ocean Optics
+514.9026147,band_712,Ocean Optics
+515.3841152,band_713,Ocean Optics
+515.8656648,band_714,Ocean Optics
+516.3472634,band_715,Ocean Optics
+516.8289112,band_716,Ocean Optics
+517.310608,band_717,Ocean Optics
+517.792354,band_718,Ocean Optics
+518.2741491,band_719,Ocean Optics
+518.7559933,band_720,Ocean Optics
+519.2378866,band_721,Ocean Optics
+519.7198292,band_722,Ocean Optics
+520.2018209,band_723,Ocean Optics
+520.6838618,band_724,Ocean Optics
+521.1659519,band_725,Ocean Optics
+521.6480912,band_726,Ocean Optics
+522.1302797,band_727,Ocean Optics
+522.6125175,band_728,Ocean Optics
+523.0948045,band_729,Ocean Optics
+523.5771408,band_730,Ocean Optics
+524.0595264,band_731,Ocean Optics
+524.5419612,band_732,Ocean Optics
+525.0244454,band_733,Ocean Optics
+525.5069788,band_734,Ocean Optics
+525.9895616,band_735,Ocean Optics
+526.4721937,band_736,Ocean Optics
+526.9548752,band_737,Ocean Optics
+527.4376061,band_738,Ocean Optics
+527.9203863,band_739,Ocean Optics
+528.4032159,band_740,Ocean Optics
+528.8860949,band_741,Ocean Optics
+529.3690234,band_742,Ocean Optics
+529.8520012,band_743,Ocean Optics
+530.3350285,band_744,Ocean Optics
+530.8181053,band_745,Ocean Optics
+531.3012315,band_746,Ocean Optics
+531.7844072,band_747,Ocean Optics
+532.2676323,band_748,Ocean Optics
+532.750907,band_749,Ocean Optics
+533.2342312,band_750,Ocean Optics
+533.7176049,band_751,Ocean Optics
+534.2010282,band_752,Ocean Optics
+534.684501,band_753,Ocean Optics
+535.1680234,band_754,Ocean Optics
+535.6515954,band_755,Ocean Optics
+536.1352169,band_756,Ocean Optics
+536.6188881,band_757,Ocean Optics
+537.1026089,band_758,Ocean Optics
+537.5863793,band_759,Ocean Optics
+538.0701993,band_760,Ocean Optics
+538.554069,band_761,Ocean Optics
+539.0379884,band_762,Ocean Optics
+539.5219574,band_763,Ocean Optics
+540.0059761,band_764,Ocean Optics
+540.4900446,band_765,Ocean Optics
+540.9741627,band_766,Ocean Optics
+541.4583306,band_767,Ocean Optics
+541.9425482,band_768,Ocean Optics
+542.4268156,band_769,Ocean Optics
+542.9111328,band_770,Ocean Optics
+543.3954997,band_771,Ocean Optics
+543.8799164,band_772,Ocean Optics
+544.3643829,band_773,Ocean Optics
+544.8488993,band_774,Ocean Optics
+545.3334654,band_775,Ocean Optics
+545.8180815,band_776,Ocean Optics
+546.3027473,band_777,Ocean Optics
+546.7874631,band_778,Ocean Optics
+547.2722287,band_779,Ocean Optics
+547.7570442,band_780,Ocean Optics
+548.2419096,band_781,Ocean Optics
+548.7268249,band_782,Ocean Optics
+549.2117902,band_783,Ocean Optics
+549.6968054,band_784,Ocean Optics
+550.1818706,band_785,Ocean Optics
+550.6669857,band_786,Ocean Optics
+551.1521508,band_787,Ocean Optics
+551.6373659,band_788,Ocean Optics
+552.1226311,band_789,Ocean Optics
+552.6079462,band_790,Ocean Optics
+553.0933114,band_791,Ocean Optics
+553.5787266,band_792,Ocean Optics
+554.0641918,band_793,Ocean Optics
+554.5497072,band_794,Ocean Optics
+555.0352726,band_795,Ocean Optics
+555.5208881,band_796,Ocean Optics
+556.0065537,band_797,Ocean Optics
+556.4922694,band_798,Ocean Optics
+556.9780353,band_799,Ocean Optics
+557.4638513,band_800,Ocean Optics
+557.9497175,band_801,Ocean Optics
+558.4356338,band_802,Ocean Optics
+558.9216004,band_803,Ocean Optics
+559.4076171,band_804,Ocean Optics
+559.893684,band_805,Ocean Optics
+560.3798012,band_806,Ocean Optics
+560.8659685,band_807,Ocean Optics
+561.3521862,band_808,Ocean Optics
+561.8384541,band_809,Ocean Optics
+562.3247722,band_810,Ocean Optics
+562.8111407,band_811,Ocean Optics
+563.2975594,band_812,Ocean Optics
+563.7840284,band_813,Ocean Optics
+564.2705478,band_814,Ocean Optics
+564.7571175,band_815,Ocean Optics
+565.2437375,band_816,Ocean Optics
+565.7304079,band_817,Ocean Optics
+566.2171287,band_818,Ocean Optics
+566.7038999,band_819,Ocean Optics
+567.1907214,band_820,Ocean Optics
+567.6775934,band_821,Ocean Optics
+568.1645158,band_822,Ocean Optics
+568.6514886,band_823,Ocean Optics
+569.1385119,band_824,Ocean Optics
+569.6255856,band_825,Ocean Optics
+570.1127098,band_826,Ocean Optics
+570.5998845,band_827,Ocean Optics
+571.0871097,band_828,Ocean Optics
+571.5743854,band_829,Ocean Optics
+572.0617116,band_830,Ocean Optics
+572.5490883,band_831,Ocean Optics
+573.0365156,band_832,Ocean Optics
+573.5239935,band_833,Ocean Optics
+574.0115219,band_834,Ocean Optics
+574.499101,band_835,Ocean Optics
+574.9867306,band_836,Ocean Optics
+575.4744108,band_837,Ocean Optics
+575.9621416,band_838,Ocean Optics
+576.4499231,band_839,Ocean Optics
+576.9377553,band_840,Ocean Optics
+577.4256381,band_841,Ocean Optics
+577.9135715,band_842,Ocean Optics
+578.4015557,band_843,Ocean Optics
+578.8895905,band_844,Ocean Optics
+579.3776761,band_845,Ocean Optics
+579.8658124,band_846,Ocean Optics
+580.3539994,band_847,Ocean Optics
+580.8422372,band_848,Ocean Optics
+581.3305257,band_849,Ocean Optics
+581.8188651,band_850,Ocean Optics
+582.3072552,band_851,Ocean Optics
+582.7956961,band_852,Ocean Optics
+583.2841878,band_853,Ocean Optics
+583.7727303,band_854,Ocean Optics
+584.2613237,band_855,Ocean Optics
+584.7499679,band_856,Ocean Optics
+585.238663,band_857,Ocean Optics
+585.727409,band_858,Ocean Optics
+586.2162058,band_859,Ocean Optics
+586.7050536,band_860,Ocean Optics
+587.1939522,band_861,Ocean Optics
+587.6829018,band_862,Ocean Optics
+588.1719023,band_863,Ocean Optics
+588.6609538,band_864,Ocean Optics
+589.1500563,band_865,Ocean Optics
+589.6392097,band_866,Ocean Optics
+590.1284141,band_867,Ocean Optics
+590.6176695,band_868,Ocean Optics
+591.1069759,band_869,Ocean Optics
+591.5963334,band_870,Ocean Optics
+592.0857419,band_871,Ocean Optics
+592.5752014,band_872,Ocean Optics
+593.064712,band_873,Ocean Optics
+593.5542737,band_874,Ocean Optics
+594.0438864,band_875,Ocean Optics
+594.5335503,band_876,Ocean Optics
+595.0232653,band_877,Ocean Optics
+595.5130314,band_878,Ocean Optics
+596.0028487,band_879,Ocean Optics
+596.4927171,band_880,Ocean Optics
+596.9826366,band_881,Ocean Optics
+597.4726074,band_882,Ocean Optics
+597.9626293,band_883,Ocean Optics
+598.4527025,band_884,Ocean Optics
+598.9428268,band_885,Ocean Optics
+599.4330024,band_886,Ocean Optics
+599.9232292,band_887,Ocean Optics
+600.4135073,band_888,Ocean Optics
+600.9038366,band_889,Ocean Optics
+601.3942172,band_890,Ocean Optics
+601.8846492,band_891,Ocean Optics
+602.3751324,band_892,Ocean Optics
+602.8656669,band_893,Ocean Optics
+603.3562528,band_894,Ocean Optics
+603.84689,band_895,Ocean Optics
+604.3375785,band_896,Ocean Optics
+604.8283184,band_897,Ocean Optics
+605.3191097,band_898,Ocean Optics
+605.8099524,band_899,Ocean Optics
+606.3008465,band_900,Ocean Optics
+606.791792,band_901,Ocean Optics
+607.282789,band_902,Ocean Optics
+607.7738373,band_903,Ocean Optics
+608.2649372,band_904,Ocean Optics
+608.7560885,band_905,Ocean Optics
+609.2472913,band_906,Ocean Optics
+609.7385455,band_907,Ocean Optics
+610.2298513,band_908,Ocean Optics
+610.7212086,band_909,Ocean Optics
+611.2126174,band_910,Ocean Optics
+611.7040778,band_911,Ocean Optics
+612.1955897,band_912,Ocean Optics
+612.6871532,band_913,Ocean Optics
+613.1787683,band_914,Ocean Optics
+613.670435,band_915,Ocean Optics
+614.1621532,band_916,Ocean Optics
+614.6539231,band_917,Ocean Optics
+615.1457447,band_918,Ocean Optics
+615.6376178,band_919,Ocean Optics
+616.1295426,band_920,Ocean Optics
+616.6215191,band_921,Ocean Optics
+617.1135473,band_922,Ocean Optics
+617.6056272,band_923,Ocean Optics
+618.0977587,band_924,Ocean Optics
+618.589942,band_925,Ocean Optics
+619.082177,band_926,Ocean Optics
+619.5744638,band_927,Ocean Optics
+620.0668023,band_928,Ocean Optics
+620.5591926,band_929,Ocean Optics
+621.0516347,band_930,Ocean Optics
+621.5441286,band_931,Ocean Optics
+622.0366742,band_932,Ocean Optics
+622.5292717,band_933,Ocean Optics
+623.0219211,band_934,Ocean Optics
+623.5146222,band_935,Ocean Optics
+624.0073753,band_936,Ocean Optics
+624.5001802,band_937,Ocean Optics
+624.9930369,band_938,Ocean Optics
+625.4859456,band_939,Ocean Optics
+625.9789062,band_940,Ocean Optics
+626.4719187,band_941,Ocean Optics
+626.9649831,band_942,Ocean Optics
+627.4580995,band_943,Ocean Optics
+627.9512679,band_944,Ocean Optics
+628.4444882,band_945,Ocean Optics
+628.9377605,band_946,Ocean Optics
+629.4310848,band_947,Ocean Optics
+629.9244611,band_948,Ocean Optics
+630.4178894,band_949,Ocean Optics
+630.9113698,band_950,Ocean Optics
+631.4049022,band_951,Ocean Optics
+631.8984866,band_952,Ocean Optics
+632.3921231,band_953,Ocean Optics
+632.8858118,band_954,Ocean Optics
+633.3795525,band_955,Ocean Optics
+633.8733453,band_956,Ocean Optics
+634.3671902,band_957,Ocean Optics
+634.8610873,band_958,Ocean Optics
+635.3550365,band_959,Ocean Optics
+635.8490379,band_960,Ocean Optics
+636.3430915,band_961,Ocean Optics
+636.8371972,band_962,Ocean Optics
+637.3313552,band_963,Ocean Optics
+637.8255653,band_964,Ocean Optics
+638.3198277,band_965,Ocean Optics
+638.8141423,band_966,Ocean Optics
+639.3085092,band_967,Ocean Optics
+639.8029283,band_968,Ocean Optics
+640.2973997,band_969,Ocean Optics
+640.7919233,band_970,Ocean Optics
+641.2864993,band_971,Ocean Optics
+641.7811276,band_972,Ocean Optics
+642.2758082,band_973,Ocean Optics
+642.7705412,band_974,Ocean Optics
+643.2653264,band_975,Ocean Optics
+643.7601641,band_976,Ocean Optics
+644.2550541,band_977,Ocean Optics
+644.7499965,band_978,Ocean Optics
+645.2449914,band_979,Ocean Optics
+645.7400386,band_980,Ocean Optics
+646.2351382,band_981,Ocean Optics
+646.7302903,band_982,Ocean Optics
+647.2254948,band_983,Ocean Optics
+647.7207518,band_984,Ocean Optics
+648.2160613,band_985,Ocean Optics
+648.7114233,band_986,Ocean Optics
+649.2068377,band_987,Ocean Optics
+649.7023047,band_988,Ocean Optics
+650.1978242,band_989,Ocean Optics
+650.6933962,band_990,Ocean Optics
+651.1890208,band_991,Ocean Optics
+651.6846979,band_992,Ocean Optics
+652.1804277,band_993,Ocean Optics
+652.67621,band_994,Ocean Optics
+653.1720449,band_995,Ocean Optics
+653.6679324,band_996,Ocean Optics
+654.1638726,band_997,Ocean Optics
+654.6598653,band_998,Ocean Optics
+655.1559108,band_999,Ocean Optics
+655.6520089,band_1000,Ocean Optics
+656.1481596,band_1001,Ocean Optics
+656.6443631,band_1002,Ocean Optics
+657.1406193,band_1003,Ocean Optics
+657.6369282,band_1004,Ocean Optics
+658.1332898,band_1005,Ocean Optics
+658.6297041,band_1006,Ocean Optics
+659.1261712,band_1007,Ocean Optics
+659.6226911,band_1008,Ocean Optics
+660.1192637,band_1009,Ocean Optics
+660.6158891,band_1010,Ocean Optics
+661.1125673,band_1011,Ocean Optics
+661.6092984,band_1012,Ocean Optics
+662.1060823,band_1013,Ocean Optics
+662.602919,band_1014,Ocean Optics
+663.0998085,band_1015,Ocean Optics
+663.596751,band_1016,Ocean Optics
+664.0937463,band_1017,Ocean Optics
+664.5907945,band_1018,Ocean Optics
+665.0878955,band_1019,Ocean Optics
+665.5850496,band_1020,Ocean Optics
+666.0822565,band_1021,Ocean Optics
+666.5795164,band_1022,Ocean Optics
+667.0768292,band_1023,Ocean Optics
+667.574195,band_1024,Ocean Optics
+190.0358673,band_1,StellarNet
+190.2137022,band_2,StellarNet
+190.3915762,band_3,StellarNet
+190.5694895,band_4,StellarNet
+190.7474419,band_5,StellarNet
+190.9254335,band_6,StellarNet
+191.1034643,band_7,StellarNet
+191.2815342,band_8,StellarNet
+191.4596434,band_9,StellarNet
+191.6377916,band_10,StellarNet
+191.815979,band_11,StellarNet
+191.9942055,band_12,StellarNet
+192.1724711,band_13,StellarNet
+192.3507759,band_14,StellarNet
+192.5291197,band_15,StellarNet
+192.7075026,band_16,StellarNet
+192.8859247,band_17,StellarNet
+193.0643858,band_18,StellarNet
+193.2428859,band_19,StellarNet
+193.4214251,band_20,StellarNet
+193.6000034,band_21,StellarNet
+193.7786207,band_22,StellarNet
+193.957277,band_23,StellarNet
+194.1359723,band_24,StellarNet
+194.3147067,band_25,StellarNet
+194.4934801,band_26,StellarNet
+194.6722924,band_27,StellarNet
+194.8511437,band_28,StellarNet
+195.0300341,band_29,StellarNet
+195.2089633,band_30,StellarNet
+195.3879316,band_31,StellarNet
+195.5669388,band_32,StellarNet
+195.7459849,band_33,StellarNet
+195.92507,band_34,StellarNet
+196.1041939,band_35,StellarNet
+196.2833568,band_36,StellarNet
+196.4625586,band_37,StellarNet
+196.6417993,band_38,StellarNet
+196.8210789,band_39,StellarNet
+197.0003974,band_40,StellarNet
+197.1797547,band_41,StellarNet
+197.3591509,band_42,StellarNet
+197.5385859,band_43,StellarNet
+197.7180598,band_44,StellarNet
+197.8975725,band_45,StellarNet
+198.0771241,band_46,StellarNet
+198.2567144,band_47,StellarNet
+198.4363436,band_48,StellarNet
+198.6160116,band_49,StellarNet
+198.7957183,band_50,StellarNet
+198.9754639,band_51,StellarNet
+199.1552482,band_52,StellarNet
+199.3350712,band_53,StellarNet
+199.5149331,band_54,StellarNet
+199.6948336,band_55,StellarNet
+199.8747729,band_56,StellarNet
+200.054751,band_57,StellarNet
+200.2347677,band_58,StellarNet
+200.4148232,band_59,StellarNet
+200.5949173,band_60,StellarNet
+200.7750502,band_61,StellarNet
+200.9552217,band_62,StellarNet
+201.1354319,band_63,StellarNet
+201.3156808,band_64,StellarNet
+201.4959683,band_65,StellarNet
+201.6762945,band_66,StellarNet
+201.8566593,band_67,StellarNet
+202.0370627,band_68,StellarNet
+202.2175048,band_69,StellarNet
+202.3979854,band_70,StellarNet
+202.5785047,band_71,StellarNet
+202.7590626,band_72,StellarNet
+202.939659,band_73,StellarNet
+203.120294,band_74,StellarNet
+203.3009676,band_75,StellarNet
+203.4816798,band_76,StellarNet
+203.6624305,band_77,StellarNet
+203.8432197,band_78,StellarNet
+204.0240475,band_79,StellarNet
+204.2049138,band_80,StellarNet
+204.3858186,band_81,StellarNet
+204.5667619,band_82,StellarNet
+204.7477437,band_83,StellarNet
+204.928764,band_84,StellarNet
+205.1098228,band_85,StellarNet
+205.29092,band_86,StellarNet
+205.4720557,band_87,StellarNet
+205.6532299,band_88,StellarNet
+205.8344425,band_89,StellarNet
+206.0156935,band_90,StellarNet
+206.1969829,band_91,StellarNet
+206.3783108,band_92,StellarNet
+206.5596771,band_93,StellarNet
+206.7410817,band_94,StellarNet
+206.9225248,band_95,StellarNet
+207.1040062,band_96,StellarNet
+207.2855261,band_97,StellarNet
+207.4670842,band_98,StellarNet
+207.6486808,band_99,StellarNet
+207.8303156,band_100,StellarNet
+208.0119888,band_101,StellarNet
+208.1937004,band_102,StellarNet
+208.3754502,band_103,StellarNet
+208.5572384,band_104,StellarNet
+208.7390649,band_105,StellarNet
+208.9209296,band_106,StellarNet
+209.1028326,band_107,StellarNet
+209.2847739,band_108,StellarNet
+209.4667535,band_109,StellarNet
+209.6487713,band_110,StellarNet
+209.8308274,band_111,StellarNet
+210.0129217,band_112,StellarNet
+210.1950543,band_113,StellarNet
+210.377225,band_114,StellarNet
+210.559434,band_115,StellarNet
+210.7416812,band_116,StellarNet
+210.9239666,band_117,StellarNet
+211.1062901,band_118,StellarNet
+211.2886518,band_119,StellarNet
+211.4710517,band_120,StellarNet
+211.6534898,band_121,StellarNet
+211.835966,band_122,StellarNet
+212.0184803,band_123,StellarNet
+212.2010328,band_124,StellarNet
+212.3836234,band_125,StellarNet
+212.5662521,band_126,StellarNet
+212.7489189,band_127,StellarNet
+212.9316238,band_128,StellarNet
+213.1143668,band_129,StellarNet
+213.2971479,band_130,StellarNet
+213.479967,band_131,StellarNet
+213.6628242,band_132,StellarNet
+213.8457195,band_133,StellarNet
+214.0286528,band_134,StellarNet
+214.2116241,band_135,StellarNet
+214.3946334,band_136,StellarNet
+214.5776808,band_137,StellarNet
+214.7607662,band_138,StellarNet
+214.9438895,band_139,StellarNet
+215.1270509,band_140,StellarNet
+215.3102502,band_141,StellarNet
+215.4934876,band_142,StellarNet
+215.6767628,band_143,StellarNet
+215.8600761,band_144,StellarNet
+216.0434272,band_145,StellarNet
+216.2268163,band_146,StellarNet
+216.4102434,band_147,StellarNet
+216.5937083,band_148,StellarNet
+216.7772112,band_149,StellarNet
+216.9607519,band_150,StellarNet
+217.1443306,band_151,StellarNet
+217.3279471,band_152,StellarNet
+217.5116015,band_153,StellarNet
+217.6952938,band_154,StellarNet
+217.8790239,band_155,StellarNet
+218.0627919,band_156,StellarNet
+218.2465977,band_157,StellarNet
+218.4304413,band_158,StellarNet
+218.6143228,band_159,StellarNet
+218.798242,band_160,StellarNet
+218.9821991,band_161,StellarNet
+219.166194,band_162,StellarNet
+219.3502266,band_163,StellarNet
+219.534297,band_164,StellarNet
+219.7184052,band_165,StellarNet
+219.9025512,band_166,StellarNet
+220.0867349,band_167,StellarNet
+220.2709563,band_168,StellarNet
+220.4552154,band_169,StellarNet
+220.6395123,band_170,StellarNet
+220.8238469,band_171,StellarNet
+221.0082192,band_172,StellarNet
+221.1926292,band_173,StellarNet
+221.3770769,band_174,StellarNet
+221.5615623,band_175,StellarNet
+221.7460853,band_176,StellarNet
+221.930646,band_177,StellarNet
+222.1152443,band_178,StellarNet
+222.2998803,band_179,StellarNet
+222.4845539,band_180,StellarNet
+222.6692652,band_181,StellarNet
+222.854014,band_182,StellarNet
+223.0388005,band_183,StellarNet
+223.2236246,band_184,StellarNet
+223.4084862,band_185,StellarNet
+223.5933854,band_186,StellarNet
+223.7783222,band_187,StellarNet
+223.9632966,band_188,StellarNet
+224.1483085,band_189,StellarNet
+224.333358,band_190,StellarNet
+224.518445,band_191,StellarNet
+224.7035695,band_192,StellarNet
+224.8887315,band_193,StellarNet
+225.0739311,band_194,StellarNet
+225.2591681,band_195,StellarNet
+225.4444426,band_196,StellarNet
+225.6297547,band_197,StellarNet
+225.8151041,band_198,StellarNet
+226.0004911,band_199,StellarNet
+226.1859155,band_200,StellarNet
+226.3713774,band_201,StellarNet
+226.5568767,band_202,StellarNet
+226.7424134,band_203,StellarNet
+226.9279875,band_204,StellarNet
+227.1135991,band_205,StellarNet
+227.299248,band_206,StellarNet
+227.4849344,band_207,StellarNet
+227.6706581,band_208,StellarNet
+227.8564192,band_209,StellarNet
+228.0422177,band_210,StellarNet
+228.2280535,band_211,StellarNet
+228.4139267,band_212,StellarNet
+228.5998372,band_213,StellarNet
+228.785785,band_214,StellarNet
+228.9717702,band_215,StellarNet
+229.1577927,band_216,StellarNet
+229.3438525,band_217,StellarNet
+229.5299496,band_218,StellarNet
+229.7160839,band_219,StellarNet
+229.9022556,band_220,StellarNet
+230.0884645,band_221,StellarNet
+230.2747106,band_222,StellarNet
+230.4609941,band_223,StellarNet
+230.6473147,band_224,StellarNet
+230.8336726,band_225,StellarNet
+231.0200677,band_226,StellarNet
+231.2065001,band_227,StellarNet
+231.3929696,band_228,StellarNet
+231.5794764,band_229,StellarNet
+231.7660203,band_230,StellarNet
+231.9526014,band_231,StellarNet
+232.1392197,band_232,StellarNet
+232.3258751,band_233,StellarNet
+232.5125677,band_234,StellarNet
+232.6992974,band_235,StellarNet
+232.8860643,band_236,StellarNet
+233.0728683,band_237,StellarNet
+233.2597094,band_238,StellarNet
+233.4465876,band_239,StellarNet
+233.633503,band_240,StellarNet
+233.8204554,band_241,StellarNet
+234.0074449,band_242,StellarNet
+234.1944714,band_243,StellarNet
+234.3815351,band_244,StellarNet
+234.5686358,band_245,StellarNet
+234.7557735,band_246,StellarNet
+234.9429483,band_247,StellarNet
+235.13016,band_248,StellarNet
+235.3174089,band_249,StellarNet
+235.5046947,band_250,StellarNet
+235.6920175,band_251,StellarNet
+235.8793773,band_252,StellarNet
+236.0667741,band_253,StellarNet
+236.2542079,band_254,StellarNet
+236.4416787,band_255,StellarNet
+236.6291864,band_256,StellarNet
+236.816731,band_257,StellarNet
+237.0043126,band_258,StellarNet
+237.1919311,band_259,StellarNet
+237.3795866,band_260,StellarNet
+237.5672789,band_261,StellarNet
+237.7550082,band_262,StellarNet
+237.9427743,band_263,StellarNet
+238.1305774,band_264,StellarNet
+238.3184173,band_265,StellarNet
+238.5062941,band_266,StellarNet
+238.6942077,band_267,StellarNet
+238.8821582,band_268,StellarNet
+239.0701456,band_269,StellarNet
+239.2581697,band_270,StellarNet
+239.4462307,band_271,StellarNet
+239.6343285,band_272,StellarNet
+239.8224631,band_273,StellarNet
+240.0106345,band_274,StellarNet
+240.1988427,band_275,StellarNet
+240.3870877,band_276,StellarNet
+240.5753695,band_277,StellarNet
+240.763688,band_278,StellarNet
+240.9520432,band_279,StellarNet
+241.1404352,band_280,StellarNet
+241.328864,band_281,StellarNet
+241.5173294,band_282,StellarNet
+241.7058316,band_283,StellarNet
+241.8943705,band_284,StellarNet
+242.0829461,band_285,StellarNet
+242.2715584,band_286,StellarNet
+242.4602073,band_287,StellarNet
+242.648893,band_288,StellarNet
+242.8376153,band_289,StellarNet
+243.0263742,band_290,StellarNet
+243.2151698,band_291,StellarNet
+243.4040021,band_292,StellarNet
+243.5928709,band_293,StellarNet
+243.7817764,band_294,StellarNet
+243.9707185,band_295,StellarNet
+244.1596972,band_296,StellarNet
+244.3487125,band_297,StellarNet
+244.5377643,band_298,StellarNet
+244.7268528,band_299,StellarNet
+244.9159778,band_300,StellarNet
+245.1051394,band_301,StellarNet
+245.2943375,band_302,StellarNet
+245.4835721,band_303,StellarNet
+245.6728433,band_304,StellarNet
+245.862151,band_305,StellarNet
+246.0514952,band_306,StellarNet
+246.240876,band_307,StellarNet
+246.4302932,band_308,StellarNet
+246.6197469,band_309,StellarNet
+246.8092371,band_310,StellarNet
+246.9987637,band_311,StellarNet
+247.1883268,band_312,StellarNet
+247.3779264,band_313,StellarNet
+247.5675624,band_314,StellarNet
+247.7572348,band_315,StellarNet
+247.9469437,band_316,StellarNet
+248.1366889,band_317,StellarNet
+248.3264706,band_318,StellarNet
+248.5162887,band_319,StellarNet
+248.7061431,band_320,StellarNet
+248.896034,band_321,StellarNet
+249.0859612,band_322,StellarNet
+249.2759247,band_323,StellarNet
+249.4659247,band_324,StellarNet
+249.6559609,band_325,StellarNet
+249.8460335,band_326,StellarNet
+250.0361424,band_327,StellarNet
+250.2262877,band_328,StellarNet
+250.4164692,band_329,StellarNet
+250.6066871,band_330,StellarNet
+250.7969412,band_331,StellarNet
+250.9872316,band_332,StellarNet
+251.1775583,band_333,StellarNet
+251.3679213,band_334,StellarNet
+251.5583205,band_335,StellarNet
+251.748756,band_336,StellarNet
+251.9392276,band_337,StellarNet
+252.1297356,band_338,StellarNet
+252.3202797,band_339,StellarNet
+252.5108601,band_340,StellarNet
+252.7014766,band_341,StellarNet
+252.8921293,band_342,StellarNet
+253.0828183,band_343,StellarNet
+253.2735434,band_344,StellarNet
+253.4643046,band_345,StellarNet
+253.6551021,band_346,StellarNet
+253.8459356,band_347,StellarNet
+254.0368053,band_348,StellarNet
+254.2277112,band_349,StellarNet
+254.4186531,band_350,StellarNet
+254.6096312,band_351,StellarNet
+254.8006454,band_352,StellarNet
+254.9916957,band_353,StellarNet
+255.182782,band_354,StellarNet
+255.3739044,band_355,StellarNet
+255.5650629,band_356,StellarNet
+255.7562575,band_357,StellarNet
+255.9474881,band_358,StellarNet
+256.1387548,band_359,StellarNet
+256.3300574,band_360,StellarNet
+256.5213961,band_361,StellarNet
+256.7127709,band_362,StellarNet
+256.9041816,band_363,StellarNet
+257.0956283,band_364,StellarNet
+257.287111,band_365,StellarNet
+257.4786297,band_366,StellarNet
+257.6701844,band_367,StellarNet
+257.861775,band_368,StellarNet
+258.0534016,band_369,StellarNet
+258.2450641,band_370,StellarNet
+258.4367625,band_371,StellarNet
+258.6284969,band_372,StellarNet
+258.8202672,band_373,StellarNet
+259.0120734,band_374,StellarNet
+259.2039155,band_375,StellarNet
+259.3957935,band_376,StellarNet
+259.5877073,band_377,StellarNet
+259.7796571,band_378,StellarNet
+259.9716427,band_379,StellarNet
+260.1636641,band_380,StellarNet
+260.3557215,band_381,StellarNet
+260.5478146,band_382,StellarNet
+260.7399436,band_383,StellarNet
+260.9321083,band_384,StellarNet
+261.1243089,band_385,StellarNet
+261.3165453,band_386,StellarNet
+261.5088175,band_387,StellarNet
+261.7011255,band_388,StellarNet
+261.8934692,band_389,StellarNet
+262.0858488,band_390,StellarNet
+262.278264,band_391,StellarNet
+262.470715,band_392,StellarNet
+262.6632018,band_393,StellarNet
+262.8557243,band_394,StellarNet
+263.0482825,band_395,StellarNet
+263.2408764,band_396,StellarNet
+263.433506,band_397,StellarNet
+263.6261713,band_398,StellarNet
+263.8188723,band_399,StellarNet
+264.011609,band_400,StellarNet
+264.2043814,band_401,StellarNet
+264.3971894,band_402,StellarNet
+264.590033,band_403,StellarNet
+264.7829123,band_404,StellarNet
+264.9758272,band_405,StellarNet
+265.1687778,band_406,StellarNet
+265.3617639,band_407,StellarNet
+265.5547857,band_408,StellarNet
+265.7478431,band_409,StellarNet
+265.940936,band_410,StellarNet
+266.1340646,band_411,StellarNet
+266.3272287,band_412,StellarNet
+266.5204283,band_413,StellarNet
+266.7136635,band_414,StellarNet
+266.9069343,band_415,StellarNet
+267.1002406,band_416,StellarNet
+267.2935824,band_417,StellarNet
+267.4869597,band_418,StellarNet
+267.6803726,band_419,StellarNet
+267.8738209,band_420,StellarNet
+268.0673047,band_421,StellarNet
+268.260824,band_422,StellarNet
+268.4543788,band_423,StellarNet
+268.6479691,band_424,StellarNet
+268.8415948,band_425,StellarNet
+269.0352559,band_426,StellarNet
+269.2289525,band_427,StellarNet
+269.4226845,band_428,StellarNet
+269.6164519,band_429,StellarNet
+269.8102547,band_430,StellarNet
+270.004093,band_431,StellarNet
+270.1979666,band_432,StellarNet
+270.3918756,band_433,StellarNet
+270.58582,band_434,StellarNet
+270.7797997,band_435,StellarNet
+270.9738149,band_436,StellarNet
+271.1678653,band_437,StellarNet
+271.3619511,band_438,StellarNet
+271.5560722,band_439,StellarNet
+271.7502287,band_440,StellarNet
+271.9444204,band_441,StellarNet
+272.1386475,band_442,StellarNet
+272.3329098,band_443,StellarNet
+272.5272075,band_444,StellarNet
+272.7215404,band_445,StellarNet
+272.9159085,band_446,StellarNet
+273.110312,band_447,StellarNet
+273.3047507,band_448,StellarNet
+273.4992246,band_449,StellarNet
+273.6937338,band_450,StellarNet
+273.8882781,band_451,StellarNet
+274.0828577,band_452,StellarNet
+274.2774725,band_453,StellarNet
+274.4721225,band_454,StellarNet
+274.6668077,band_455,StellarNet
+274.8615281,band_456,StellarNet
+275.0562836,band_457,StellarNet
+275.2510743,band_458,StellarNet
+275.4459001,band_459,StellarNet
+275.6407611,band_460,StellarNet
+275.8356573,band_461,StellarNet
+276.0305885,band_462,StellarNet
+276.2255549,band_463,StellarNet
+276.4205563,band_464,StellarNet
+276.6155929,band_465,StellarNet
+276.8106646,band_466,StellarNet
+277.0057713,band_467,StellarNet
+277.2009131,band_468,StellarNet
+277.39609,band_469,StellarNet
+277.5913019,band_470,StellarNet
+277.7865489,band_471,StellarNet
+277.9818309,band_472,StellarNet
+278.1771479,band_473,StellarNet
+278.3725,band_474,StellarNet
+278.567887,band_475,StellarNet
+278.7633091,band_476,StellarNet
+278.9587662,band_477,StellarNet
+279.1542582,band_478,StellarNet
+279.3497852,band_479,StellarNet
+279.5453472,band_480,StellarNet
+279.7409441,band_481,StellarNet
+279.936576,band_482,StellarNet
+280.1322428,band_483,StellarNet
+280.3279446,band_484,StellarNet
+280.5236812,band_485,StellarNet
+280.7194528,band_486,StellarNet
+280.9152593,band_487,StellarNet
+281.1111007,band_488,StellarNet
+281.3069769,band_489,StellarNet
+281.5028881,band_490,StellarNet
+281.6988341,band_491,StellarNet
+281.8948149,band_492,StellarNet
+282.0908306,band_493,StellarNet
+282.2868812,band_494,StellarNet
+282.4829666,band_495,StellarNet
+282.6790868,band_496,StellarNet
+282.8752418,band_497,StellarNet
+283.0714316,band_498,StellarNet
+283.2676563,band_499,StellarNet
+283.4639157,band_500,StellarNet
+283.6602098,band_501,StellarNet
+283.8565388,band_502,StellarNet
+284.0529025,band_503,StellarNet
+284.249301,band_504,StellarNet
+284.4457342,band_505,StellarNet
+284.6422021,band_506,StellarNet
+284.8387048,band_507,StellarNet
+285.0352422,band_508,StellarNet
+285.2318143,band_509,StellarNet
+285.4284211,band_510,StellarNet
+285.6250626,band_511,StellarNet
+285.8217387,band_512,StellarNet
+286.0184495,band_513,StellarNet
+286.215195,band_514,StellarNet
+286.4119752,band_515,StellarNet
+286.60879,band_516,StellarNet
+286.8056394,band_517,StellarNet
+287.0025235,band_518,StellarNet
+287.1994421,band_519,StellarNet
+287.3963954,band_520,StellarNet
+287.5933833,band_521,StellarNet
+287.7904058,band_522,StellarNet
+287.9874628,band_523,StellarNet
+288.1845545,band_524,StellarNet
+288.3816807,band_525,StellarNet
+288.5788414,band_526,StellarNet
+288.7760367,band_527,StellarNet
+288.9732665,band_528,StellarNet
+289.1705309,band_529,StellarNet
+289.3678298,band_530,StellarNet
+289.5651632,band_531,StellarNet
+289.7625311,band_532,StellarNet
+289.9599335,band_533,StellarNet
+290.1573704,band_534,StellarNet
+290.3548417,band_535,StellarNet
+290.5523475,band_536,StellarNet
+290.7498878,band_537,StellarNet
+290.9474625,band_538,StellarNet
+291.1450717,band_539,StellarNet
+291.3427153,band_540,StellarNet
+291.5403933,band_541,StellarNet
+291.7381058,band_542,StellarNet
+291.9358526,band_543,StellarNet
+292.1336338,band_544,StellarNet
+292.3314494,band_545,StellarNet
+292.5292994,band_546,StellarNet
+292.7271838,band_547,StellarNet
+292.9251025,band_548,StellarNet
+293.1230556,band_549,StellarNet
+293.3210431,band_550,StellarNet
+293.5190648,band_551,StellarNet
+293.7171209,band_552,StellarNet
+293.9152113,band_553,StellarNet
+294.113336,band_554,StellarNet
+294.311495,band_555,StellarNet
+294.5096883,band_556,StellarNet
+294.7079159,band_557,StellarNet
+294.9061777,band_558,StellarNet
+295.1044738,band_559,StellarNet
+295.3028042,band_560,StellarNet
+295.5011688,band_561,StellarNet
+295.6995676,band_562,StellarNet
+295.8980007,band_563,StellarNet
+296.0964679,band_564,StellarNet
+296.2949694,band_565,StellarNet
+296.4935051,band_566,StellarNet
+296.692075,band_567,StellarNet
+296.8906791,band_568,StellarNet
+297.0893173,band_569,StellarNet
+297.2879897,band_570,StellarNet
+297.4866963,band_571,StellarNet
+297.685437,band_572,StellarNet
+297.8842118,band_573,StellarNet
+298.0830208,band_574,StellarNet
+298.2818639,band_575,StellarNet
+298.4807411,band_576,StellarNet
+298.6796524,band_577,StellarNet
+298.8785978,band_578,StellarNet
+299.0775773,band_579,StellarNet
+299.2765909,band_580,StellarNet
+299.4756385,band_581,StellarNet
+299.6747202,band_582,StellarNet
+299.8738359,band_583,StellarNet
+300.0729857,band_584,StellarNet
+300.2721695,band_585,StellarNet
+300.4713873,band_586,StellarNet
+300.6706391,band_587,StellarNet
+300.869925,band_588,StellarNet
+301.0692448,band_589,StellarNet
+301.2685987,band_590,StellarNet
+301.4679865,band_591,StellarNet
+301.6674082,band_592,StellarNet
+301.866864,band_593,StellarNet
+302.0663536,band_594,StellarNet
+302.2658773,band_595,StellarNet
+302.4654348,band_596,StellarNet
+302.6650263,band_597,StellarNet
+302.8646517,band_598,StellarNet
+303.064311,band_599,StellarNet
+303.2640042,band_600,StellarNet
+303.4637313,band_601,StellarNet
+303.6634923,band_602,StellarNet
+303.8632871,band_603,StellarNet
+304.0631158,band_604,StellarNet
+304.2629784,band_605,StellarNet
+304.4628748,band_606,StellarNet
+304.6628051,band_607,StellarNet
+304.8627691,band_608,StellarNet
+305.062767,band_609,StellarNet
+305.2627987,band_610,StellarNet
+305.4628642,band_611,StellarNet
+305.6629635,band_612,StellarNet
+305.8630965,band_613,StellarNet
+306.0632634,band_614,StellarNet
+306.263464,band_615,StellarNet
+306.4636983,band_616,StellarNet
+306.6639664,band_617,StellarNet
+306.8642683,band_618,StellarNet
+307.0646039,band_619,StellarNet
+307.2649731,band_620,StellarNet
+307.4653762,band_621,StellarNet
+307.6658129,band_622,StellarNet
+307.8662833,band_623,StellarNet
+308.0667873,band_624,StellarNet
+308.2673251,band_625,StellarNet
+308.4678965,band_626,StellarNet
+308.6685016,band_627,StellarNet
+308.8691403,band_628,StellarNet
+309.0698127,band_629,StellarNet
+309.2705187,band_630,StellarNet
+309.4712583,band_631,StellarNet
+309.6720316,band_632,StellarNet
+309.8728384,band_633,StellarNet
+310.0736788,band_634,StellarNet
+310.2745529,band_635,StellarNet
+310.4754605,band_636,StellarNet
+310.6764016,band_637,StellarNet
+310.8773764,band_638,StellarNet
+311.0783846,band_639,StellarNet
+311.2794265,band_640,StellarNet
+311.4805018,band_641,StellarNet
+311.6816107,band_642,StellarNet
+311.8827531,band_643,StellarNet
+312.083929,band_644,StellarNet
+312.2851384,band_645,StellarNet
+312.4863813,band_646,StellarNet
+312.6876576,band_647,StellarNet
+312.8889675,band_648,StellarNet
+313.0903108,band_649,StellarNet
+313.2916875,band_650,StellarNet
+313.4930977,band_651,StellarNet
+313.6945413,band_652,StellarNet
+313.8960184,band_653,StellarNet
+314.0975289,band_654,StellarNet
+314.2990728,band_655,StellarNet
+314.50065,band_656,StellarNet
+314.7022607,band_657,StellarNet
+314.9039048,band_658,StellarNet
+315.1055822,band_659,StellarNet
+315.307293,band_660,StellarNet
+315.5090372,band_661,StellarNet
+315.7108146,band_662,StellarNet
+315.9126255,band_663,StellarNet
+316.1144696,band_664,StellarNet
+316.3163471,band_665,StellarNet
+316.5182579,band_666,StellarNet
+316.720202,band_667,StellarNet
+316.9221794,band_668,StellarNet
+317.1241901,band_669,StellarNet
+317.326234,band_670,StellarNet
+317.5283112,band_671,StellarNet
+317.7304217,band_672,StellarNet
+317.9325654,band_673,StellarNet
+318.1347424,band_674,StellarNet
+318.3369526,band_675,StellarNet
+318.539196,band_676,StellarNet
+318.7414726,band_677,StellarNet
+318.9437824,band_678,StellarNet
+319.1461254,band_679,StellarNet
+319.3485016,band_680,StellarNet
+319.550911,band_681,StellarNet
+319.7533536,band_682,StellarNet
+319.9558293,band_683,StellarNet
+320.1583382,band_684,StellarNet
+320.3608802,band_685,StellarNet
+320.5634553,band_686,StellarNet
+320.7660636,band_687,StellarNet
+320.9687049,band_688,StellarNet
+321.1713794,band_689,StellarNet
+321.374087,band_690,StellarNet
+321.5768277,band_691,StellarNet
+321.7796014,band_692,StellarNet
+321.9824083,band_693,StellarNet
+322.1852481,band_694,StellarNet
+322.3881211,band_695,StellarNet
+322.591027,band_696,StellarNet
+322.7939661,band_697,StellarNet
+322.9969381,band_698,StellarNet
+323.1999432,band_699,StellarNet
+323.4029812,band_700,StellarNet
+323.6060523,band_701,StellarNet
+323.8091563,band_702,StellarNet
+324.0122934,band_703,StellarNet
+324.2154634,band_704,StellarNet
+324.4186664,band_705,StellarNet
+324.6219023,band_706,StellarNet
+324.8251712,band_707,StellarNet
+325.028473,band_708,StellarNet
+325.2318077,band_709,StellarNet
+325.4351754,band_710,StellarNet
+325.638576,band_711,StellarNet
+325.8420094,band_712,StellarNet
+326.0454758,band_713,StellarNet
+326.248975,band_714,StellarNet
+326.4525072,band_715,StellarNet
+326.6560722,band_716,StellarNet
+326.85967,band_717,StellarNet
+327.0633007,band_718,StellarNet
+327.2669642,band_719,StellarNet
+327.4706606,band_720,StellarNet
+327.6743898,band_721,StellarNet
+327.8781518,band_722,StellarNet
+328.0819466,band_723,StellarNet
+328.2857742,band_724,StellarNet
+328.4896346,band_725,StellarNet
+328.6935277,band_726,StellarNet
+328.8974537,band_727,StellarNet
+329.1014124,band_728,StellarNet
+329.3054038,band_729,StellarNet
+329.509428,band_730,StellarNet
+329.7134849,band_731,StellarNet
+329.9175745,band_732,StellarNet
+330.1216969,band_733,StellarNet
+330.325852,band_734,StellarNet
+330.5300397,band_735,StellarNet
+330.7342602,band_736,StellarNet
+330.9385133,band_737,StellarNet
+331.1427991,band_738,StellarNet
+331.3471175,band_739,StellarNet
+331.5514686,band_740,StellarNet
+331.7558524,band_741,StellarNet
+331.9602688,band_742,StellarNet
+332.1647178,band_743,StellarNet
+332.3691994,band_744,StellarNet
+332.5737137,band_745,StellarNet
+332.7782605,band_746,StellarNet
+332.9828399,band_747,StellarNet
+333.1874519,band_748,StellarNet
+333.3920965,band_749,StellarNet
+333.5967737,band_750,StellarNet
+333.8014834,band_751,StellarNet
+334.0062256,band_752,StellarNet
+334.2110004,band_753,StellarNet
+334.4158077,band_754,StellarNet
+334.6206475,band_755,StellarNet
+334.8255199,band_756,StellarNet
+335.0304247,band_757,StellarNet
+335.2353621,band_758,StellarNet
+335.4403319,band_759,StellarNet
+335.6453342,band_760,StellarNet
+335.8503689,band_761,StellarNet
+336.0554361,band_762,StellarNet
+336.2605358,band_763,StellarNet
+336.4656679,band_764,StellarNet
+336.6708325,band_765,StellarNet
+336.8760294,band_766,StellarNet
+337.0812588,band_767,StellarNet
+337.2865205,band_768,StellarNet
+337.4918147,band_769,StellarNet
+337.6971413,band_770,StellarNet
+337.9025002,band_771,StellarNet
+338.1078915,band_772,StellarNet
+338.3133151,band_773,StellarNet
+338.5187712,band_774,StellarNet
+338.7242595,band_775,StellarNet
+338.9297802,band_776,StellarNet
+339.1353332,band_777,StellarNet
+339.3409185,band_778,StellarNet
+339.5465361,band_779,StellarNet
+339.7521861,band_780,StellarNet
+339.9578683,band_781,StellarNet
+340.1635828,band_782,StellarNet
+340.3693295,band_783,StellarNet
+340.5751085,band_784,StellarNet
+340.7809198,band_785,StellarNet
+340.9867633,band_786,StellarNet
+341.1926391,band_787,StellarNet
+341.3985471,band_788,StellarNet
+341.6044872,band_789,StellarNet
+341.8104596,band_790,StellarNet
+342.0164642,band_791,StellarNet
+342.222501,band_792,StellarNet
+342.42857,band_793,StellarNet
+342.6346712,band_794,StellarNet
+342.8408045,band_795,StellarNet
+343.0469699,band_796,StellarNet
+343.2531675,band_797,StellarNet
+343.4593973,band_798,StellarNet
+343.6656592,band_799,StellarNet
+343.8719531,band_800,StellarNet
+344.0782792,band_801,StellarNet
+344.2846375,band_802,StellarNet
+344.4910277,band_803,StellarNet
+344.6974501,band_804,StellarNet
+344.9039046,band_805,StellarNet
+345.1103911,band_806,StellarNet
+345.3169097,band_807,StellarNet
+345.5234603,band_808,StellarNet
+345.730043,band_809,StellarNet
+345.9366577,band_810,StellarNet
+346.1433044,band_811,StellarNet
+346.3499831,band_812,StellarNet
+346.5566938,band_813,StellarNet
+346.7634366,band_814,StellarNet
+346.9702113,band_815,StellarNet
+347.177018,band_816,StellarNet
+347.3838566,band_817,StellarNet
+347.5907272,band_818,StellarNet
+347.7976298,band_819,StellarNet
+348.0045643,band_820,StellarNet
+348.2115307,band_821,StellarNet
+348.4185291,band_822,StellarNet
+348.6255594,band_823,StellarNet
+348.8326215,band_824,StellarNet
+349.0397156,band_825,StellarNet
+349.2468416,band_826,StellarNet
+349.4539994,band_827,StellarNet
+349.6611892,band_828,StellarNet
+349.8684107,band_829,StellarNet
+350.0756642,band_830,StellarNet
+350.2829494,band_831,StellarNet
+350.4902665,band_832,StellarNet
+350.6976155,band_833,StellarNet
+350.9049962,band_834,StellarNet
+351.1124088,band_835,StellarNet
+351.3198531,band_836,StellarNet
+351.5273293,band_837,StellarNet
+351.7348372,band_838,StellarNet
+351.9423769,band_839,StellarNet
+352.1499483,band_840,StellarNet
+352.3575516,band_841,StellarNet
+352.5651865,band_842,StellarNet
+352.7728532,band_843,StellarNet
+352.9805516,band_844,StellarNet
+353.1882818,band_845,StellarNet
+353.3960436,band_846,StellarNet
+353.6038372,band_847,StellarNet
+353.8116624,band_848,StellarNet
+354.0195194,band_849,StellarNet
+354.227408,band_850,StellarNet
+354.4353283,band_851,StellarNet
+354.6432802,band_852,StellarNet
+354.8512638,band_853,StellarNet
+355.059279,band_854,StellarNet
+355.2673258,band_855,StellarNet
+355.4754043,band_856,StellarNet
+355.6835144,band_857,StellarNet
+355.891656,band_858,StellarNet
+356.0998293,band_859,StellarNet
+356.3080342,band_860,StellarNet
+356.5162706,band_861,StellarNet
+356.7245386,band_862,StellarNet
+356.9328382,band_863,StellarNet
+357.1411693,band_864,StellarNet
+357.3495319,band_865,StellarNet
+357.5579261,band_866,StellarNet
+357.7663518,band_867,StellarNet
+357.974809,band_868,StellarNet
+358.1832978,band_869,StellarNet
+358.391818,band_870,StellarNet
+358.6003697,band_871,StellarNet
+358.8089529,band_872,StellarNet
+359.0175676,band_873,StellarNet
+359.2262137,band_874,StellarNet
+359.4348913,band_875,StellarNet
+359.6436003,band_876,StellarNet
+359.8523407,band_877,StellarNet
+360.0611126,band_878,StellarNet
+360.2699159,band_879,StellarNet
+360.4787506,band_880,StellarNet
+360.6876167,band_881,StellarNet
+360.8965142,band_882,StellarNet
+361.1054431,band_883,StellarNet
+361.3144033,band_884,StellarNet
+361.5233949,band_885,StellarNet
+361.7324179,band_886,StellarNet
+361.9414722,band_887,StellarNet
+362.1505578,band_888,StellarNet
+362.3596748,band_889,StellarNet
+362.5688231,band_890,StellarNet
+362.7780027,band_891,StellarNet
+362.9872135,band_892,StellarNet
+363.1964557,band_893,StellarNet
+363.4057292,band_894,StellarNet
+363.615034,band_895,StellarNet
+363.82437,band_896,StellarNet
+364.0337372,band_897,StellarNet
+364.2431358,band_898,StellarNet
+364.4525655,band_899,StellarNet
+364.6620265,band_900,StellarNet
+364.8715187,band_901,StellarNet
+365.0810421,band_902,StellarNet
+365.2905967,band_903,StellarNet
+365.5001825,band_904,StellarNet
+365.7097995,band_905,StellarNet
+365.9194477,band_906,StellarNet
+366.1291271,band_907,StellarNet
+366.3388376,band_908,StellarNet
+366.5485792,band_909,StellarNet
+366.758352,band_910,StellarNet
+366.9681559,band_911,StellarNet
+367.177991,band_912,StellarNet
+367.3878571,band_913,StellarNet
+367.5977544,band_914,StellarNet
+367.8076828,band_915,StellarNet
+368.0176422,band_916,StellarNet
+368.2276327,band_917,StellarNet
+368.4376543,band_918,StellarNet
+368.647707,band_919,StellarNet
+368.8577907,band_920,StellarNet
+369.0679055,band_921,StellarNet
+369.2780512,band_922,StellarNet
+369.4882281,band_923,StellarNet
+369.6984359,band_924,StellarNet
+369.9086747,band_925,StellarNet
+370.1189446,band_926,StellarNet
+370.3292454,band_927,StellarNet
+370.5395772,band_928,StellarNet
+370.74994,band_929,StellarNet
+370.9603337,band_930,StellarNet
+371.1707584,band_931,StellarNet
+371.381214,band_932,StellarNet
+371.5917006,band_933,StellarNet
+371.8022181,band_934,StellarNet
+372.0127665,band_935,StellarNet
+372.2233458,band_936,StellarNet
+372.4339561,band_937,StellarNet
+372.6445972,band_938,StellarNet
+372.8552692,band_939,StellarNet
+373.0659721,band_940,StellarNet
+373.2767058,band_941,StellarNet
+373.4874704,band_942,StellarNet
+373.6982659,band_943,StellarNet
+373.9090922,band_944,StellarNet
+374.1199493,band_945,StellarNet
+374.3308372,band_946,StellarNet
+374.541756,band_947,StellarNet
+374.7527055,band_948,StellarNet
+374.9636858,band_949,StellarNet
+375.174697,band_950,StellarNet
+375.3857389,band_951,StellarNet
+375.5968116,band_952,StellarNet
+375.807915,band_953,StellarNet
+376.0190492,band_954,StellarNet
+376.2302141,band_955,StellarNet
+376.4414097,band_956,StellarNet
+376.6526361,band_957,StellarNet
+376.8638932,band_958,StellarNet
+377.075181,band_959,StellarNet
+377.2864995,band_960,StellarNet
+377.4978487,band_961,StellarNet
+377.7092285,band_962,StellarNet
+377.920639,band_963,StellarNet
+378.1320802,band_964,StellarNet
+378.3435521,band_965,StellarNet
+378.5550545,band_966,StellarNet
+378.7665877,band_967,StellarNet
+378.9781514,band_968,StellarNet
+379.1897457,band_969,StellarNet
+379.4013707,band_970,StellarNet
+379.6130263,band_971,StellarNet
+379.8247124,band_972,StellarNet
+380.0364291,band_973,StellarNet
+380.2481764,band_974,StellarNet
+380.4599543,band_975,StellarNet
+380.6717627,band_976,StellarNet
+380.8836017,band_977,StellarNet
+381.0954712,band_978,StellarNet
+381.3073712,band_979,StellarNet
+381.5193018,band_980,StellarNet
+381.7312628,band_981,StellarNet
+381.9432544,band_982,StellarNet
+382.1552764,band_983,StellarNet
+382.3673289,band_984,StellarNet
+382.5794119,band_985,StellarNet
+382.7915254,band_986,StellarNet
+383.0036693,band_987,StellarNet
+383.2158437,band_988,StellarNet
+383.4280485,band_989,StellarNet
+383.6402837,band_990,StellarNet
+383.8525494,band_991,StellarNet
+384.0648455,band_992,StellarNet
+384.2771719,band_993,StellarNet
+384.4895288,band_994,StellarNet
+384.7019161,band_995,StellarNet
+384.9143337,band_996,StellarNet
+385.1267817,band_997,StellarNet
+385.33926,band_998,StellarNet
+385.5517687,band_999,StellarNet
+385.7643078,band_1000,StellarNet
+385.9768771,band_1001,StellarNet
+386.1894768,band_1002,StellarNet
+386.4021068,band_1003,StellarNet
+386.6147671,band_1004,StellarNet
+386.8274578,band_1005,StellarNet
+387.0401786,band_1006,StellarNet
+387.2529298,band_1007,StellarNet
+387.4657113,band_1008,StellarNet
+387.678523,band_1009,StellarNet
+387.8913649,band_1010,StellarNet
+388.1042371,band_1011,StellarNet
+388.3171396,band_1012,StellarNet
+388.5300722,band_1013,StellarNet
+388.7430351,band_1014,StellarNet
+388.9560282,band_1015,StellarNet
+389.1690514,band_1016,StellarNet
+389.3821049,band_1017,StellarNet
+389.5951885,band_1018,StellarNet
+389.8083024,band_1019,StellarNet
+390.0214463,band_1020,StellarNet
+390.2346205,band_1021,StellarNet
+390.4478247,band_1022,StellarNet
+390.6610592,band_1023,StellarNet
+390.8743237,band_1024,StellarNet
+391.0876184,band_1025,StellarNet
+391.3009431,band_1026,StellarNet
+391.514298,band_1027,StellarNet
+391.727683,band_1028,StellarNet
+391.941098,band_1029,StellarNet
+392.1545431,band_1030,StellarNet
+392.3680183,band_1031,StellarNet
+392.5815235,band_1032,StellarNet
+392.7950588,band_1033,StellarNet
+393.0086241,band_1034,StellarNet
+393.2222195,band_1035,StellarNet
+393.4358448,band_1036,StellarNet
+393.6495002,band_1037,StellarNet
+393.8631856,band_1038,StellarNet
+394.076901,band_1039,StellarNet
+394.2906463,band_1040,StellarNet
+394.5044217,band_1041,StellarNet
+394.718227,band_1042,StellarNet
+394.9320622,band_1043,StellarNet
+395.1459275,band_1044,StellarNet
+395.3598226,band_1045,StellarNet
+395.5737477,band_1046,StellarNet
+395.7877027,band_1047,StellarNet
+396.0016876,band_1048,StellarNet
+396.2157024,band_1049,StellarNet
+396.4297471,band_1050,StellarNet
+396.6438218,band_1051,StellarNet
+396.8579262,band_1052,StellarNet
+397.0720606,band_1053,StellarNet
+397.2862248,band_1054,StellarNet
+397.5004189,band_1055,StellarNet
+397.7146428,band_1056,StellarNet
+397.9288965,band_1057,StellarNet
+398.1431801,band_1058,StellarNet
+398.3574934,band_1059,StellarNet
+398.5718366,band_1060,StellarNet
+398.7862096,band_1061,StellarNet
+399.0006124,band_1062,StellarNet
+399.2150449,band_1063,StellarNet
+399.4295073,band_1064,StellarNet
+399.6439993,band_1065,StellarNet
+399.8585212,band_1066,StellarNet
+400.0730728,band_1067,StellarNet
+400.2876541,band_1068,StellarNet
+400.5022651,band_1069,StellarNet
+400.7169059,band_1070,StellarNet
+400.9315764,band_1071,StellarNet
+401.1462765,band_1072,StellarNet
+401.3610064,band_1073,StellarNet
+401.5757659,band_1074,StellarNet
+401.7905552,band_1075,StellarNet
+402.005374,band_1076,StellarNet
+402.2202226,band_1077,StellarNet
+402.4351008,band_1078,StellarNet
+402.6500086,band_1079,StellarNet
+402.864946,band_1080,StellarNet
+403.0799131,band_1081,StellarNet
+403.2949098,band_1082,StellarNet
+403.5099361,band_1083,StellarNet
+403.724992,band_1084,StellarNet
+403.9400774,band_1085,StellarNet
+404.1551925,band_1086,StellarNet
+404.3703371,band_1087,StellarNet
+404.5855112,band_1088,StellarNet
+404.8007149,band_1089,StellarNet
+405.0159482,band_1090,StellarNet
+405.231211,band_1091,StellarNet
+405.4465033,band_1092,StellarNet
+405.6618251,band_1093,StellarNet
+405.8771764,band_1094,StellarNet
+406.0925572,band_1095,StellarNet
+406.3079675,band_1096,StellarNet
+406.5234073,band_1097,StellarNet
+406.7388766,band_1098,StellarNet
+406.9543753,band_1099,StellarNet
+407.1699035,band_1100,StellarNet
+407.3854611,band_1101,StellarNet
+407.6010481,band_1102,StellarNet
+407.8166646,band_1103,StellarNet
+408.0323104,band_1104,StellarNet
+408.2479857,band_1105,StellarNet
+408.4636904,band_1106,StellarNet
+408.6794245,band_1107,StellarNet
+408.8951879,band_1108,StellarNet
+409.1109807,band_1109,StellarNet
+409.3268029,band_1110,StellarNet
+409.5426545,band_1111,StellarNet
+409.7585353,band_1112,StellarNet
+409.9744455,band_1113,StellarNet
+410.1903851,band_1114,StellarNet
+410.4063539,band_1115,StellarNet
+410.6223521,band_1116,StellarNet
+410.8383796,band_1117,StellarNet
+411.0544363,band_1118,StellarNet
+411.2705224,band_1119,StellarNet
+411.4866377,band_1120,StellarNet
+411.7027823,band_1121,StellarNet
+411.9189561,band_1122,StellarNet
+412.1351592,band_1123,StellarNet
+412.3513915,band_1124,StellarNet
+412.567653,band_1125,StellarNet
+412.7839438,band_1126,StellarNet
+413.0002638,band_1127,StellarNet
+413.216613,band_1128,StellarNet
+413.4329913,band_1129,StellarNet
+413.6493989,band_1130,StellarNet
+413.8658356,band_1131,StellarNet
+414.0823015,band_1132,StellarNet
+414.2987966,band_1133,StellarNet
+414.5153208,band_1134,StellarNet
+414.7318741,band_1135,StellarNet
+414.9484566,band_1136,StellarNet
+415.1650682,band_1137,StellarNet
+415.3817089,band_1138,StellarNet
+415.5983787,band_1139,StellarNet
+415.8150776,band_1140,StellarNet
+416.0318056,band_1141,StellarNet
+416.2485627,band_1142,StellarNet
+416.4653488,band_1143,StellarNet
+416.682164,band_1144,StellarNet
+416.8990083,band_1145,StellarNet
+417.1158816,band_1146,StellarNet
+417.3327839,band_1147,StellarNet
+417.5497153,band_1148,StellarNet
+417.7666756,band_1149,StellarNet
+417.983665,band_1150,StellarNet
+418.2006834,band_1151,StellarNet
+418.4177307,band_1152,StellarNet
+418.6348071,band_1153,StellarNet
+418.8519124,band_1154,StellarNet
+419.0690466,band_1155,StellarNet
+419.2862099,band_1156,StellarNet
+419.503402,band_1157,StellarNet
+419.7206231,band_1158,StellarNet
+419.9378732,band_1159,StellarNet
+420.1551521,band_1160,StellarNet
+420.37246,band_1161,StellarNet
+420.5897967,band_1162,StellarNet
+420.8071624,band_1163,StellarNet
+421.0245569,band_1164,StellarNet
+421.2419803,band_1165,StellarNet
+421.4594325,band_1166,StellarNet
+421.6769137,band_1167,StellarNet
+421.8944236,band_1168,StellarNet
+422.1119624,band_1169,StellarNet
+422.3295301,band_1170,StellarNet
+422.5471265,band_1171,StellarNet
+422.7647518,band_1172,StellarNet
+422.9824058,band_1173,StellarNet
+423.2000887,band_1174,StellarNet
+423.4178003,band_1175,StellarNet
+423.6355407,band_1176,StellarNet
+423.8533099,band_1177,StellarNet
+424.0711079,band_1178,StellarNet
+424.2889345,band_1179,StellarNet
+424.50679,band_1180,StellarNet
+424.7246741,band_1181,StellarNet
+424.942587,band_1182,StellarNet
+425.1605286,band_1183,StellarNet
+425.3784989,band_1184,StellarNet
+425.5964979,band_1185,StellarNet
+425.8145255,band_1186,StellarNet
+426.0325819,band_1187,StellarNet
+426.2506669,band_1188,StellarNet
+426.4687806,band_1189,StellarNet
+426.6869229,band_1190,StellarNet
+426.9050939,band_1191,StellarNet
+427.1232935,band_1192,StellarNet
+427.3415217,band_1193,StellarNet
+427.5597786,band_1194,StellarNet
+427.778064,band_1195,StellarNet
+427.9963781,band_1196,StellarNet
+428.2147207,band_1197,StellarNet
+428.4330919,band_1198,StellarNet
+428.6514917,band_1199,StellarNet
+428.8699201,band_1200,StellarNet
+429.088377,band_1201,StellarNet
+429.3068624,band_1202,StellarNet
+429.5253764,band_1203,StellarNet
+429.7439189,band_1204,StellarNet
+429.9624899,band_1205,StellarNet
+430.1810895,band_1206,StellarNet
+430.3997175,band_1207,StellarNet
+430.618374,band_1208,StellarNet
+430.837059,band_1209,StellarNet
+431.0557725,band_1210,StellarNet
+431.2745144,band_1211,StellarNet
+431.4932848,band_1212,StellarNet
+431.7120837,band_1213,StellarNet
+431.9309109,band_1214,StellarNet
+432.1497666,band_1215,StellarNet
+432.3686508,band_1216,StellarNet
+432.5875633,band_1217,StellarNet
+432.8065042,band_1218,StellarNet
+433.0254736,band_1219,StellarNet
+433.2444713,band_1220,StellarNet
+433.4634974,band_1221,StellarNet
+433.6825518,band_1222,StellarNet
+433.9016346,band_1223,StellarNet
+434.1207458,band_1224,StellarNet
+434.3398853,band_1225,StellarNet
+434.5590531,band_1226,StellarNet
+434.7782493,band_1227,StellarNet
+434.9974737,band_1228,StellarNet
+435.2167265,band_1229,StellarNet
+435.4360076,band_1230,StellarNet
+435.6553169,band_1231,StellarNet
+435.8746545,band_1232,StellarNet
+436.0940204,band_1233,StellarNet
+436.3134146,band_1234,StellarNet
+436.532837,band_1235,StellarNet
+436.7522876,band_1236,StellarNet
+436.9717665,band_1237,StellarNet
+437.1912736,band_1238,StellarNet
+437.4108089,band_1239,StellarNet
+437.6303724,band_1240,StellarNet
+437.8499642,band_1241,StellarNet
+438.0695841,band_1242,StellarNet
+438.2892321,band_1243,StellarNet
+438.5089084,band_1244,StellarNet
+438.7286128,band_1245,StellarNet
+438.9483454,band_1246,StellarNet
+439.1681061,band_1247,StellarNet
+439.3878949,band_1248,StellarNet
+439.6077119,band_1249,StellarNet
+439.827557,band_1250,StellarNet
+440.0474302,band_1251,StellarNet
+440.2673315,band_1252,StellarNet
+440.4872609,band_1253,StellarNet
+440.7072184,band_1254,StellarNet
+440.9272039,band_1255,StellarNet
+441.1472175,band_1256,StellarNet
+441.3672592,band_1257,StellarNet
+441.5873289,band_1258,StellarNet
+441.8074266,band_1259,StellarNet
+442.0275524,band_1260,StellarNet
+442.2477062,band_1261,StellarNet
+442.467888,band_1262,StellarNet
+442.6880978,band_1263,StellarNet
+442.9083356,band_1264,StellarNet
+443.1286014,band_1265,StellarNet
+443.3488951,band_1266,StellarNet
+443.5692168,band_1267,StellarNet
+443.7895665,band_1268,StellarNet
+444.0099441,band_1269,StellarNet
+444.2303497,band_1270,StellarNet
+444.4507832,band_1271,StellarNet
+444.6712446,band_1272,StellarNet
+444.8917339,band_1273,StellarNet
+445.1122511,band_1274,StellarNet
+445.3327963,band_1275,StellarNet
+445.5533693,band_1276,StellarNet
+445.7739702,band_1277,StellarNet
+445.9945989,band_1278,StellarNet
+446.2152555,band_1279,StellarNet
+446.43594,band_1280,StellarNet
+446.6566523,band_1281,StellarNet
+446.8773924,band_1282,StellarNet
+447.0981604,band_1283,StellarNet
+447.3189562,band_1284,StellarNet
+447.5397798,band_1285,StellarNet
+447.7606311,band_1286,StellarNet
+447.9815103,band_1287,StellarNet
+448.2024173,band_1288,StellarNet
+448.423352,band_1289,StellarNet
+448.6443144,band_1290,StellarNet
+448.8653047,band_1291,StellarNet
+449.0863226,band_1292,StellarNet
+449.3073684,band_1293,StellarNet
+449.5284418,band_1294,StellarNet
+449.7495429,band_1295,StellarNet
+449.9706718,band_1296,StellarNet
+450.1918283,band_1297,StellarNet
+450.4130126,band_1298,StellarNet
+450.6342245,band_1299,StellarNet
+450.8554641,band_1300,StellarNet
+451.0767314,band_1301,StellarNet
+451.2980263,band_1302,StellarNet
+451.5193489,band_1303,StellarNet
+451.7406991,band_1304,StellarNet
+451.9620769,band_1305,StellarNet
+452.1834823,band_1306,StellarNet
+452.4049154,band_1307,StellarNet
+452.626376,band_1308,StellarNet
+452.8478643,band_1309,StellarNet
+453.0693801,band_1310,StellarNet
+453.2909235,band_1311,StellarNet
+453.5124945,band_1312,StellarNet
+453.734093,band_1313,StellarNet
+453.9557191,band_1314,StellarNet
+454.1773727,band_1315,StellarNet
+454.3990539,band_1316,StellarNet
+454.6207625,band_1317,StellarNet
+454.8424987,band_1318,StellarNet
+455.0642624,band_1319,StellarNet
+455.2860536,band_1320,StellarNet
+455.5078723,band_1321,StellarNet
+455.7297184,band_1322,StellarNet
+455.951592,band_1323,StellarNet
+456.1734931,band_1324,StellarNet
+456.3954216,band_1325,StellarNet
+456.6173775,band_1326,StellarNet
+456.8393609,band_1327,StellarNet
+457.0613717,band_1328,StellarNet
+457.28341,band_1329,StellarNet
+457.5054756,band_1330,StellarNet
+457.7275686,band_1331,StellarNet
+457.949689,band_1332,StellarNet
+458.1718368,band_1333,StellarNet
+458.394012,band_1334,StellarNet
+458.6162145,band_1335,StellarNet
+458.8384444,band_1336,StellarNet
+459.0607016,band_1337,StellarNet
+459.2829862,band_1338,StellarNet
+459.5052981,band_1339,StellarNet
+459.7276373,band_1340,StellarNet
+459.9500038,band_1341,StellarNet
+460.1723976,band_1342,StellarNet
+460.3948187,band_1343,StellarNet
+460.6172671,band_1344,StellarNet
+460.8397427,band_1345,StellarNet
+461.0622456,band_1346,StellarNet
+461.2847758,band_1347,StellarNet
+461.5073332,band_1348,StellarNet
+461.7299178,band_1349,StellarNet
+461.9525297,band_1350,StellarNet
+462.1751688,band_1351,StellarNet
+462.3978351,band_1352,StellarNet
+462.6205286,band_1353,StellarNet
+462.8432493,band_1354,StellarNet
+463.0659972,band_1355,StellarNet
+463.2887722,band_1356,StellarNet
+463.5115745,band_1357,StellarNet
+463.7344038,band_1358,StellarNet
+463.9572604,band_1359,StellarNet
+464.180144,band_1360,StellarNet
+464.4030548,band_1361,StellarNet
+464.6259927,band_1362,StellarNet
+464.8489577,band_1363,StellarNet
+465.0719499,band_1364,StellarNet
+465.2949691,band_1365,StellarNet
+465.5180154,band_1366,StellarNet
+465.7410888,band_1367,StellarNet
+465.9641892,band_1368,StellarNet
+466.1873167,band_1369,StellarNet
+466.4104713,band_1370,StellarNet
+466.6336529,band_1371,StellarNet
+466.8568615,band_1372,StellarNet
+467.0800972,band_1373,StellarNet
+467.3033599,band_1374,StellarNet
+467.5266495,band_1375,StellarNet
+467.7499662,band_1376,StellarNet
+467.9733099,band_1377,StellarNet
+468.1966805,band_1378,StellarNet
+468.4200781,band_1379,StellarNet
+468.6435027,band_1380,StellarNet
+468.8669542,band_1381,StellarNet
+469.0904326,band_1382,StellarNet
+469.313938,band_1383,StellarNet
+469.5374704,band_1384,StellarNet
+469.7610296,band_1385,StellarNet
+469.9846158,band_1386,StellarNet
+470.2082288,band_1387,StellarNet
+470.4318687,band_1388,StellarNet
+470.6555355,band_1389,StellarNet
+470.8792292,band_1390,StellarNet
+471.1029498,band_1391,StellarNet
+471.3266972,band_1392,StellarNet
+471.5504714,band_1393,StellarNet
+471.7742725,band_1394,StellarNet
+471.9981004,band_1395,StellarNet
+472.2219552,band_1396,StellarNet
+472.4458367,band_1397,StellarNet
+472.669745,band_1398,StellarNet
+472.8936802,band_1399,StellarNet
+473.1176421,band_1400,StellarNet
+473.3416308,band_1401,StellarNet
+473.5656462,band_1402,StellarNet
+473.7896884,band_1403,StellarNet
+474.0137574,band_1404,StellarNet
+474.2378531,band_1405,StellarNet
+474.4619755,band_1406,StellarNet
+474.6861247,band_1407,StellarNet
+474.9103005,band_1408,StellarNet
+475.1345031,band_1409,StellarNet
+475.3587324,band_1410,StellarNet
+475.5829883,band_1411,StellarNet
+475.8072709,band_1412,StellarNet
+476.0315802,band_1413,StellarNet
+476.2559161,band_1414,StellarNet
+476.4802787,band_1415,StellarNet
+476.704668,band_1416,StellarNet
+476.9290838,band_1417,StellarNet
+477.1535263,band_1418,StellarNet
+477.3779954,band_1419,StellarNet
+477.6024911,band_1420,StellarNet
+477.8270134,band_1421,StellarNet
+478.0515623,band_1422,StellarNet
+478.2761378,band_1423,StellarNet
+478.5007398,band_1424,StellarNet
+478.7253684,band_1425,StellarNet
+478.9500236,band_1426,StellarNet
+479.1747053,band_1427,StellarNet
+479.3994135,band_1428,StellarNet
+479.6241482,band_1429,StellarNet
+479.8489095,band_1430,StellarNet
+480.0736973,band_1431,StellarNet
+480.2985116,band_1432,StellarNet
+480.5233523,band_1433,StellarNet
+480.7482196,band_1434,StellarNet
+480.9731133,band_1435,StellarNet
+481.1980335,band_1436,StellarNet
+481.4229801,band_1437,StellarNet
+481.6479532,band_1438,StellarNet
+481.8729527,band_1439,StellarNet
+482.0979786,band_1440,StellarNet
+482.323031,band_1441,StellarNet
+482.5481098,band_1442,StellarNet
+482.7732149,band_1443,StellarNet
+482.9983465,band_1444,StellarNet
+483.2235044,band_1445,StellarNet
+483.4486887,band_1446,StellarNet
+483.6738994,band_1447,StellarNet
+483.8991365,band_1448,StellarNet
+484.1243999,band_1449,StellarNet
+484.3496896,band_1450,StellarNet
+484.5750056,band_1451,StellarNet
+484.800348,band_1452,StellarNet
+485.0257167,band_1453,StellarNet
+485.2511117,band_1454,StellarNet
+485.476533,band_1455,StellarNet
+485.7019805,band_1456,StellarNet
+485.9274544,band_1457,StellarNet
+486.1529545,band_1458,StellarNet
+486.3784808,band_1459,StellarNet
+486.6040335,band_1460,StellarNet
+486.8296123,band_1461,StellarNet
+487.0552174,band_1462,StellarNet
+487.2808487,band_1463,StellarNet
+487.5065062,band_1464,StellarNet
+487.73219,band_1465,StellarNet
+487.9578999,band_1466,StellarNet
+488.183636,band_1467,StellarNet
+488.4093983,band_1468,StellarNet
+488.6351868,band_1469,StellarNet
+488.8610014,band_1470,StellarNet
+489.0868422,band_1471,StellarNet
+489.3127091,band_1472,StellarNet
+489.5386021,band_1473,StellarNet
+489.7645213,band_1474,StellarNet
+489.9904666,band_1475,StellarNet
+490.216438,band_1476,StellarNet
+490.4424355,band_1477,StellarNet
+490.6684591,band_1478,StellarNet
+490.8945087,band_1479,StellarNet
+491.1205845,band_1480,StellarNet
+491.3466863,band_1481,StellarNet
+491.5728141,band_1482,StellarNet
+491.798968,band_1483,StellarNet
+492.0251479,band_1484,StellarNet
+492.2513539,band_1485,StellarNet
+492.4775859,band_1486,StellarNet
+492.7038439,band_1487,StellarNet
+492.9301278,band_1488,StellarNet
+493.1564378,band_1489,StellarNet
+493.3827738,band_1490,StellarNet
+493.6091357,band_1491,StellarNet
+493.8355236,band_1492,StellarNet
+494.0619375,band_1493,StellarNet
+494.2883773,band_1494,StellarNet
+494.514843,band_1495,StellarNet
+494.7413347,band_1496,StellarNet
+494.9678523,band_1497,StellarNet
+495.1943958,band_1498,StellarNet
+495.4209652,band_1499,StellarNet
+495.6475605,band_1500,StellarNet
+495.8741817,band_1501,StellarNet
+496.1008287,band_1502,StellarNet
+496.3275016,band_1503,StellarNet
+496.5542004,band_1504,StellarNet
+496.7809251,band_1505,StellarNet
+497.0076755,band_1506,StellarNet
+497.2344518,band_1507,StellarNet
+497.461254,band_1508,StellarNet
+497.6880819,band_1509,StellarNet
+497.9149356,band_1510,StellarNet
+498.1418152,band_1511,StellarNet
+498.3687205,band_1512,StellarNet
+498.5956516,band_1513,StellarNet
+498.8226085,band_1514,StellarNet
+499.0495911,band_1515,StellarNet
+499.2765995,band_1516,StellarNet
+499.5036336,band_1517,StellarNet
+499.7306935,band_1518,StellarNet
+499.9577791,band_1519,StellarNet
+500.1848904,band_1520,StellarNet
+500.4120274,band_1521,StellarNet
+500.6391901,band_1522,StellarNet
+500.8663785,band_1523,StellarNet
+501.0935926,band_1524,StellarNet
+501.3208323,band_1525,StellarNet
+501.5480977,band_1526,StellarNet
+501.7753888,band_1527,StellarNet
+502.0027055,band_1528,StellarNet
+502.2300478,band_1529,StellarNet
+502.4574158,band_1530,StellarNet
+502.6848094,band_1531,StellarNet
+502.9122286,band_1532,StellarNet
+503.1396734,band_1533,StellarNet
+503.3671438,band_1534,StellarNet
+503.5946397,band_1535,StellarNet
+503.8221613,band_1536,StellarNet
+504.0497084,band_1537,StellarNet
+504.2772811,band_1538,StellarNet
+504.5048793,band_1539,StellarNet
+504.732503,band_1540,StellarNet
+504.9601523,band_1541,StellarNet
+505.1878271,band_1542,StellarNet
+505.4155274,band_1543,StellarNet
+505.6432532,band_1544,StellarNet
+505.8710045,band_1545,StellarNet
+506.0987813,band_1546,StellarNet
+506.3265836,band_1547,StellarNet
+506.5544113,band_1548,StellarNet
+506.7822645,band_1549,StellarNet
+507.0101431,band_1550,StellarNet
+507.2380472,band_1551,StellarNet
+507.4659767,band_1552,StellarNet
+507.6939316,band_1553,StellarNet
+507.921912,band_1554,StellarNet
+508.1499177,band_1555,StellarNet
+508.3779489,band_1556,StellarNet
+508.6060054,band_1557,StellarNet
+508.8340873,band_1558,StellarNet
+509.0621946,band_1559,StellarNet
+509.2903272,band_1560,StellarNet
+509.5184852,band_1561,StellarNet
+509.7466685,band_1562,StellarNet
+509.9748772,band_1563,StellarNet
+510.2031112,band_1564,StellarNet
+510.4313705,band_1565,StellarNet
+510.6596551,band_1566,StellarNet
+510.887965,band_1567,StellarNet
+511.1163002,band_1568,StellarNet
+511.3446607,band_1569,StellarNet
+511.5730464,band_1570,StellarNet
+511.8014575,band_1571,StellarNet
+512.0298937,band_1572,StellarNet
+512.2583552,band_1573,StellarNet
+512.486842,band_1574,StellarNet
+512.7153539,band_1575,StellarNet
+512.9438911,band_1576,StellarNet
+513.1724535,band_1577,StellarNet
+513.4010411,band_1578,StellarNet
+513.6296539,band_1579,StellarNet
+513.8582919,band_1580,StellarNet
+514.086955,band_1581,StellarNet
+514.3156433,band_1582,StellarNet
+514.5443568,band_1583,StellarNet
+514.7730954,band_1584,StellarNet
+515.0018591,band_1585,StellarNet
+515.230648,band_1586,StellarNet
+515.459462,band_1587,StellarNet
+515.6883011,band_1588,StellarNet
+515.9171653,band_1589,StellarNet
+516.1460546,band_1590,StellarNet
+516.374969,band_1591,StellarNet
+516.6039085,band_1592,StellarNet
+516.832873,band_1593,StellarNet
+517.0618626,band_1594,StellarNet
+517.2908772,band_1595,StellarNet
+517.5199169,band_1596,StellarNet
+517.7489816,band_1597,StellarNet
+517.9780713,band_1598,StellarNet
+518.2071861,band_1599,StellarNet
+518.4363258,band_1600,StellarNet
+518.6654905,band_1601,StellarNet
+518.8946803,band_1602,StellarNet
+519.123895,band_1603,StellarNet
+519.3531346,band_1604,StellarNet
+519.5823993,band_1605,StellarNet
+519.8116889,band_1606,StellarNet
+520.0410034,band_1607,StellarNet
+520.2703428,band_1608,StellarNet
+520.4997072,band_1609,StellarNet
+520.7290965,band_1610,StellarNet
+520.9585107,band_1611,StellarNet
+521.1879498,band_1612,StellarNet
+521.4174138,band_1613,StellarNet
+521.6469027,band_1614,StellarNet
+521.8764164,band_1615,StellarNet
+522.105955,band_1616,StellarNet
+522.3355185,band_1617,StellarNet
+522.5651068,band_1618,StellarNet
+522.7947199,band_1619,StellarNet
+523.0243579,band_1620,StellarNet
+523.2540206,band_1621,StellarNet
+523.4837082,band_1622,StellarNet
+523.7134206,band_1623,StellarNet
+523.9431578,band_1624,StellarNet
+524.1729198,band_1625,StellarNet
+524.4027065,band_1626,StellarNet
+524.632518,band_1627,StellarNet
+524.8623542,band_1628,StellarNet
+525.0922152,band_1629,StellarNet
+525.322101,band_1630,StellarNet
+525.5520114,band_1631,StellarNet
+525.7819466,band_1632,StellarNet
+526.0119065,band_1633,StellarNet
+526.2418911,band_1634,StellarNet
+526.4719004,band_1635,StellarNet
+526.7019344,band_1636,StellarNet
+526.931993,band_1637,StellarNet
+527.1620763,band_1638,StellarNet
+527.3921843,band_1639,StellarNet
+527.6223169,band_1640,StellarNet
+527.8524742,band_1641,StellarNet
+528.0826561,band_1642,StellarNet
+528.3128626,band_1643,StellarNet
+528.5430937,band_1644,StellarNet
+528.7733494,band_1645,StellarNet
+529.0036298,band_1646,StellarNet
+529.2339347,band_1647,StellarNet
+529.4642642,band_1648,StellarNet
+529.6946182,band_1649,StellarNet
+529.9249968,band_1650,StellarNet
+530.1554,band_1651,StellarNet
+530.3858277,band_1652,StellarNet
+530.61628,band_1653,StellarNet
+530.8467567,band_1654,StellarNet
+531.077258,band_1655,StellarNet
+531.3077838,band_1656,StellarNet
+531.5383341,band_1657,StellarNet
+531.7689088,band_1658,StellarNet
+531.9995081,band_1659,StellarNet
+532.2301318,band_1660,StellarNet
+532.46078,band_1661,StellarNet
+532.6914526,band_1662,StellarNet
+532.9221497,band_1663,StellarNet
+533.1528712,band_1664,StellarNet
+533.3836172,band_1665,StellarNet
+533.6143875,band_1666,StellarNet
+533.8451823,band_1667,StellarNet
+534.0760015,band_1668,StellarNet
+534.306845,band_1669,StellarNet
+534.537713,band_1670,StellarNet
+534.7686053,band_1671,StellarNet
+534.999522,band_1672,StellarNet
+535.230463,band_1673,StellarNet
+535.4614284,band_1674,StellarNet
+535.6924181,band_1675,StellarNet
+535.9234321,band_1676,StellarNet
+536.1544705,band_1677,StellarNet
+536.3855332,band_1678,StellarNet
+536.6166201,band_1679,StellarNet
+536.8477314,band_1680,StellarNet
+537.078867,band_1681,StellarNet
+537.3100268,band_1682,StellarNet
+537.5412109,band_1683,StellarNet
+537.7724192,band_1684,StellarNet
+538.0036518,band_1685,StellarNet
+538.2349087,band_1686,StellarNet
+538.4661897,band_1687,StellarNet
+538.697495,band_1688,StellarNet
+538.9288245,band_1689,StellarNet
+539.1601782,band_1690,StellarNet
+539.3915561,band_1691,StellarNet
+539.6229582,band_1692,StellarNet
+539.8543845,band_1693,StellarNet
+540.0858349,band_1694,StellarNet
+540.3173095,band_1695,StellarNet
+540.5488083,band_1696,StellarNet
+540.7803311,band_1697,StellarNet
+541.0118782,band_1698,StellarNet
+541.2434493,band_1699,StellarNet
+541.4750445,band_1700,StellarNet
+541.7066639,band_1701,StellarNet
+541.9383074,band_1702,StellarNet
+542.1699749,band_1703,StellarNet
+542.4016665,band_1704,StellarNet
+542.6333822,band_1705,StellarNet
+542.865122,band_1706,StellarNet
+543.0968858,band_1707,StellarNet
+543.3286737,band_1708,StellarNet
+543.5604855,band_1709,StellarNet
+543.7923215,band_1710,StellarNet
+544.0241814,band_1711,StellarNet
+544.2560653,band_1712,StellarNet
+544.4879733,band_1713,StellarNet
+544.7199052,band_1714,StellarNet
+544.9518611,band_1715,StellarNet
+545.183841,band_1716,StellarNet
+545.4158448,band_1717,StellarNet
+545.6478726,band_1718,StellarNet
+545.8799244,band_1719,StellarNet
+546.1120001,band_1720,StellarNet
+546.3440997,band_1721,StellarNet
+546.5762232,band_1722,StellarNet
+546.8083707,band_1723,StellarNet
+547.040542,band_1724,StellarNet
+547.2727372,band_1725,StellarNet
+547.5049564,band_1726,StellarNet
+547.7371994,band_1727,StellarNet
+547.9694662,band_1728,StellarNet
+548.2017569,band_1729,StellarNet
+548.4340715,band_1730,StellarNet
+548.6664099,band_1731,StellarNet
+548.8987722,band_1732,StellarNet
+549.1311582,band_1733,StellarNet
+549.3635681,band_1734,StellarNet
+549.5960017,band_1735,StellarNet
+549.8284592,band_1736,StellarNet
+550.0609405,band_1737,StellarNet
+550.2934455,band_1738,StellarNet
+550.5259743,band_1739,StellarNet
+550.7585269,band_1740,StellarNet
+550.9911032,band_1741,StellarNet
+551.2237032,band_1742,StellarNet
+551.456327,band_1743,StellarNet
+551.6889745,band_1744,StellarNet
+551.9216457,band_1745,StellarNet
+552.1543407,band_1746,StellarNet
+552.3870593,band_1747,StellarNet
+552.6198016,band_1748,StellarNet
+552.8525676,band_1749,StellarNet
+553.0853572,band_1750,StellarNet
+553.3181706,band_1751,StellarNet
+553.5510075,band_1752,StellarNet
+553.7838681,band_1753,StellarNet
+554.0167524,band_1754,StellarNet
+554.2496603,band_1755,StellarNet
+554.4825918,band_1756,StellarNet
+554.7155469,band_1757,StellarNet
+554.9485256,band_1758,StellarNet
+555.1815279,band_1759,StellarNet
+555.4145537,band_1760,StellarNet
+555.6476032,band_1761,StellarNet
+555.8806762,band_1762,StellarNet
+556.1137728,band_1763,StellarNet
+556.3468929,band_1764,StellarNet
+556.5800365,band_1765,StellarNet
+556.8132037,band_1766,StellarNet
+557.0463944,band_1767,StellarNet
+557.2796086,band_1768,StellarNet
+557.5128463,band_1769,StellarNet
+557.7461075,band_1770,StellarNet
+557.9793922,band_1771,StellarNet
+558.2127003,band_1772,StellarNet
+558.4460319,band_1773,StellarNet
+558.679387,band_1774,StellarNet
+558.9127655,band_1775,StellarNet
+559.1461675,band_1776,StellarNet
+559.3795929,band_1777,StellarNet
+559.6130417,band_1778,StellarNet
+559.8465139,band_1779,StellarNet
+560.0800096,band_1780,StellarNet
+560.3135286,band_1781,StellarNet
+560.547071,band_1782,StellarNet
+560.7806368,band_1783,StellarNet
+561.014226,band_1784,StellarNet
+561.2478385,band_1785,StellarNet
+561.4814743,band_1786,StellarNet
+561.7151335,band_1787,StellarNet
+561.9488161,band_1788,StellarNet
+562.1825219,band_1789,StellarNet
+562.4162511,band_1790,StellarNet
+562.6500036,band_1791,StellarNet
+562.8837794,band_1792,StellarNet
+563.1175784,band_1793,StellarNet
+563.3514008,band_1794,StellarNet
+563.5852464,band_1795,StellarNet
+563.8191153,band_1796,StellarNet
+564.0530074,band_1797,StellarNet
+564.2869228,band_1798,StellarNet
+564.5208614,band_1799,StellarNet
+564.7548232,band_1800,StellarNet
+564.9888083,band_1801,StellarNet
+565.2228165,band_1802,StellarNet
+565.456848,band_1803,StellarNet
+565.6909026,band_1804,StellarNet
+565.9249804,band_1805,StellarNet
+566.1590814,band_1806,StellarNet
+566.3932056,band_1807,StellarNet
+566.6273529,band_1808,StellarNet
+566.8615234,band_1809,StellarNet
+567.095717,band_1810,StellarNet
+567.3299337,band_1811,StellarNet
+567.5641735,band_1812,StellarNet
+567.7984365,band_1813,StellarNet
+568.0327226,band_1814,StellarNet
+568.2670317,band_1815,StellarNet
+568.5013639,band_1816,StellarNet
+568.7357192,band_1817,StellarNet
+568.9700976,band_1818,StellarNet
+569.204499,band_1819,StellarNet
+569.4389235,band_1820,StellarNet
+569.673371,band_1821,StellarNet
+569.9078416,band_1822,StellarNet
+570.1423351,band_1823,StellarNet
+570.3768517,band_1824,StellarNet
+570.6113913,band_1825,StellarNet
+570.8459539,band_1826,StellarNet
+571.0805394,band_1827,StellarNet
+571.315148,band_1828,StellarNet
+571.5497795,band_1829,StellarNet
+571.7844339,band_1830,StellarNet
+572.0191113,band_1831,StellarNet
+572.2538117,band_1832,StellarNet
+572.488535,band_1833,StellarNet
+572.7232812,band_1834,StellarNet
+572.9580503,band_1835,StellarNet
+573.1928423,band_1836,StellarNet
+573.4276573,band_1837,StellarNet
+573.6624951,band_1838,StellarNet
+573.8973558,band_1839,StellarNet
+574.1322393,band_1840,StellarNet
+574.3671457,band_1841,StellarNet
+574.602075,band_1842,StellarNet
+574.8370271,band_1843,StellarNet
+575.0720021,band_1844,StellarNet
+575.3069999,band_1845,StellarNet
+575.5420204,band_1846,StellarNet
+575.7770638,band_1847,StellarNet
+576.01213,band_1848,StellarNet
+576.247219,band_1849,StellarNet
+576.4823308,band_1850,StellarNet
+576.7174653,band_1851,StellarNet
+576.9526226,band_1852,StellarNet
+577.1878027,band_1853,StellarNet
+577.4230055,band_1854,StellarNet
+577.6582311,band_1855,StellarNet
+577.8934793,band_1856,StellarNet
+578.1287503,band_1857,StellarNet
+578.364044,band_1858,StellarNet
+578.5993604,band_1859,StellarNet
+578.8346995,band_1860,StellarNet
+579.0700613,band_1861,StellarNet
+579.3054457,band_1862,StellarNet
+579.5408528,band_1863,StellarNet
+579.7762826,band_1864,StellarNet
+580.011735,band_1865,StellarNet
+580.24721,band_1866,StellarNet
+580.4827077,band_1867,StellarNet
+580.718228,band_1868,StellarNet
+580.953771,band_1869,StellarNet
+581.1893365,band_1870,StellarNet
+581.4249246,band_1871,StellarNet
+581.6605353,band_1872,StellarNet
+581.8961686,band_1873,StellarNet
+582.1318244,band_1874,StellarNet
+582.3675028,band_1875,StellarNet
+582.6032037,band_1876,StellarNet
+582.8389272,band_1877,StellarNet
+583.0746733,band_1878,StellarNet
+583.3104418,band_1879,StellarNet
+583.5462329,band_1880,StellarNet
+583.7820464,band_1881,StellarNet
+584.0178825,band_1882,StellarNet
+584.253741,band_1883,StellarNet
+584.4896221,band_1884,StellarNet
+584.7255256,band_1885,StellarNet
+584.9614515,band_1886,StellarNet
+585.1973999,band_1887,StellarNet
+585.4333708,band_1888,StellarNet
+585.6693641,band_1889,StellarNet
+585.9053798,band_1890,StellarNet
+586.1414179,band_1891,StellarNet
+586.3774784,band_1892,StellarNet
+586.6135614,band_1893,StellarNet
+586.8496667,band_1894,StellarNet
+587.0857944,band_1895,StellarNet
+587.3219445,band_1896,StellarNet
+587.5581169,band_1897,StellarNet
+587.7943117,band_1898,StellarNet
+588.0305288,band_1899,StellarNet
+588.2667683,band_1900,StellarNet
+588.5030301,band_1901,StellarNet
+588.7393142,band_1902,StellarNet
+588.9756207,band_1903,StellarNet
+589.2119494,band_1904,StellarNet
+589.4483004,band_1905,StellarNet
+589.6846737,band_1906,StellarNet
+589.9210693,band_1907,StellarNet
+590.1574871,band_1908,StellarNet
+590.3939272,band_1909,StellarNet
+590.6303896,band_1910,StellarNet
+590.8668742,band_1911,StellarNet
+591.103381,band_1912,StellarNet
+591.33991,band_1913,StellarNet
+591.5764613,band_1914,StellarNet
+591.8130347,band_1915,StellarNet
+592.0496303,band_1916,StellarNet
+592.2862482,band_1917,StellarNet
+592.5228882,band_1918,StellarNet
+592.7595503,band_1919,StellarNet
+592.9962347,band_1920,StellarNet
+593.2329412,band_1921,StellarNet
+593.4696698,band_1922,StellarNet
+593.7064205,band_1923,StellarNet
+593.9431934,band_1924,StellarNet
+594.1799884,band_1925,StellarNet
+594.4168055,band_1926,StellarNet
+594.6536447,band_1927,StellarNet
+594.8905059,band_1928,StellarNet
+595.1273893,band_1929,StellarNet
+595.3642947,band_1930,StellarNet
+595.6012222,band_1931,StellarNet
+595.8381717,band_1932,StellarNet
+596.0751433,band_1933,StellarNet
+596.3121369,band_1934,StellarNet
+596.5491526,band_1935,StellarNet
+596.7861902,band_1936,StellarNet
+597.0232499,band_1937,StellarNet
+597.2603315,band_1938,StellarNet
+597.4974352,band_1939,StellarNet
+597.7345608,band_1940,StellarNet
+597.9717084,band_1941,StellarNet
+598.208878,band_1942,StellarNet
+598.4460695,band_1943,StellarNet
+598.6832829,band_1944,StellarNet
+598.9205183,band_1945,StellarNet
+599.1577757,band_1946,StellarNet
+599.3950549,band_1947,StellarNet
+599.6323561,band_1948,StellarNet
+599.8696791,band_1949,StellarNet
+600.107024,band_1950,StellarNet
+600.3443909,band_1951,StellarNet
+600.5817796,band_1952,StellarNet
+600.8191901,band_1953,StellarNet
+601.0566226,band_1954,StellarNet
+601.2940768,band_1955,StellarNet
+601.5315529,band_1956,StellarNet
+601.7690509,band_1957,StellarNet
+602.0065706,band_1958,StellarNet
+602.2441122,band_1959,StellarNet
+602.4816756,band_1960,StellarNet
+602.7192607,band_1961,StellarNet
+602.9568677,band_1962,StellarNet
+603.1944964,band_1963,StellarNet
+603.4321469,band_1964,StellarNet
+603.6698191,band_1965,StellarNet
+603.9075131,band_1966,StellarNet
+604.1452289,band_1967,StellarNet
+604.3829663,band_1968,StellarNet
+604.6207255,band_1969,StellarNet
+604.8585064,band_1970,StellarNet
+605.096309,band_1971,StellarNet
+605.3341333,band_1972,StellarNet
+605.5719793,band_1973,StellarNet
+605.809847,band_1974,StellarNet
+606.0477364,band_1975,StellarNet
+606.2856474,band_1976,StellarNet
+606.52358,band_1977,StellarNet
+606.7615343,band_1978,StellarNet
+606.9995102,band_1979,StellarNet
+607.2375078,band_1980,StellarNet
+607.4755269,band_1981,StellarNet
+607.7135677,band_1982,StellarNet
+607.9516301,band_1983,StellarNet
+608.1897141,band_1984,StellarNet
+608.4278196,band_1985,StellarNet
+608.6659467,band_1986,StellarNet
+608.9040954,band_1987,StellarNet
+609.1422656,band_1988,StellarNet
+609.3804574,band_1989,StellarNet
+609.6186707,band_1990,StellarNet
+609.8569055,band_1991,StellarNet
+610.0951619,band_1992,StellarNet
+610.3334398,band_1993,StellarNet
+610.5717391,band_1994,StellarNet
+610.81006,band_1995,StellarNet
+611.0484023,band_1996,StellarNet
+611.2867661,band_1997,StellarNet
+611.5251514,band_1998,StellarNet
+611.7635582,band_1999,StellarNet
+612.0019863,band_2000,StellarNet
+612.2404359,band_2001,StellarNet
+612.478907,band_2002,StellarNet
+612.7173995,band_2003,StellarNet
+612.9559133,band_2004,StellarNet
+613.1944486,band_2005,StellarNet
+613.4330053,band_2006,StellarNet
+613.6715833,band_2007,StellarNet
+613.9101828,band_2008,StellarNet
+614.1488036,band_2009,StellarNet
+614.3874457,band_2010,StellarNet
+614.6261093,band_2011,StellarNet
+614.8647941,band_2012,StellarNet
