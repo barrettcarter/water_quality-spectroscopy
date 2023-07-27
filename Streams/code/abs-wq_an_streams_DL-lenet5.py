@@ -8,7 +8,7 @@ Created on Tue Sep 28 17:14:36 2021
 import os
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -29,8 +29,9 @@ from sklearn.decomposition import PCA
 #%%
 ################################################################################ DEFAULTS
 
-user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+# user = os.getlogin() 
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 spectra_path = os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 abs_wq_fn = 'abs_wq_df_streams.csv'
@@ -50,11 +51,11 @@ abs_wq_df=pd.read_csv(spectra_path)
 
 specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
 
-abs_wq_df=abs_wq_df.dropna(axis=0)
+# abs_wq_df=abs_wq_df.dropna(axis=0)
 
 # ds_x=df.loc[:,specCols].values
 
-abs_wq_df.loc[abs_wq_df['Phosphate-P']<0.15,['Phosphate-P','TP','OP']]=-0.1
+# abs_wq_df.loc[abs_wq_df['Phosphate-P']<0.15,['Phosphate-P','TP','OP']]=-0.1
 
 #%%
 ################################################################################ FUNCTIONS
@@ -107,9 +108,9 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
     """## Train/Val Split"""
     print('Full set:',X_train.shape)
     
-    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.25,
+    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=0.3,
                                                       random_state= iteration)
-    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=.20,
+    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=0.20,
                                                           random_state=iteration)
     
     y_train_ind = list(y_train.index)
@@ -198,7 +199,7 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
             print(type(variable_names[out]))
             print(type(output_names[out]))
             sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-            outputs_df = outputs_df.append(sub_df,ignore_index=True)
+            outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
         except AttributeError as e:
             print(e)
             import sys
@@ -210,15 +211,15 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
 
 ################################################################################ CHECK FITS
 
-    plt.figure(figsize=(12,8))
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    #plt.ylim((0, .05))
-    # plt.ylim(0, 0.05)
-    plt.legend(['Training', 'Validation'], loc='upper right')
-    plt.show()
+    # plt.figure(figsize=(12,8))
+    # plt.plot(history.history['loss'])
+    # plt.plot(history.history['val_loss'])
+    # plt.ylabel('Loss')
+    # plt.xlabel('Epoch')
+    # #plt.ylim((0, .05))
+    # # plt.ylim(0, 0.05)
+    # plt.legend(['Training', 'Validation'], loc='upper right')
+    # plt.show()
     
     ################################################################################ PREDICT
     
@@ -322,12 +323,12 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     n_drop = 4
     ds_x_smooth = ds_x_smooth[:,range(0,ds_x_smooth.shape[1],n_drop)]
     
-    plt.figure(figsize=(12, 8))
-    for i in range(ds_x_smooth.shape[0]):
-        plt.plot(ds_x_smooth[i])
-    plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Reflectance (Normalized)')
-    plt.show()
+    # plt.figure(figsize=(12, 8))
+    # for i in range(ds_x_smooth.shape[0]):
+    #     plt.plot(ds_x_smooth[i])
+    # plt.xlabel('Wavelength (nm)')
+    # plt.ylabel('Reflectance (Normalized)')
+    # plt.show()
     
     # v = species[12]
     # v="Molybdenum"
