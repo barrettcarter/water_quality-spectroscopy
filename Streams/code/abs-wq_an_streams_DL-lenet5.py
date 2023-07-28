@@ -5,6 +5,8 @@ Created on Tue Sep 28 17:14:36 2021
 @author: aditya01
 """
 
+print('loading modules...')
+
 import os
 import numpy as np
 import pandas as pd
@@ -24,7 +26,9 @@ from keras.optimizers import Adam
 # from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error as MSE
-from sklearn.decomposition import PCA
+# from sklearn.decomposition import PCA
+
+print('modules loaded')
 
 #%%
 ################################################################################ DEFAULTS
@@ -99,6 +103,9 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
                  variable_names):
 
+    print(f'working on species: {s}')
+    print(f'iteration {iteration}')
+    
     X_train=ds_x_smooth[df[s]>0,:]
 
     y_train = df.loc[df[s]>0,s]
@@ -352,107 +359,107 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
+# outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
 #%% Define function for making plots
 
-def make_plots(outputs_df, output_label):
+# def make_plots(outputs_df, output_label):
 
-    ## make plots for both filtered and unfiltered samples
+#     ## make plots for both filtered and unfiltered samples
         
-    fig, axs = plt.subplots(4,2)
-    fig.set_size_inches(15,20)
-    fig.suptitle(output_label,fontsize = 18)
-    fig.tight_layout(pad = 4)
-    #axs[2, 1].axis('off')
-    row = 0
-    col = 0
-    species = outputs_df.species.unique()
-    for s in species:
-        y_true_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_train')),
-                                       'value']
+#     fig, axs = plt.subplots(4,2)
+#     fig.set_size_inches(15,20)
+#     fig.suptitle(output_label,fontsize = 18)
+#     fig.tight_layout(pad = 4)
+#     #axs[2, 1].axis('off')
+#     row = 0
+#     col = 0
+#     species = outputs_df.species.unique()
+#     for s in species:
+#         y_true_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_train')),
+#                                        'value']
         
-        y_hat_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_train')),
-                                       'value']
+#         y_hat_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_train')),
+#                                        'value']
         
-        y_true_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_test')),
-                                       'value']
+#         y_true_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_test')),
+#                                        'value']
         
-        y_hat_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_test')),
-                                       'value']
+#         y_hat_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_test')),
+#                                        'value']
         
-        line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))),
-                              max(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))))
+#         line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))),
+#                               max(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))))
         
-        y_text = min(line11)+(max(line11)-min(line11))*0
-        x_text = max(line11)-(max(line11)-min(line11))*0.6
+#         y_text = min(line11)+(max(line11)-min(line11))*0
+#         x_text = max(line11)-(max(line11)-min(line11))*0.6
         
-        # lr = LinearRegression().fit(Y_hat,y_test)
-        # linelr = lr.predict(line11.reshape(-1,1))
+#         # lr = LinearRegression().fit(Y_hat,y_test)
+#         # linelr = lr.predict(line11.reshape(-1,1))
         
-        # plt.plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'predictions')
-        # plt.plot(line11,line11,label= '1:1 line')
-        # plt.title(s)
-        # # plt.plot(line11,linelr,label = 'regression line')
-        # plt.xlabel('Lab Measured '+s+' (mg/L)')
-        # plt.ylabel('Predicted '+s+' (mg/L)')
-        # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
-        # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
-        # plt.legend()
-        # plt.show()
+#         # plt.plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'predictions')
+#         # plt.plot(line11,line11,label= '1:1 line')
+#         # plt.title(s)
+#         # # plt.plot(line11,linelr,label = 'regression line')
+#         # plt.xlabel('Lab Measured '+s+' (mg/L)')
+#         # plt.ylabel('Predicted '+s+' (mg/L)')
+#         # plt.text(x_text,y_text1,r'$r^2 =$'+str(np.round(r_sq,3)))
+#         # plt.text(x_text,y_text2,r'MAPE = '+str(np.round(MAPE_test,1))+'%')
+#         # plt.legend()
+#         # plt.show()
         
-        train_rmse = float(outputs_df['value'][(outputs_df.output == 'train_rmse')&
-                            (outputs_df.species==s)])
+#         train_rmse = float(outputs_df['value'][(outputs_df.output == 'train_rmse')&
+#                             (outputs_df.species==s)])
         
-        test_rmse = float(outputs_df['value'][(outputs_df.output == 'test_rmse')&
-                            (outputs_df.species==s)])
+#         test_rmse = float(outputs_df['value'][(outputs_df.output == 'test_rmse')&
+#                             (outputs_df.species==s)])
         
-        ax = axs[row,col]
+#         ax = axs[row,col]
         
-        for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-            label.set_fontsize(16)
+#         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+#             label.set_fontsize(16)
         
-        axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
-        axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
-        axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
-        # axs[row,col].set_title(s)
-        axs[row,col].legend(loc = 'upper left',fontsize = 16)
-        axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
-        axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
-        # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/rmse =$'+str(np.round(train_rmse,3))+'\n'
-                +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 16)
-        # ticks = ax.get_yticks()
-        # print(ticks)
-        # # tick_labels = ax.get_yticklabels()
-        # tick_labels =[str(round(x,1)) for x in ticks]
-        # tick_labels = tick_labels[1:-1]
-        # print(tick_labels)
-        # ax.set_xticks(ticks)
-        # ax.set_xticklabels(tick_labels)
+#         axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
+#         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
+#         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
+#         # axs[row,col].set_title(s)
+#         axs[row,col].legend(loc = 'upper left',fontsize = 16)
+#         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
+#         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
+#         # axs[row,col].get_xaxis().set_visible(False)
+#         ax.text(x_text,y_text,r'$train\/rmse =$'+str(np.round(train_rmse,3))+'\n'
+#                 +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 16)
+#         # ticks = ax.get_yticks()
+#         # print(ticks)
+#         # # tick_labels = ax.get_yticklabels()
+#         # tick_labels =[str(round(x,1)) for x in ticks]
+#         # tick_labels = tick_labels[1:-1]
+#         # print(tick_labels)
+#         # ax.set_xticks(ticks)
+#         # ax.set_xticklabels(tick_labels)
         
-        if col == 1:
-            col = 0
-            row += 1
-        else:
-            col +=1
-    # fig.show()
+#         if col == 1:
+#             col = 0
+#             row += 1
+#         else:
+#             col +=1
+#     # fig.show()
     
 #%% make plots for all samples
 
-make_plots(outputs_df,'Filtered and Unfiltered Samples')
-# make_plots(outputs_df_fil,'Filtered Samples')
-# make_plots(outputs_df_unf,'Unfiltered Samples')
+# make_plots(outputs_df,'Filtered and Unfiltered Samples')
+# # make_plots(outputs_df_fil,'Filtered Samples')
+# # make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% Save output file
 
-outputs_df.to_csv(output_dir+'streams_DL_B1_results.csv',index=False)
+# outputs_df.to_csv(output_dir+'streams_DL_B1_results.csv',index=False)
 
 #%% make and save outputs
 
@@ -462,39 +469,39 @@ def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0-9_results.csv',
-                      its = 10, eps = 5000)
+make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0_results.csv',
+                      its = 0, eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-# Testing
+# # Testing
 
-output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
-                    'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
-                    'train_rmse','test_mape','train_mape']
+# output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
+#                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
+#                     'train_rmse','test_mape','train_mape']
     
-variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
-                      'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
-                      'RMSE_train','MAPE_test','MAPE_train']
+# variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
+#                       'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
+#                       'RMSE_train','MAPE_test','MAPE_train']
 
-s = 'something'
-iteration = 11041991
+# s = 'something'
+# iteration = 11041991
 
-for out in range(len(output_names)):
-            # print(out)
-            print(eval(variable_names[out])) 
-            print(output_names[out]) 
-            print(s)
-            print(iteration)
+# for out in range(len(output_names)):
+#             # print(out)
+#             print(eval(variable_names[out])) 
+#             print(output_names[out]) 
+#             print(s)
+#             print(iteration)
             
-#%%
+# #%%
 
-v = abs_wq_df['TKN']
-eval('v.index')
+# v = abs_wq_df['TKN']
+# eval('v.index')
 
-#%%
+# #%%
 
-v = v.values
-v = v.repeat(2,axis = 0)
+# v = v.values
+# v = v.repeat(2,axis = 0)
 
