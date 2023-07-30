@@ -28,14 +28,17 @@ from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error as MSE
 # from sklearn.decomposition import PCA
 
+from joblib import dump
+
 print('modules loaded')
 
 #%%
 ################################################################################ DEFAULTS
 
-# user = os.getlogin() 
+user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 spectra_path = os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 abs_wq_fn = 'abs_wq_df_streams.csv'
@@ -45,11 +48,9 @@ np.random.seed(7)
 
 #%%
 
-species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
+# species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
-iEpochs=5000
-
-augmentRatio=10
+species=['Nitrate-N'] # for testing
 
 abs_wq_df=pd.read_csv(spectra_path)
 
@@ -61,25 +62,203 @@ specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
 
 # abs_wq_df.loc[abs_wq_df['Phosphate-P']<0.15,['Phosphate-P','TP','OP']]=-0.1
 
-#%%
-################################################################################ FUNCTIONS
+#%% Define functions and classes
 
 add_dimension = lambda ds_x: np.reshape(ds_x, (ds_x.shape[0], 1, ds_x.shape[1]))
 
 # I'm not entirely sure if augmentation is well set-up, but the models don't work without this
-def augment(x, betashift, slopeshift, multishift):
-    beta = np.random.random(size=(x.shape[0],1))*2*betashift-betashift
-    slope = np.random.random(size=(x.shape[0],1))*2*slopeshift-slopeshift + 1
-    axis = np.array(range(x.shape[1]))/float(x.shape[1])
-    offset = slope*(axis) + beta - axis - slope/2 + 0.5
-    multi = np.random.random(size=(x.shape[0],1))*2*multishift-multishift + 1
-    return multi*x + offset
 
-def predict(models, input):
-    output = np.zeros((input.shape[0]))
-    for model in models:
-        output += model.predict(input).flatten()
-    return output / len(models)
+
+class lenet():
+    
+    def __init__(self):
+        
+        self.ds_x_smooth = None
+        
+    def augment(x, betashift, slopeshift, multishift):
+        beta = np.random.random(size=(x.shape[0],1))*2*betashift-betashift
+        slope = np.random.random(size=(x.shape[0],1))*2*slopeshift-slopeshift + 1
+        axis = np.array(range(x.shape[1]))/float(x.shape[1])
+        offset = slope*(axis) + beta - axis - slope/2 + 0.5
+        multi = np.random.random(size=(x.shape[0],1))*2*multishift-multishift + 1
+        return multi*x + offset
+
+    def predict(models, input):
+        output = np.zeros((input.shape[0]))
+        for model in models:
+            output += model.predict(input).flatten()
+        return output / len(models)
+        
+    def prepare_x(self, x_df, smooth = False):
+        
+        self.x_df = x_df
+        
+        self.smooth = smooth
+        
+        # make scaled absorbance dataset for training
+        self.scaler_x = MinMaxScaler()
+        self.ds_x = self.x_df.values
+        # pca = PCA(n_components = 10)
+        # ds_x = pca.fit_transform(ds_x)
+        self.scaler_x = self.scaler_x.fit(self.ds_x)
+
+        self.ds_x = self.scaler_x.transform(ds_x)
+        
+        """## Smoothing
+        Using Savitzky-Golay
+        """
+
+        if self.smooth == True:
+        
+            window = 5
+            degree = 3
+            
+            self.x = np.array(list(map(lambda s: float(s[4:].replace('_', '.')), self.df.columns[6:])))
+            
+            self.ds_x_smooth = np.array(list(map(lambda y: savgol_filter((self.x, y),
+                                                                         window, degree)[1], self.ds_x)))
+             
+        else:
+            
+            self.ds_x_smooth=self.ds_x
+
+        """"DROPPING OUT EVERY N'th WAVELENGTH"""
+        n_drop = 4
+        self.ds_x_smooth = self.ds_x_smooth[:,range(0,self.ds_x_smooth.shape[1],n_drop)]
+        
+        # final step to prepare for using in Sequential() model
+        
+        self.X_train = self.ds_x_smooth
+        
+        self.X_train = add_dimension(X_train)
+        
+    
+    def transform_x(self,x_new_df):
+        
+        if ds_x_smooth == None:
+            
+            print('ERROR: x must be prepared first using prepare_x method.')
+        
+        self.x_new_df = x_new_df
+        
+        
+        
+        self.ds_x = self.x_df.values
+        # pca = PCA(n_components = 10)
+        # ds_x = pca.fit_transform(ds_x)
+        self.scaler_x = self.scaler_x.fit(self.ds_x)
+
+        self.ds_x = self.scaler_x.transform(ds_x)
+        
+        """## Smoothing
+        Using Savitzky-Golay
+        """
+
+        if self.smooth == True:
+        
+            window = 5
+            degree = 3
+            
+            self.x = np.array(list(map(lambda s: float(s[4:].replace('_', '.')), self.df.columns[6:])))
+            
+            self.ds_x_smooth = np.array(list(map(lambda y: savgol_filter((self.x, y),
+                                                                         window, degree)[1], self.ds_x)))
+             
+        else:
+            
+            self.ds_x_smooth=self.ds_x
+
+        """"DROPPING OUT EVERY N'th WAVELENGTH"""
+        n_drop = 4
+        self.ds_x_smooth = self.ds_x_smooth[:,range(0,self.ds_x_smooth.shape[1],n_drop)]
+        
+        # final step to prepare for using in Sequential() model
+        
+        self.X_train = self.ds_x_smooth
+        
+        self.X_train = add_dimension(X_train)
+        
+    def plot_x(self):
+
+        plt.figure(figsize=(12, 8))
+        for i in range(self.ds_x_smooth.shape[0]):
+            plt.plot(self.ds_x_smooth[i])
+        plt.xlabel('Wavelength (nm)')
+        plt.ylabel('Absorbanced (Normalized)')
+        plt.show()
+            
+        
+    def smooth_plot(self):
+        
+        if self.smooth == True:
+    
+            plt.figure(figsize=(12, 8))
+            plt.plot(self.x, self.ds_x[2])
+            plt.plot(self.x, self.ds_x_smooth[2])
+            plt.legend(['Original', 'Smooth'])
+            plt.xlabel('Wavelength (nm)')
+            plt.ylabel('Absorbance (Normalized)')
+            plt.title(f'Savitzky-Golay Smoothing (Window Size={window}, Degree={degree})')
+            plt.show()
+            
+        else:
+            
+            print('x was not smoothed.')
+            
+        
+    def make_model(self, y_train, augmentRatio=10):
+        
+        """## Augmentation"""
+        
+        self.y_train = y_train
+        
+        self.augmentRatio = augmentRatio
+
+        self.multiplier = self.augmentRatio
+    
+        self.y_train = self.y_train.to_numpy()
+        self.y_train.shape=(len(self.y_train),1)
+        
+        self.y_train = self.y_train.repeat(self.multiplier, axis=0)
+        
+        self.X_train = self.X_train.repeat(multiplier, axis=0)
+        self.X_train = augment(self.X_train, .01, .01, .01)
+        
+        
+        
+        """## Add Dimension
+        """
+        
+        X_val = add_dimension(X_val)
+        X_test = add_dimension(X_test)
+        
+        """# Training Creation
+        
+        ## LeNet 5
+        """
+        
+        drop = 0.05
+        reg = .01
+        
+        lenet = Sequential()
+        lenet.add(Conv1D(6, 1,activation='selu',input_shape=(1, X_train.shape[2])))
+        lenet.add(Dropout(drop))
+        lenet.add(AveragePooling1D(1))
+        lenet.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        lenet.add(Dropout(drop))
+        lenet.add(Flatten())
+        lenet.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        lenet.add(Dropout(drop))
+        lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        lenet.add(Dropout(drop))
+        lenet.add(Dense(1,activation = 'linear'))
+        lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
+        history = lenet.fit(
+            X_train, y_train,
+            epochs=num_epochs, batch_size=int(1e10),
+            verbose=0,
+            validation_data=(X_val, y_val),
+        )
 
 #%% Creat function for writing output files
 
@@ -100,13 +279,13 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 
 #%% Create a function for making the outputs
 
-def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
+def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
                  variable_names):
 
     print(f'working on species: {s}')
     print(f'iteration {iteration}')
     
-    X_train=ds_x_smooth[df[s]>0,:]
+    X_train=df.loc[df[s]>0,specCols]
 
     y_train = df.loc[df[s]>0,s]
     
@@ -120,59 +299,20 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
     X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=0.20,
                                                           random_state=iteration)
     
-    y_train_ind = list(y_train.index)
-    y_test_ind = list(y_test.index)
-    
-    """## Augmentation"""
-    
-    multiplier = augmentRatio
-
-    y_train = y_train.to_numpy()
-    y_train.shape=(len(y_train),1)
-    
-    y_train = y_train.repeat(multiplier, axis=0)
-    
-    X_train = X_train.repeat(multiplier, axis=0)
-    X_train = augment(X_train, .01, .01, .01)
-    
     print(s)
     print('Train set:',X_train.shape)
     print('Validation set:',X_val.shape)
     print('External set:',X_test.shape)
     
-    """## Add Dimension
-    """
-    X_train = add_dimension(X_train)
-    X_val = add_dimension(X_val)
-    X_test = add_dimension(X_test)
     
-    """# Training Creation
+    filename = f'DL-scaler_x_{s}_It{iteration}.joblib'
+    pickle_path = os.path.join(output_dir,'picklejar',filename)
+    dump(scaler_x,pickle_path)
     
-    ## LeNet 5
-    """
+    y_train_ind = list(y_train.index)
+    y_test_ind = list(y_test.index)
     
-    drop = 0.05
-    reg = .01
-    
-    lenet = Sequential()
-    lenet.add(Conv1D(6, 1,activation='selu',input_shape=(1, X_train.shape[2])))
-    lenet.add(Dropout(drop))
-    lenet.add(AveragePooling1D(1))
-    lenet.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-    lenet.add(Dropout(drop))
-    lenet.add(Flatten())
-    lenet.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-    lenet.add(Dropout(drop))
-    lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-    lenet.add(Dropout(drop))
-    lenet.add(Dense(1,activation = 'linear'))
-    lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
-    history = lenet.fit(
-        X_train, y_train,
-        epochs=num_epochs, batch_size=int(1e10),
-        verbose=0,
-        validation_data=(X_val, y_val),
-    )
+
 
     Y_hat = list(predict([lenet], X_test))
     Y_hat_train = list(predict([lenet], X_train))
@@ -196,6 +336,10 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
     abs_train_errors = abs(y_train-Y_hat_train)
     APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
     MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+    
+    filename = f'DL_{s}_It{iteration}.joblib'
+    pickle_path = os.path.join(output_dir,'picklejar',filename)
+    dump(lenet,pickle_path)
     
     ### Write outputs
     
@@ -268,7 +412,7 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
 
 #%% Create function for producing and writing model outputs
 """
-This function take in an input pandas data frame 'input_df', which has a column
+This function takes in an input pandas data frame 'input_df', which has a column
 for each species' concentrations and a column for absorbance at each wavelength.
 
 'num_epochs' is an integer used in the artificial neural network algorithm.
@@ -296,50 +440,6 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
                       'RMSE_train','MAPE_test','MAPE_train']
 ################################################################################ PROCESS
 
-    scaler_x = MinMaxScaler()
-    ds_x = input_df.loc[:,specCols].values
-    # pca = PCA(n_components = 10)
-    # ds_x = pca.fit_transform(ds_x)
-    ds_x = scaler_x.fit_transform(ds_x)
-    # scaler_y = MinMaxScaler()
-    #ds_y = scaler_y.fit_transform(ds_y)
-    
-    """## Smoothing
-    Using Savitzky-Golay
-    """
-    # window = 5
-    # degree = 3
-    
-    # #x = np.array(list(map(lambda s: float(s[4:].replace('_', '.')), df.columns[6:])))
-    # x=WVLs
-    # ds_x_smooth = np.array(list(map(lambda y: savgol_filter((x, y), window, degree)[1], ds_x)))
-    ds_x_smooth=ds_x 
-    """COMMENTED OUT"""
-    
-    # plt.figure(figsize=(12, 8))
-    # plt.plot(x, ds_x[2])
-    # plt.plot(x, ds_x_smooth[2])
-    # plt.legend(['Original', 'Smooth'])
-    # plt.xlabel('Wavelength (nm)')
-    # plt.ylabel('Reflectance (Normalized)')
-    # plt.title(f'Savitzky-Golay Smoothing (Window Size={window}, Degree={degree})')
-    # plt.show()
-    
-    
-    """"DROPPING OUT EVERY N'th WAVELENGTH"""
-    n_drop = 4
-    ds_x_smooth = ds_x_smooth[:,range(0,ds_x_smooth.shape[1],n_drop)]
-    
-    # plt.figure(figsize=(12, 8))
-    # for i in range(ds_x_smooth.shape[0]):
-    #     plt.plot(ds_x_smooth[i])
-    # plt.xlabel('Wavelength (nm)')
-    # plt.ylabel('Reflectance (Normalized)')
-    # plt.show()
-    
-    # v = species[12]
-    # v="Molybdenum"
-    # iteration = 1
     df = input_df
     for s in species:
         
@@ -359,7 +459,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% Create outputs
 
-# outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
+outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
 #%% Define function for making plots
 
