@@ -32,8 +32,7 @@ from joblib import dump
 
 print('modules loaded')
 
-#%%
-################################################################################ DEFAULTS
+#%% Set paths and bring in data
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
@@ -52,6 +51,8 @@ np.random.seed(7)
 
 species=['Nitrate-N'] # for testing
 
+# s = species[0]
+
 abs_wq_df=pd.read_csv(spectra_path)
 
 specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
@@ -62,38 +63,34 @@ specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
 
 # abs_wq_df.loc[abs_wq_df['Phosphate-P']<0.15,['Phosphate-P','TP','OP']]=-0.1
 
-#%% Define functions and classes
+#%% Define class for pre-processing data and training neural network.
 
-add_dimension = lambda ds_x: np.reshape(ds_x, (ds_x.shape[0], 1, ds_x.shape[1]))
+def augment(x, betashift, slopeshift, multishift):
+    beta = np.random.random(size=(x.shape[0],1))*2*betashift-betashift
+    slope = np.random.random(size=(x.shape[0],1))*2*slopeshift-slopeshift + 1
+    axis = np.array(range(x.shape[1]))/float(x.shape[1])
+    offset = slope*(axis) + beta - axis - slope/2 + 0.5
+    multi = np.random.random(size=(x.shape[0],1))*2*multishift-multishift + 1
+    return(multi*x + offset)
 
-# I'm not entirely sure if augmentation is well set-up, but the models don't work without this
-
+def add_dimension(ds_x):
+    
+    return(np.reshape(ds_x, (ds_x.shape[0], 1, ds_x.shape[1])))
 
 class lenet():
     
     def __init__(self):
         
-        self.ds_x_smooth = None
-        
-    def augment(x, betashift, slopeshift, multishift):
-        beta = np.random.random(size=(x.shape[0],1))*2*betashift-betashift
-        slope = np.random.random(size=(x.shape[0],1))*2*slopeshift-slopeshift + 1
-        axis = np.array(range(x.shape[1]))/float(x.shape[1])
-        offset = slope*(axis) + beta - axis - slope/2 + 0.5
-        multi = np.random.random(size=(x.shape[0],1))*2*multishift-multishift + 1
-        return multi*x + offset
+        self.ds_x_smooth = 0
 
-    def predict(models, input):
-        output = np.zeros((input.shape[0]))
-        for model in models:
-            output += model.predict(input).flatten()
-        return output / len(models)
         
-    def prepare_x(self, x_df, smooth = False):
+    def prepare_x(self, x_df, augmentRatio=10, smooth = False):
         
         self.x_df = x_df
         
         self.smooth = smooth
+        
+        self.augmentRatio = augmentRatio
         
         # make scaled absorbance dataset for training
         self.scaler_x = MinMaxScaler()
@@ -102,7 +99,7 @@ class lenet():
         # ds_x = pca.fit_transform(ds_x)
         self.scaler_x = self.scaler_x.fit(self.ds_x)
 
-        self.ds_x = self.scaler_x.transform(ds_x)
+        self.ds_x = self.scaler_x.transform(self.ds_x)
         
         """## Smoothing
         Using Savitzky-Golay
@@ -123,32 +120,31 @@ class lenet():
             self.ds_x_smooth=self.ds_x
 
         """"DROPPING OUT EVERY N'th WAVELENGTH"""
-        n_drop = 4
-        self.ds_x_smooth = self.ds_x_smooth[:,range(0,self.ds_x_smooth.shape[1],n_drop)]
+        self.n_drop = 4
+        self.ds_x_smooth = self.ds_x_smooth[:,range(0,self.ds_x_smooth.shape[1],self.n_drop)]
         
         # final step to prepare for using in Sequential() model
         
         self.X_train = self.ds_x_smooth
         
-        self.X_train = add_dimension(X_train)
+        self.X_train_aug = self.X_train.repeat(self.augmentRatio, axis=0)
+        self.X_train_aug = augment(self.X_train_aug, .01, .01, .01)
+        
+        self.X_train = add_dimension(self.X_train)
+        self.X_train_aug = add_dimension(self.X_train_aug)
+        
+        return(self.X_train)
         
     
     def transform_x(self,x_new_df):
         
-        if ds_x_smooth == None:
+        if type(self.ds_x_smooth) == int:
             
-            print('ERROR: x must be prepared first using prepare_x method.')
+            print('ERROR: x must be prepared first by using prepare_x method.')
         
         self.x_new_df = x_new_df
-        
-        
-        
-        self.ds_x = self.x_df.values
-        # pca = PCA(n_components = 10)
-        # ds_x = pca.fit_transform(ds_x)
-        self.scaler_x = self.scaler_x.fit(self.ds_x)
 
-        self.ds_x = self.scaler_x.transform(ds_x)
+        self.x_new_df = self.scaler_x.transform(self.x_new_df)
         
         """## Smoothing
         Using Savitzky-Golay
@@ -159,78 +155,70 @@ class lenet():
             window = 5
             degree = 3
             
-            self.x = np.array(list(map(lambda s: float(s[4:].replace('_', '.')), self.df.columns[6:])))
-            
-            self.ds_x_smooth = np.array(list(map(lambda y: savgol_filter((self.x, y),
-                                                                         window, degree)[1], self.ds_x)))
-             
-        else:
-            
-            self.ds_x_smooth=self.ds_x
+            self.x_new_df = np.array(list(map(lambda y: savgol_filter((self.x, y),
+                                                                         window, degree)[1], self.x_new_df)))
 
         """"DROPPING OUT EVERY N'th WAVELENGTH"""
-        n_drop = 4
-        self.ds_x_smooth = self.ds_x_smooth[:,range(0,self.ds_x_smooth.shape[1],n_drop)]
+        self.x_new_df = self.x_new_df[:,range(0,self.x_new_df.shape[1],self.n_drop)]
         
         # final step to prepare for using in Sequential() model
         
-        self.X_train = self.ds_x_smooth
+        self.x_new_df = add_dimension(self.x_new_df)
         
-        self.X_train = add_dimension(X_train)
+        return(self.x_new_df)
         
-    def plot_x(self):
+    # def plot_x(self):
 
-        plt.figure(figsize=(12, 8))
-        for i in range(self.ds_x_smooth.shape[0]):
-            plt.plot(self.ds_x_smooth[i])
-        plt.xlabel('Wavelength (nm)')
-        plt.ylabel('Absorbanced (Normalized)')
-        plt.show()
+    #     plt.figure(figsize=(12, 8))
+    #     for i in range(self.ds_x_smooth.shape[0]):
+    #         plt.plot(self.ds_x_smooth[i])
+    #     plt.xlabel('Wavelength (nm)')
+    #     plt.ylabel('Absorbanced (Normalized)')
+    #     plt.show()
             
         
-    def smooth_plot(self):
+    # def smooth_plot(self):
         
-        if self.smooth == True:
+    #     if self.smooth == True:
     
-            plt.figure(figsize=(12, 8))
-            plt.plot(self.x, self.ds_x[2])
-            plt.plot(self.x, self.ds_x_smooth[2])
-            plt.legend(['Original', 'Smooth'])
-            plt.xlabel('Wavelength (nm)')
-            plt.ylabel('Absorbance (Normalized)')
-            plt.title(f'Savitzky-Golay Smoothing (Window Size={window}, Degree={degree})')
-            plt.show()
+    #         plt.figure(figsize=(12, 8))
+    #         plt.plot(self.x, self.ds_x[2])
+    #         plt.plot(self.x, self.ds_x_smooth[2])
+    #         plt.legend(['Original', 'Smooth'])
+    #         plt.xlabel('Wavelength (nm)')
+    #         plt.ylabel('Absorbance (Normalized)')
+    #         plt.title(f'Savitzky-Golay Smoothing (Window Size={window}, Degree={degree})')
+    #         plt.show()
             
-        else:
+    #     else:
             
-            print('x was not smoothed.')
+    #         print('x was not smoothed.')
             
         
-    def make_model(self, y_train, augmentRatio=10):
+    def make_model(self, y_train, y_val, X_val, num_epochs = 1000):
         
         """## Augmentation"""
         
+        if type(self.ds_x_smooth) == int:
+            
+            print('ERROR: x must be prepared first by using prepare_x method.')
+        
         self.y_train = y_train
         
-        self.augmentRatio = augmentRatio
+        self.y_val = y_val
+        
+        self.X_val = X_val
+        
+        self.num_epochs = num_epochs
 
         self.multiplier = self.augmentRatio
     
         self.y_train = self.y_train.to_numpy()
         self.y_train.shape=(len(self.y_train),1)
         
-        self.y_train = self.y_train.repeat(self.multiplier, axis=0)
-        
-        self.X_train = self.X_train.repeat(multiplier, axis=0)
-        self.X_train = augment(self.X_train, .01, .01, .01)
+        self.y_train_aug = self.y_train.repeat(self.multiplier, axis=0)
         
         
-        
-        """## Add Dimension
-        """
-        
-        X_val = add_dimension(X_val)
-        X_test = add_dimension(X_test)
         
         """# Training Creation
         
@@ -240,25 +228,31 @@ class lenet():
         drop = 0.05
         reg = .01
         
-        lenet = Sequential()
-        lenet.add(Conv1D(6, 1,activation='selu',input_shape=(1, X_train.shape[2])))
-        lenet.add(Dropout(drop))
-        lenet.add(AveragePooling1D(1))
-        lenet.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-        lenet.add(Dropout(drop))
-        lenet.add(Flatten())
-        lenet.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-        lenet.add(Dropout(drop))
-        lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-        lenet.add(Dropout(drop))
-        lenet.add(Dense(1,activation = 'linear'))
-        lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
-        history = lenet.fit(
-            X_train, y_train,
-            epochs=num_epochs, batch_size=int(1e10),
+        self.model = Sequential()
+        self.model.add(Conv1D(6, 1,activation='selu',input_shape=(1, self.X_train_aug.shape[2])))
+        self.model.add(Dropout(drop))
+        self.model.add(AveragePooling1D(1))
+        self.model.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        self.model.add(Dropout(drop))
+        self.model.add(Flatten())
+        self.model.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        self.model.add(Dropout(drop))
+        self.model.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        self.model.add(Dropout(drop))
+        self.model.add(Dense(1,activation = 'linear'))
+        self.model.compile(loss='mean_squared_error', optimizer=Adam(.001))
+        self.history = self.model.fit(
+            self.X_train_aug, self.y_train_aug,
+            epochs=self.num_epochs, batch_size=int(1e10),
             verbose=0,
-            validation_data=(X_val, y_val),
+            validation_data=(self.X_val, self.y_val),
         )
+        
+        print('Model trained.')
+        
+    def predict(self, x_pred):
+        
+        return(self.model.predict(x_pred).flatten())
 
 #%% Creat function for writing output files
 
@@ -304,18 +298,30 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     print('Validation set:',X_val.shape)
     print('External set:',X_test.shape)
     
+    # initialize lenet model and prepare X sets for modeling
     
-    filename = f'DL-scaler_x_{s}_It{iteration}.joblib'
-    pickle_path = os.path.join(output_dir,'picklejar',filename)
-    dump(scaler_x,pickle_path)
+    lenet_mod = lenet()
+    
+    X_train = lenet_mod.prepare_x(X_train)
+    # print(f' X_train shape: {X_train.shape}')
+    
+    
+    X_val = lenet_mod.transform_x(X_val)
+    X_test = lenet_mod.transform_x(X_test)
+    # print(f' X_test shape: {X_test.shape}')
+    
+    lenet_mod.make_model(y_train,y_val,X_val,num_epochs = num_epochs)
+    
+    print(f'y_train shape: {y_train.shape}')
+    print(f'y_train type: {type(y_train)}')
     
     y_train_ind = list(y_train.index)
     y_test_ind = list(y_test.index)
     
-
-
-    Y_hat = list(predict([lenet], X_test))
-    Y_hat_train = list(predict([lenet], X_train))
+    Y_hat = list(lenet_mod.predict(X_test))
+    # print(f' Y_hat: {Y_hat}')
+    Y_hat_train = list(lenet_mod.predict(X_train))
+    # print(f' Y_hat_train: {Y_hat_train}')
     
     r_sq = float(r2_score(y_test,Y_hat))
     r_sq_train = float(r2_score(y_train,Y_hat_train))
@@ -329,26 +335,27 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     MSE_train = MSE(y_train,Y_hat_train)
     RMSE_train = float(np.sqrt(MSE_train))
     
-    abs_test_errors = abs(y_test-Y_hat)
-    APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
-    MAPE_test = float(np.mean(APE_test)*100) # this is percentage
+    # abs_test_errors = abs(y_test-Y_hat)
+    # APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
+    # MAPE_test = float(np.mean(APE_test)*100) # this is percentage
     
-    abs_train_errors = abs(y_train-Y_hat_train)
-    APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
-    MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+    # abs_train_errors = abs(y_train-Y_hat_train)
+    # APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
+    # MAPE_train = float(np.mean(APE_train)*100) # this is percentage
     
     filename = f'DL_{s}_It{iteration}.joblib'
     pickle_path = os.path.join(output_dir,'picklejar',filename)
-    dump(lenet,pickle_path)
+    dump(lenet_mod,pickle_path)
     
     ### Write outputs
     
     for out in range(len(output_names)):
-        print(type(out))
+        # print(type(out))
         try:
-            print(variable_names[out])
-            print(type(variable_names[out]))
-            print(type(output_names[out]))
+            print(f'variable name: {variable_names[out]}')
+            print(f'output name: {output_names[out]}')
+            print(f'variable type: {type(eval(variable_names[out]))}')
+            # print(type(eval(output_names[out])))
             sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
             outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
         except AttributeError as e:
@@ -431,13 +438,21 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     
     outputs_df = pd.DataFrame(columns= ['output','species','iteration','value']) #save outputs in dataframe
     
-    output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
-                    'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
-                    'train_rmse','test_mape','train_mape']
+    # output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
+    #                 'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
+    #                 'train_rmse','test_mape','train_mape']
     
-    variable_names = ['Y_hat','Y_hat_train','list(y_train[:,0])', 'list(y_test)',
+    # variable_names = ['Y_hat','Y_hat_train','list(y_train[:,0])', 'list(y_test)',
+    #                   'y_test_ind','y_train_ind','r_sq','r_sq_train','RMSE_test',
+    #                   'RMSE_train','MAPE_test','MAPE_train']
+
+    output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
+                'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
+                'train_rmse']
+    
+    variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
                       'y_test_ind','y_train_ind','r_sq','r_sq_train','RMSE_test',
-                      'RMSE_train','MAPE_test','MAPE_train']
+                      'RMSE_train']
 ################################################################################ PROCESS
 
     df = input_df
@@ -445,14 +460,14 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
         
         if type(iterations)==int:
             
-            outputs_df = make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iterations,
+            outputs_df = make_outputs(df,num_epochs,outputs_df,s,iterations,
                          output_names,variable_names)
         
         else:
         
             for iteration in iterations:
                 
-                outputs_df = make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,
+                outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
                              output_names,variable_names)
         
     return(outputs_df)
