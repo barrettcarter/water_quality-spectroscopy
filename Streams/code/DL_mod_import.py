@@ -24,7 +24,8 @@ from matplotlib.axis import Tick
 #%% Set paths and bring in models
 
 user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 
@@ -33,7 +34,7 @@ abs_wq_df_fn = 'abs_wq_df_streams.csv'
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
 
-filename = 'XGB_Nitrate-N_It0.joblib'
+filename = 'DL_Nitrate-N_It0.joblib'
 pickle_path = os.path.join(output_dir,'picklejar',filename)
 
 #bring in model
@@ -53,7 +54,7 @@ Y = Y[keep]
 X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
                                                                 test_size = 0.3)
 
-mod = clf.best_estimator_
+mod = clf
 
 y_hat = mod.predict(X_test)
 
