@@ -34,10 +34,10 @@ print('modules loaded')
 
 #%% Set paths and bring in data
 
-user = os.getlogin() 
+# user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 spectra_path = os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 abs_wq_fn = 'abs_wq_df_streams.csv'
@@ -47,9 +47,9 @@ np.random.seed(7)
 
 #%%
 
-# species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
+species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
-species=['Nitrate-N'] # for testing
+# species=['Nitrate-N'] # for testing
 
 # s = species[0]
 
@@ -474,7 +474,7 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
+# outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
 #%% Define function for making plots
 
@@ -584,8 +584,8 @@ def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0_results.csv',
-                      its = 0, eps = 5000)
+make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0-19_results.csv',
+                      its = np.arange(0,20), eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
