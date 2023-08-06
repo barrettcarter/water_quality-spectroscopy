@@ -5,10 +5,12 @@ Created on Tue Sep 28 17:14:36 2021
 @author: aditya01
 """
 
+print('loading modules...')
+
 import os
 import numpy as np
 import pandas as pd
-from matplotlib import pyplot as plt
+# from matplotlib import pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -24,58 +26,235 @@ from keras.optimizers import Adam
 # from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.metrics import r2_score
 from sklearn.metrics import mean_squared_error as MSE
+# from sklearn.decomposition import PCA
 
-#%%
-################################################################################ DEFAULTS
+from joblib import dump
 
-user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
-output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
+print('modules loaded')
 
-abs_wq_df_fn = 'abs-wq_HNSr_df.csv'
+#%% Set paths and bring in data
 
-# Bring in data
-abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:62,:]
+# user = os.getlogin() 
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+spectra_path = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
+output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
+
+abs_wq_fn = 'abs-wq_HNSr_df.csv'
+spectra_path = os.path.join(spectra_path,abs_wq_fn)
+os.path.exists(spectra_path)
 np.random.seed(7)
 
-#%%
+#%% Define useful variables
 
-#species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
+abs_wq_df=pd.read_csv(spectra_path)
+abs_wq_df = abs_wq_df.loc[0:62,:]
 
-iEpochs=5000
+species=list(abs_wq_df.columns[0:14])
 
-augmentRatio=7
+# species=['Nitrate-N'] # for testing
 
-species = abs_wq_df.columns[0:14]
+# s = species[0]
 
 specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
 
-abs_wq_df=abs_wq_df.dropna(axis=0)
+# abs_wq_df=abs_wq_df.dropna(axis=0)
 
 # ds_x=df.loc[:,specCols].values
 
+# abs_wq_df.loc[abs_wq_df['Phosphate-P']<0.15,['Phosphate-P','TP','OP']]=-0.1
 
-#%%
-################################################################################ FUNCTIONS
+#%% Define class for pre-processing data and training neural network.
 
-add_dimension = lambda ds_x: np.reshape(ds_x, (ds_x.shape[0], 1, ds_x.shape[1]))
-
-# I'm not entirely sure if augmentation is well set-up, but the models don't work without this
 def augment(x, betashift, slopeshift, multishift):
     beta = np.random.random(size=(x.shape[0],1))*2*betashift-betashift
     slope = np.random.random(size=(x.shape[0],1))*2*slopeshift-slopeshift + 1
     axis = np.array(range(x.shape[1]))/float(x.shape[1])
     offset = slope*(axis) + beta - axis - slope/2 + 0.5
     multi = np.random.random(size=(x.shape[0],1))*2*multishift-multishift + 1
-    return multi*x + offset
+    return(multi*x + offset)
 
-def predict(models, input):
-    output = np.zeros((input.shape[0]))
-    for model in models:
-        output += model.predict(input).flatten()
-    return output / len(models)
+def add_dimension(ds_x):
+    
+    return(np.reshape(ds_x, (ds_x.shape[0], 1, ds_x.shape[1])))
+
+class lenet():
+    
+    def __init__(self):
+        
+        self.ds_x_smooth = 0
+
+        
+    def prepare_x(self, x_df, augmentRatio=10, smooth = False):
+        
+        self.x_df = x_df
+        
+        self.smooth = smooth
+        
+        self.augmentRatio = augmentRatio
+        
+        # make scaled absorbance dataset for training
+        self.scaler_x = MinMaxScaler()
+        self.ds_x = self.x_df.values
+        # pca = PCA(n_components = 10)
+        # ds_x = pca.fit_transform(ds_x)
+        self.scaler_x = self.scaler_x.fit(self.ds_x)
+
+        self.ds_x = self.scaler_x.transform(self.ds_x)
+        
+        """## Smoothing
+        Using Savitzky-Golay
+        """
+
+        if self.smooth == True:
+        
+            window = 5
+            degree = 3
+            
+            self.x = np.array(list(map(lambda s: float(s[4:].replace('_', '.')), self.df.columns[6:])))
+            
+            self.ds_x_smooth = np.array(list(map(lambda y: savgol_filter((self.x, y),
+                                                                         window, degree)[1], self.ds_x)))
+             
+        else:
+            
+            self.ds_x_smooth=self.ds_x
+
+        """"DROPPING OUT EVERY N'th WAVELENGTH"""
+        self.n_drop = 4
+        self.ds_x_smooth = self.ds_x_smooth[:,range(0,self.ds_x_smooth.shape[1],self.n_drop)]
+        
+        # final step to prepare for using in Sequential() model
+        
+        self.X_train = self.ds_x_smooth
+        
+        self.X_train_aug = self.X_train.repeat(self.augmentRatio, axis=0)
+        self.X_train_aug = augment(self.X_train_aug, .01, .01, .01)
+        
+        self.X_train = add_dimension(self.X_train)
+        self.X_train_aug = add_dimension(self.X_train_aug)
+        
+        return(self.X_train)
+        
+    
+    def transform_x(self,x_new_df):
+        
+        if type(self.ds_x_smooth) == int:
+            
+            print('ERROR: x must be prepared first by using prepare_x method.')
+        
+        self.x_new_df = x_new_df
+
+        self.x_new_df = self.scaler_x.transform(self.x_new_df)
+        
+        """## Smoothing
+        Using Savitzky-Golay
+        """
+
+        if self.smooth == True:
+        
+            window = 5
+            degree = 3
+            
+            self.x_new_df = np.array(list(map(lambda y: savgol_filter((self.x, y),
+                                                                         window, degree)[1], self.x_new_df)))
+
+        """"DROPPING OUT EVERY N'th WAVELENGTH"""
+        self.x_new_df = self.x_new_df[:,range(0,self.x_new_df.shape[1],self.n_drop)]
+        
+        # final step to prepare for using in Sequential() model
+        
+        self.x_new_df = add_dimension(self.x_new_df)
+        
+        return(self.x_new_df)
+        
+    # def plot_x(self):
+
+    #     plt.figure(figsize=(12, 8))
+    #     for i in range(self.ds_x_smooth.shape[0]):
+    #         plt.plot(self.ds_x_smooth[i])
+    #     plt.xlabel('Wavelength (nm)')
+    #     plt.ylabel('Absorbanced (Normalized)')
+    #     plt.show()
+            
+        
+    # def smooth_plot(self):
+        
+    #     if self.smooth == True:
+    
+    #         plt.figure(figsize=(12, 8))
+    #         plt.plot(self.x, self.ds_x[2])
+    #         plt.plot(self.x, self.ds_x_smooth[2])
+    #         plt.legend(['Original', 'Smooth'])
+    #         plt.xlabel('Wavelength (nm)')
+    #         plt.ylabel('Absorbance (Normalized)')
+    #         plt.title(f'Savitzky-Golay Smoothing (Window Size={window}, Degree={degree})')
+    #         plt.show()
+            
+    #     else:
+            
+    #         print('x was not smoothed.')
+            
+        
+    def make_model(self, y_train, y_val, X_val, num_epochs = 1000):
+        
+        """## Augmentation"""
+        
+        if type(self.ds_x_smooth) == int:
+            
+            print('ERROR: x must be prepared first by using prepare_x method.')
+        
+        self.y_train = y_train
+        
+        self.y_val = y_val
+        
+        self.X_val = X_val
+        
+        self.num_epochs = num_epochs
+
+        self.multiplier = self.augmentRatio
+    
+        self.y_train = self.y_train.to_numpy()
+        self.y_train.shape=(len(self.y_train),1)
+        
+        self.y_train_aug = self.y_train.repeat(self.multiplier, axis=0)
+        
+        
+        
+        """# Training Creation
+        
+        ## LeNet 5
+        """
+        
+        drop = 0.05
+        reg = .01
+        
+        self.model = Sequential()
+        self.model.add(Conv1D(6, 1,activation='selu',input_shape=(1, self.X_train_aug.shape[2])))
+        self.model.add(Dropout(drop))
+        self.model.add(AveragePooling1D(1))
+        self.model.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        self.model.add(Dropout(drop))
+        self.model.add(Flatten())
+        self.model.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        self.model.add(Dropout(drop))
+        self.model.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
+        self.model.add(Dropout(drop))
+        self.model.add(Dense(1,activation = 'linear'))
+        self.model.compile(loss='mean_squared_error', optimizer=Adam(.001))
+        self.history = self.model.fit(
+            self.X_train_aug, self.y_train_aug,
+            epochs=self.num_epochs, batch_size=int(1e10),
+            verbose=0,
+            validation_data=(self.X_val, self.y_val),
+        )
+        
+        print('Model trained.')
+        
+    def predict(self, x_pred):
+        
+        return(self.model.predict(x_pred).flatten())
 
 #%% Creat function for writing output files
 
@@ -96,10 +275,13 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 
 #%% Create a function for making the outputs
 
-def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
+def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
                  variable_names):
 
-    X_train=ds_x_smooth[df[s]>0,:]
+    print(f'working on species: {s}')
+    print(f'iteration {iteration}')
+    
+    X_train=df.loc[df[s]>0,specCols]
 
     y_train = df.loc[df[s]>0,s]
     
@@ -108,67 +290,40 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
     """## Train/Val Split"""
     print('Full set:',X_train.shape)
     
-    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=.25,
+    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=0.3,
                                                       random_state= iteration)
-    X_train, X_test, y_train, y_test = train_test_split(X_train,y_train, test_size=.20,
+    X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=0.20,
                                                           random_state=iteration)
-    
-    y_train_ind = list(y_train.index)
-    y_test_ind = list(y_test.index)
-    
-    """## Augmentation"""
-    
-    multiplier = augmentRatio
-
-    y_train = y_train.to_numpy()
-    y_train.shape=(len(y_train),1)
-    
-    y_train = y_train.repeat(multiplier, axis=0)
-    
-    X_train = X_train.repeat(multiplier, axis=0)
-    X_train = augment(X_train, .01, .01, .01)
     
     print(s)
     print('Train set:',X_train.shape)
     print('Validation set:',X_val.shape)
     print('External set:',X_test.shape)
     
-    """## Add Dimension
-    """
-    X_train = add_dimension(X_train)
-    X_val = add_dimension(X_val)
-    X_test = add_dimension(X_test)
+    # initialize lenet model and prepare X sets for modeling
     
-    """# Training Creation
+    lenet_mod = lenet()
     
-    ## LeNet 5
-    """
+    X_train = lenet_mod.prepare_x(X_train)
+    # print(f' X_train shape: {X_train.shape}')
     
-    drop = 0.05
-    reg = .01
     
-    lenet = Sequential()
-    lenet.add(Conv1D(6, 1,activation='selu',input_shape=(1, X_train.shape[2])))
-    lenet.add(Dropout(drop))
-    lenet.add(AveragePooling1D(1))
-    lenet.add(Conv1D(16, 1, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-    lenet.add(Dropout(drop))
-    lenet.add(Flatten())
-    lenet.add(Dense(120, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-    lenet.add(Dropout(drop))
-    lenet.add(Dense(84, activation='selu', kernel_regularizer=l2(reg), bias_regularizer=l2(reg)))
-    lenet.add(Dropout(drop))
-    lenet.add(Dense(1,activation = 'linear'))
-    lenet.compile(loss='mean_squared_error', optimizer=Adam(.001))
-    history = lenet.fit(
-        X_train, y_train,
-        epochs=num_epochs, batch_size=int(1e10),
-        verbose=0,
-        validation_data=(X_val, y_val),
-    )
-
-    Y_hat = list(predict([lenet], X_test))
-    Y_hat_train = list(predict([lenet], X_train))
+    X_val = lenet_mod.transform_x(X_val)
+    X_test = lenet_mod.transform_x(X_test)
+    # print(f' X_test shape: {X_test.shape}')
+    
+    lenet_mod.make_model(y_train,y_val,X_val,num_epochs = num_epochs)
+    
+    print(f'y_train shape: {y_train.shape}')
+    print(f'y_train type: {type(y_train)}')
+    
+    y_train_ind = list(y_train.index)
+    y_test_ind = list(y_test.index)
+    
+    Y_hat = list(lenet_mod.predict(X_test))
+    # print(f' Y_hat: {Y_hat}')
+    Y_hat_train = list(lenet_mod.predict(X_train))
+    # print(f' Y_hat_train: {Y_hat_train}')
     
     r_sq = float(r2_score(y_test,Y_hat))
     r_sq_train = float(r2_score(y_train,Y_hat_train))
@@ -182,24 +337,29 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
     MSE_train = MSE(y_train,Y_hat_train)
     RMSE_train = float(np.sqrt(MSE_train))
     
-    abs_test_errors = abs(y_test-Y_hat)
-    APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
-    MAPE_test = float(np.mean(APE_test)*100) # this is percentage
+    # abs_test_errors = abs(y_test-Y_hat)
+    # APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
+    # MAPE_test = float(np.mean(APE_test)*100) # this is percentage
     
-    abs_train_errors = abs(y_train-Y_hat_train)
-    APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
-    MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+    # abs_train_errors = abs(y_train-Y_hat_train)
+    # APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
+    # MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+    
+    filename = f'HNSr_DL_{s}_It{iteration}.joblib'
+    pickle_path = os.path.join(output_dir,'picklejar',filename)
+    dump(lenet_mod,pickle_path)
     
     ### Write outputs
     
     for out in range(len(output_names)):
-        print(type(out))
+        # print(type(out))
         try:
-            print(variable_names[out])
-            print(type(variable_names[out]))
-            print(type(output_names[out]))
+            print(f'variable name: {variable_names[out]}')
+            print(f'output name: {output_names[out]}')
+            print(f'variable type: {type(eval(variable_names[out]))}')
+            # print(type(eval(output_names[out])))
             sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-            outputs_df = outputs_df.append(sub_df,ignore_index=True)
+            outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
         except AttributeError as e:
             print(e)
             import sys
@@ -211,15 +371,15 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
 
 ################################################################################ CHECK FITS
 
-    plt.figure(figsize=(12,8))
-    plt.plot(history.history['loss'])
-    plt.plot(history.history['val_loss'])
-    plt.ylabel('Loss')
-    plt.xlabel('Epoch')
-    #plt.ylim((0, .05))
-    # plt.ylim(0, 0.05)
-    plt.legend(['Training', 'Validation'], loc='upper right')
-    plt.show()
+    # plt.figure(figsize=(12,8))
+    # plt.plot(history.history['loss'])
+    # plt.plot(history.history['val_loss'])
+    # plt.ylabel('Loss')
+    # plt.xlabel('Epoch')
+    # #plt.ylim((0, .05))
+    # # plt.ylim(0, 0.05)
+    # plt.legend(['Training', 'Validation'], loc='upper right')
+    # plt.show()
     
     ################################################################################ PREDICT
     
@@ -261,7 +421,7 @@ def make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,output_names,
 
 #%% Create function for producing and writing model outputs
 """
-This function take in an input pandas data frame 'input_df', which has a column
+This function takes in an input pandas data frame 'input_df', which has a column
 for each species' concentrations and a column for absorbance at each wavelength.
 
 'num_epochs' is an integer used in the artificial neural network algorithm.
@@ -280,77 +440,43 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
     
     outputs_df = pd.DataFrame(columns= ['output','species','iteration','value']) #save outputs in dataframe
     
-    output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
-                    'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
-                    'train_rmse','test_mape','train_mape']
+    # output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
+    #                 'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
+    #                 'train_rmse','test_mape','train_mape']
     
-    variable_names = ['Y_hat','Y_hat_train','list(y_train[:,0])', 'list(y_test)',
+    # variable_names = ['Y_hat','Y_hat_train','list(y_train[:,0])', 'list(y_test)',
+    #                   'y_test_ind','y_train_ind','r_sq','r_sq_train','RMSE_test',
+    #                   'RMSE_train','MAPE_test','MAPE_train']
+
+    output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
+                'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
+                'train_rmse']
+    
+    variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
                       'y_test_ind','y_train_ind','r_sq','r_sq_train','RMSE_test',
-                      'RMSE_train','MAPE_test','MAPE_train']
+                      'RMSE_train']
 ################################################################################ PROCESS
 
-    scaler_x = MinMaxScaler()
-    ds_x = input_df.loc[:,specCols].values
-    ds_x = scaler_x.fit_transform(ds_x)
-    # scaler_y = MinMaxScaler()
-    #ds_y = scaler_y.fit_transform(ds_y)
-    
-    """## Smoothing
-    Using Savitzky-Golay
-    """
-    # window = 5
-    # degree = 3
-    
-    # #x = np.array(list(map(lambda s: float(s[4:].replace('_', '.')), df.columns[6:])))
-    # x=WVLs
-    # ds_x_smooth = np.array(list(map(lambda y: savgol_filter((x, y), window, degree)[1], ds_x)))
-    ds_x_smooth=ds_x 
-    """COMMENTED OUT"""
-    
-    # plt.figure(figsize=(12, 8))
-    # plt.plot(x, ds_x[2])
-    # plt.plot(x, ds_x_smooth[2])
-    # plt.legend(['Original', 'Smooth'])
-    # plt.xlabel('Wavelength (nm)')
-    # plt.ylabel('Reflectance (Normalized)')
-    # plt.title(f'Savitzky-Golay Smoothing (Window Size={window}, Degree={degree})')
-    # plt.show()
-    
-    
-    """"DROPPING OUT EVERY N'th WAVELENGTH"""
-    n_drop = 2
-    ds_x_smooth = ds_x_smooth[:,range(0,ds_x_smooth.shape[1],n_drop)]
-    
-    plt.figure(figsize=(12, 8))
-    for i in range(ds_x_smooth.shape[0]):
-        plt.plot(ds_x_smooth[i])
-    plt.xlabel('Wavelength (nm)')
-    plt.ylabel('Absorbance (Normalized)')
-    plt.show()
-    
-    # v = species[12]
-    # v="Molybdenum"
-    # iteration = 1
     df = input_df
     for s in species:
         
         if type(iterations)==int:
             
-            outputs_df = make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iterations,
+            outputs_df = make_outputs(df,num_epochs,outputs_df,s,iterations,
                          output_names,variable_names)
         
         else:
         
             for iteration in iterations:
                 
-                outputs_df = make_outputs(ds_x_smooth,df,num_epochs,outputs_df,s,iteration,
+                outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
                              output_names,variable_names)
         
     return(outputs_df)
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
+# outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
 #%% Define function for making plots
 
@@ -358,35 +484,36 @@ outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
 
 #     ## make plots for both filtered and unfiltered samples
         
-#     fig, axs = plt.subplots(4,2)
-#     fig.set_size_inches(10,20)
-#     fig.suptitle(output_label,fontsize = 18)
-#     fig.tight_layout(pad = 4)
-#     axs[2, 1].axis('off')
+#     fig, axs = plt.subplots(4,4)
+#     fig.set_size_inches(15,15)
+#     fig.suptitle(output_label,fontsize = 14)
+#     fig.tight_layout(pad = 1)
+#     axs[3, 2].axis('off')
+#     axs[3, 3].axis('off')
 #     row = 0
 #     col = 0
 #     species = outputs_df.species.unique()
 #     for s in species:
 #         y_true_train = outputs_df.loc[((outputs_df.species == s) &
 #                                         (outputs_df.output == 'y_true_train')),
-#                                        'value']
+#                                         'value']
         
 #         y_hat_train = outputs_df.loc[((outputs_df.species == s) &
 #                                         (outputs_df.output == 'y_hat_train')),
-#                                        'value']
+#                                         'value']
         
 #         y_true_test = outputs_df.loc[((outputs_df.species == s) &
 #                                         (outputs_df.output == 'y_true_test')),
-#                                        'value']
+#                                         'value']
         
 #         y_hat_test = outputs_df.loc[((outputs_df.species == s) &
 #                                         (outputs_df.output == 'y_hat_test')),
-#                                        'value']
+#                                         'value']
         
 #         line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
-#                                                  y_true_test,y_hat_test))),
+#                                                   y_true_test,y_hat_test))),
 #                               max(np.concatenate((y_true_train,y_hat_train,
-#                                                  y_true_test,y_hat_test))))
+#                                                   y_true_test,y_hat_test))))
         
 #         y_text = min(line11)+(max(line11)-min(line11))*0
 #         x_text = max(line11)-(max(line11)-min(line11))*0.6
@@ -414,18 +541,18 @@ outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
 #         ax = axs[row,col]
         
 #         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-#             label.set_fontsize(16)
+#             label.set_fontsize(12)
         
 #         axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
 #         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
 #         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
 #         # axs[row,col].set_title(s)
-#         axs[row,col].legend(loc = 'upper left',fontsize = 16)
-#         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
-#         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
+#         # axs[row,col].legend(loc = 'upper left',fontsize = 16)
+#         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 12)
+#         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 12)
 #         # axs[row,col].get_xaxis().set_visible(False)
 #         ax.text(x_text,y_text,r'$train\/rmse =$'+str(np.round(train_rmse,3))+'\n'
-#                 +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 16)
+#                 +r'$test\/rmse =$'+str(np.round(test_rmse,3)), fontsize = 12)
 #         # ticks = ax.get_yticks()
 #         # print(ticks)
 #         # # tick_labels = ax.get_yticklabels()
@@ -435,98 +562,22 @@ outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 10)
 #         # ax.set_xticks(ticks)
 #         # ax.set_xticklabels(tick_labels)
         
-#         if col == 1:
+#         if col == 3:
 #             col = 0
 #             row += 1
 #         else:
 #             col +=1
 #     # fig.show()
-
-def make_plots(outputs_df, output_label):
-        
-    fig, axs = plt.subplots(5,3)
-    fig.set_size_inches(20,30)
-    fig.suptitle(output_label,fontsize = 16)
-    fig.tight_layout(pad = 2)
-    axs[4, 2].axis('off')
-    row = 0
-    col = 0
-    species = outputs_df.species.unique()
-    for s in species:
-        y_true_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_train')),
-                                       'value']
-        
-        y_hat_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_train')),
-                                       'value']
-        
-        y_true_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_test')),
-                                       'value']
-        
-        y_hat_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_test')),
-                                       'value']
-        
-        line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))),
-                              max(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))))
-        
-        y_text = min(line11)+(max(line11)-min(line11))*0
-        x_text = max(line11)-(max(line11)-min(line11))*0.5
-        
-        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
-                            (outputs_df.species==s)]
-        
-        train_rsq = np.mean(train_rsq)
-        
-        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
-                            (outputs_df.species==s)]
-        
-        test_rsq = np.mean(test_rsq)
-        
-        ax = axs[row,col]
-        
-        for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-            label.set_fontsize(16)
-        
-        axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
-        axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
-        axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
-        # axs[row,col].set_title(s)
-        if (row == 0 and col == 0):
-            axs[row,col].legend(loc = 'upper left',fontsize = 16)
-        axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
-        axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
-        # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
-                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
-        # ticks = ax.get_yticks()
-        # print(ticks)
-        # # tick_labels = ax.get_yticklabels()
-        # tick_labels =[str(round(x,1)) for x in ticks]
-        # tick_labels = tick_labels[1:-1]
-        # print(tick_labels)
-        # ax.set_xticks(ticks)
-        # ax.set_xticklabels(tick_labels)
-        
-        if col == 2:
-            col = 0
-            row += 1
-        else:
-            col +=1
     
 #%% make plots for all samples
 
-make_plots(outputs_df,'Hydroponic Samples')
-# make_plots(outputs_df_fil,'Filtered Samples')
-# make_plots(outputs_df_unf,'Unfiltered Samples')
+# make_plots(outputs_df,'Filtered and Unfiltered Stream Samples - DL')
+# # make_plots(outputs_df_fil,'Filtered Samples')
+# # make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% Save output file
 
-outputs_df.to_csv(output_dir+'HNSr_DL_It1_results.csv',index=False)
+# outputs_df.to_csv(output_dir+'streams_DL_B1_results.csv',index=False)
 
 #%% make and save outputs
 
@@ -536,39 +587,39 @@ def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'HNSr_DL_It0-9_results.csv',
-                      its = range(10), eps = 5000)
+make_and_save_outputs(abs_wq_df,output_dir+'HNSr_DL_It0-19_results.csv',
+                      its = np.arange(0,20), eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-# Testing
+# # Testing
 
-output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
-                    'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
-                    'train_rmse','test_mape','train_mape']
+# output_names = ['y_hat_test','y_hat_train','y_true_train','y_true_test',
+#                     'test_ind','train_ind','test_rsq','train_rsq','test_rmse',
+#                     'train_rmse','test_mape','train_mape']
     
-variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
-                      'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
-                      'RMSE_train','MAPE_test','MAPE_train']
+# variable_names = ['Y_hat','Y_hat_train','list(y_train)', 'list(y_test)',
+#                       'list(X_test.index)','list(X_train.index)','r_sq','r_sq_train','RMSE_test',
+#                       'RMSE_train','MAPE_test','MAPE_train']
 
-s = 'something'
-iteration = 11041991
+# s = 'something'
+# iteration = 11041991
 
-for out in range(len(output_names)):
-            # print(out)
-            print(eval(variable_names[out])) 
-            print(output_names[out]) 
-            print(s)
-            print(iteration)
+# for out in range(len(output_names)):
+#             # print(out)
+#             print(eval(variable_names[out])) 
+#             print(output_names[out]) 
+#             print(s)
+#             print(iteration)
             
-#%%
+# #%%
 
-v = abs_wq_df['TKN']
-eval('v.index')
+# v = abs_wq_df['TKN']
+# eval('v.index')
 
-#%%
+# #%%
 
-v = v.values
-v = v.repeat(2,axis = 0)
+# v = v.values
+# v = v.repeat(2,axis = 0)
 
