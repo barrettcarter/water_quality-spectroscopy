@@ -26,8 +26,8 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 
 #for looking up available scorers
-import sklearn.metrics
-sorted(sklearn.metrics.SCORERS.keys())
+# import sklearn.metrics
+# sorted(sklearn.metrics.SCORERS.keys())
 
 from sklearn.metrics import r2_score
 
@@ -39,7 +39,6 @@ from sklearn.base import BaseEstimator
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
@@ -347,7 +346,7 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
 
 train_start = dt.datetime.now()
 
-outputs_df = create_outputs(abs_wq_df,iterations = 20) # all samples
+outputs_df = create_outputs(abs_wq_df,iterations = 1) # all samples
 
 # outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 
@@ -360,12 +359,10 @@ train_stop = dt.datetime.now()
 #%% make plots for all samples
 
 make_plots(outputs_df,'Filtered and Unfiltered Stream Samples - XGB-PCA')
-make_plots(outputs_df_fil,'Filtered Samples')
-make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_XGB_It0-19_results.csv',index=False)
+outputs_df.to_csv(output_dir+'streams_XGB_It0_results.csv',index=False)
    
 #%% make and save output.
 
