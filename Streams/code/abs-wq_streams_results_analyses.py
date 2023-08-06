@@ -33,11 +33,12 @@ from scipy import stats
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 results_pls_fn = 'streams_PLS_It0-9_results.csv'
-results_dl_fn = 'streams_DL_It0-9_results.csv'
+results_pls_fn2 = 'streams_PLS_It10-19_results.csv'
+results_dl_fn = 'streams_DL_It0-19_results.csv'
 results_rf_fn = 'streams_RF-PCA_It0-19_results.csv'
 results_xgb_fn = 'streams_XGB-PCA_It0-19_results.csv'
 results_path = os.path.join(path_to_wqs,output_dir)
@@ -48,7 +49,7 @@ sns.set(style = 'ticks',font_scale=2, palette = 'colorblind')
 
 #%% Bring in data and make combined dataframe
 
-results_files = [results_pls_fn, results_dl_fn, results_rf_fn, results_xgb_fn]
+results_files = [results_pls_fn, results_pls_fn2, results_dl_fn, results_rf_fn, results_xgb_fn]
 
 i = 0
 
