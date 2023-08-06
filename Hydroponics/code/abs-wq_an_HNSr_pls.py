@@ -9,7 +9,7 @@ import pandas as pd
 import numpy as np
 import os
 # import datetime as dt
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 # import scipy
 # from scipy import stats
 # import seaborn as sns
@@ -23,13 +23,17 @@ from sklearn.metrics import mean_squared_error as MSE
 # from sklearn.ensemble import RandomForestRegressor
 
 #for looking up available scorers
-import sklearn.metrics
-sorted(sklearn.metrics.SCORERS.keys())
+# import sklearn.metrics
+# sorted(sklearn.metrics.SCORERS.keys())
+
+from joblib import dump
 
 #%% Set paths and bring in data
 
-user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+user = os.getlogin()
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\' for OneDrive
+path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
@@ -121,111 +125,113 @@ def create_outputs(input_df,iterations = 1):
             for out in range(len(output_names)):
                 # print(out)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-                outputs_df = outputs_df.append(sub_df,ignore_index=True)
+                outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
             
-
+            filename = f'HNSr_pls_{s}_It{iteration}.joblib'
+            pickle_path = os.path.join(output_dir,'picklejar',filename)
+            dump(clf,pickle_path)
         
     return(outputs_df)
 
 #%% Define function for making plots
 
-def make_plots(outputs_df, output_label):
+# def make_plots(outputs_df, output_label):
         
-    fig, axs = plt.subplots(5,3)
-    fig.set_size_inches(20,30)
-    fig.suptitle(output_label,fontsize = 16)
-    fig.tight_layout(pad = 2)
-    axs[4, 2].axis('off')
-    row = 0
-    col = 0
-    species = outputs_df.species.unique()
-    for s in species:
-        y_true_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_train')),
-                                       'value']
+#     fig, axs = plt.subplots(5,3)
+#     fig.set_size_inches(20,30)
+#     fig.suptitle(output_label,fontsize = 16)
+#     fig.tight_layout(pad = 2)
+#     axs[4, 2].axis('off')
+#     row = 0
+#     col = 0
+#     species = outputs_df.species.unique()
+#     for s in species:
+#         y_true_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_train')),
+#                                        'value']
         
-        y_hat_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_train')),
-                                       'value']
+#         y_hat_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_train')),
+#                                        'value']
         
-        y_true_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_test')),
-                                       'value']
+#         y_true_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_test')),
+#                                        'value']
         
-        y_hat_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_test')),
-                                       'value']
+#         y_hat_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_test')),
+#                                        'value']
         
-        line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))),
-                              max(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))))
+#         line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))),
+#                               max(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))))
         
-        y_text = min(line11)+(max(line11)-min(line11))*0
-        x_text = max(line11)-(max(line11)-min(line11))*0.5
+#         y_text = min(line11)+(max(line11)-min(line11))*0
+#         x_text = max(line11)-(max(line11)-min(line11))*0.5
         
-        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
-                            (outputs_df.species==s)]
+#         train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
+#                             (outputs_df.species==s)]
         
-        train_rsq = np.mean(train_rsq)
+#         train_rsq = np.mean(train_rsq)
         
-        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
-                            (outputs_df.species==s)]
+#         test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
+#                             (outputs_df.species==s)]
         
-        test_rsq = np.mean(test_rsq)
+#         test_rsq = np.mean(test_rsq)
         
-        ax = axs[row,col]
+#         ax = axs[row,col]
         
-        for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-            label.set_fontsize(16)
+#         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+#             label.set_fontsize(16)
         
-        axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
-        axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
-        axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
-        # axs[row,col].set_title(s)
-        if (row == 0 and col == 0):
-            axs[row,col].legend(loc = 'upper left',fontsize = 16)
-        axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
-        axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
-        # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
-                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
-        # ticks = ax.get_yticks()
-        # print(ticks)
-        # # tick_labels = ax.get_yticklabels()
-        # tick_labels =[str(round(x,1)) for x in ticks]
-        # tick_labels = tick_labels[1:-1]
-        # print(tick_labels)
-        # ax.set_xticks(ticks)
-        # ax.set_xticklabels(tick_labels)
+#         axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
+#         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
+#         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
+#         # axs[row,col].set_title(s)
+#         if (row == 0 and col == 0):
+#             axs[row,col].legend(loc = 'upper left',fontsize = 16)
+#         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
+#         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
+#         # axs[row,col].get_xaxis().set_visible(False)
+#         ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
+#                 +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
+#         # ticks = ax.get_yticks()
+#         # print(ticks)
+#         # # tick_labels = ax.get_yticklabels()
+#         # tick_labels =[str(round(x,1)) for x in ticks]
+#         # tick_labels = tick_labels[1:-1]
+#         # print(tick_labels)
+#         # ax.set_xticks(ticks)
+#         # ax.set_xticklabels(tick_labels)
         
-        if col == 2:
-            col = 0
-            row += 1
-        else:
-            col +=1
+#         if col == 2:
+#             col = 0
+#             row += 1
+#         else:
+#             col +=1
 
 #%% make and save outputs
 
 def make_and_save_outputs(input_df,output_path,iterations = 1):
     outputs_df = create_outputs(input_df,iterations)
     outputs_df.to_csv(output_path,index=False)
-    make_plots(outputs_df,'Hydroponics')
-    return(outputs_df)
+#     make_plots(outputs_df,'Hydroponics')
+#     return(outputs_df)
 
 #%% Run create_outputs function for testing
 
-outputs_df = create_outputs(abs_wq_df) # all samples
+# outputs_df = create_outputs(abs_wq_df) # all samples
  
 #%% make plots for all samples
 
-make_plots(outputs_df,'Hydroponic Samples')
+# make_plots(outputs_df,'Hydroponic Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_PLS_B10_results.csv',index=False)
+# outputs_df.to_csv(output_dir+'streams_PLS_B10_results.csv',index=False)
    
 #%% make and save output.
 
-make_and_save_outputs(abs_wq_df,output_dir+'HNSr_PLS_It0-9_results.csv',
-                      iterations = 10)
+make_and_save_outputs(abs_wq_df,output_dir+'HNSr_PLS_It0-19_results.csv',
+                      iterations = 20)
