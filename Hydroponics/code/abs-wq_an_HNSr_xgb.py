@@ -122,7 +122,7 @@ class pca_xgb(BaseEstimator):
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1):
+def create_outputs(input_df,iterations = 1, autosave = False,output_path = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -236,6 +236,10 @@ def create_outputs(input_df,iterations = 1):
             filename = f'HNSr_XGB-PCA_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
+            
+            if autosave == True:
+                
+                outputs_df.to_csv(output_path,index=False)
                   
     return(outputs_df)
 
@@ -335,24 +339,29 @@ def create_outputs(input_df,iterations = 1):
 
 #%% function to make and save outputs
 
-def make_and_save_outputs(input_df,output_path,iterations = 1):
-    outputs_df = create_outputs(input_df,iterations)
-    outputs_df.to_csv(output_path,index=False)
-    return(outputs_df)
+# def make_and_save_outputs(input_df,output_path,iterations = 1):
+#     outputs_df = create_outputs(input_df,iterations)
+#     outputs_df.to_csv(output_path,index=False)
+#     return(outputs_df)
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-# train_start = dt.datetime.now()
+train_start = dt.datetime.now()
 
-# outputs_df = create_outputs(abs_wq_df,iterations = 1) # all samples
+outputs_df = create_outputs(abs_wq_df,iterations = 20,autosave=True,
+                            output_path = output_dir+'HNSr_XGB-PCA_It0-19_results.csv') # all samples
 
-# # outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
+# outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 
-# # outputs_df_fil = create_outputs(abs_wq_df_fil) # filtered samples
+# outputs_df_fil = create_outputs(abs_wq_df_fil) # filtered samples
 
-# # outputs_df_unf = create_outputs(abs_wq_df_unf) # unfiltered samples
+# outputs_df_unf = create_outputs(abs_wq_df_unf) # unfiltered samples
 
-# train_stop = dt.datetime.now()
+train_stop = dt.datetime.now()
+
+train_time = train_stop - train_start
+
+print(f'Total Run Time: {train_time}')
  
 #%% make plots for all samples
 
@@ -364,7 +373,7 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
    
 #%% make and save output.
 
-outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'HNSr_XGB-PCA_It0-19_results.csv',
-                      iterations = 20)
+# outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'HNSr_XGB-PCA_It0-19_results.csv',
+#                       iterations = 20)
 
 #%%
