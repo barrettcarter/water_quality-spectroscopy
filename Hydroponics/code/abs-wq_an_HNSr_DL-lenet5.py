@@ -276,7 +276,7 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 #%% Create a function for making the outputs
 
 def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
-                 variable_names):
+                 variable_names, output_path = None, autosave = False):
 
     print(f'working on species: {s}')
     print(f'iteration {iteration}')
@@ -365,6 +365,10 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
             import sys
             sys.exit(0)
             
+    if autosave == True:
+        
+        outputs_df.to_csv(output_path,index=False)
+            
     return(outputs_df)
     
     
@@ -432,7 +436,8 @@ resampling is performed. 'iterations' can be an integer, float, string, range,
 or 1-D numpy array.
 
 """
-def create_outputs(input_df,num_epochs = 1000,iterations = 1):
+def create_outputs(input_df,num_epochs = 1000,iterations = 1,
+                   output_path = None, autosave = False):
     
     
     ### Create a model for every species
@@ -470,13 +475,16 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
             for iteration in iterations:
                 
                 outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
-                             output_names,variable_names)
+                             output_names,variable_names, output_path=output_path,
+                             autosave = autosave)
         
     return(outputs_df)
 
 #%% Create outputs
 
-# outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
+outputs_df = create_outputs(abs_wq_df,num_epochs=5000,iterations = np.arange(0,20), 
+                            output_path = output_dir+'HNSr_DL_It0-19_results.csv',
+                            autosave = True)
 
 #%% Define function for making plots
 
@@ -581,14 +589,14 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% make and save outputs
 
-def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
-    outputs_df = create_outputs(input_df,iterations = its, num_epochs = eps)
-    outputs_df.to_csv(output_path,index=False)
+# def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
+#     outputs_df = create_outputs(input_df,iterations = its, num_epochs = eps)
+#     outputs_df.to_csv(output_path,index=False)
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'HNSr_DL_It0-19_results.csv',
-                      its = np.arange(0,20), eps = 5000)
+# make_and_save_outputs(abs_wq_df,output_dir+'HNSr_DL_It0-19_results.csv',
+#                       its = np.arange(0,20), eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
