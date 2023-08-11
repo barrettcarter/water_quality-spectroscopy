@@ -295,6 +295,9 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=0.20,
                                                           random_state=iteration)
     
+    y_train_ind = list(y_train.index)
+    y_test_ind = list(y_test.index)
+    
     print(s)
     print('Train set:',X_train.shape)
     print('Validation set:',X_val.shape)
@@ -305,25 +308,28 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     lenet_mod = lenet()
     
     X_train = lenet_mod.prepare_x(X_train)
-    # print(f' X_train shape: {X_train.shape}')
+    print(f' X_train: {X_train}')
     
     
     X_val = lenet_mod.transform_x(X_val)
     X_test = lenet_mod.transform_x(X_test)
-    # print(f' X_test shape: {X_test.shape}')
+    print(f' X_test: {X_test}')
     
     lenet_mod.make_model(y_train,y_val,X_val,num_epochs = num_epochs)
     
-    print(f'y_train shape: {y_train.shape}')
+    y_train = list(y_train)
+    
+    # print(f'y_train shape: {y_train.shape}')
     print(f'y_train type: {type(y_train)}')
     
-    y_train_ind = list(y_train.index)
-    y_test_ind = list(y_test.index)
+    
     
     Y_hat = list(lenet_mod.predict(X_test))
-    # print(f' Y_hat: {Y_hat}')
+    print(f' Y_hat: {Y_hat}')
     Y_hat_train = list(lenet_mod.predict(X_train))
-    # print(f' Y_hat_train: {Y_hat_train}')
+    print(f' Y_hat_train: {Y_hat_train}')
+    
+    
     
     r_sq = float(r2_score(y_test,Y_hat))
     r_sq_train = float(r2_score(y_train,Y_hat_train))
