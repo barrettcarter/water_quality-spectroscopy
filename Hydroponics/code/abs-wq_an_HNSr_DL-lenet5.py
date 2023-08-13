@@ -38,18 +38,20 @@ print('modules loaded')
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
-spectra_path = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
+inter_dir = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_fn = 'abs-wq_HNSr_df.csv'
-spectra_path = os.path.join(spectra_path,abs_wq_fn)
-os.path.exists(spectra_path)
-np.random.seed(7)
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
+
+# Bring in data
+abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+abs_wq_df = abs_wq_df.loc[0:57,:]
 
 #%% Define useful variables
 
-abs_wq_df=pd.read_csv(spectra_path)
-abs_wq_df = abs_wq_df.loc[0:62,:]
+subset_name = 'HNSrd30'
+
+np.random.seed(7)
 
 species=list(abs_wq_df.columns[0:14])
 
@@ -351,7 +353,7 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     # APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
     # MAPE_train = float(np.mean(APE_train)*100) # this is percentage
     
-    filename = f'HNSr_DL_{s}_It{iteration}.joblib'
+    filename = f'{subset_name}_DL_{s}_It{iteration}.joblib'
     pickle_path = os.path.join(output_dir,'picklejar',filename)
     dump(lenet_mod,pickle_path)
     
@@ -488,8 +490,12 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1,
 
 #%% Create outputs
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=5000,iterations = np.arange(0,20), 
-                            output_path = output_dir+'HNSr_DL_It0-19_results.csv',
+iterations = np.arange(0,20)
+
+output_fn = f'{subset_name}_DL_It{min(iterations)}-{max(iterations)}_results.csv'
+
+outputs_df = create_outputs(abs_wq_df,num_epochs=5000,iterations = iterations, 
+                            output_path = os.path.join(output_dir,output_fn),
                             autosave = True)
 
 #%% Define function for making plots

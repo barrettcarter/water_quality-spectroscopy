@@ -45,11 +45,13 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSr_df.csv'
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:62,:]
+abs_wq_df = abs_wq_df.loc[0:57,:]
+
+subset_name = 'HNSrd30'
 
 #%% make custom estimator combining PCA and XGB
 
@@ -233,7 +235,7 @@ def create_outputs(input_df,iterations = 1, autosave = False,output_path = None)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
-            filename = f'HNSr_XGB-PCA_{s}_It{iteration}.joblib'
+            filename = f'{subset_name}_XGB-PCA_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
             
@@ -348,8 +350,12 @@ def create_outputs(input_df,iterations = 1, autosave = False,output_path = None)
 
 train_start = dt.datetime.now()
 
-outputs_df = create_outputs(abs_wq_df,iterations = 20,autosave=True,
-                            output_path = output_dir+'HNSr_XGB-PCA_It0-19_results.csv') # all samples
+iterations = np.arange(0,20)
+
+output_fn = f'{subset_name}_XGB-PCA_It{min(iterations)}-{max(iterations)}_results.csv'
+
+outputs_df = create_outputs(abs_wq_df,iterations = iterations,autosave=True,
+                            output_path = os.path.join(output_dir,output_fn)) # all samples
 
 # outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 

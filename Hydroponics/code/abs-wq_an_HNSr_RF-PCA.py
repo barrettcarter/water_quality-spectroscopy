@@ -44,11 +44,13 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSr_df.csv'
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:62,:]
+abs_wq_df = abs_wq_df.loc[0:57,:]
+
+subset_name = 'HNSrd30'
 
 #%% make custom estimator combining PCA and RF
 
@@ -120,7 +122,7 @@ class pca_RF(BaseEstimator):
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1):
+def create_outputs(input_df,iterations = 1,autosave = False,output_path = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -227,9 +229,13 @@ def create_outputs(input_df,iterations = 1):
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
-            filename = f'HNSr_RF-PCA_{s}_It{iteration}.joblib'
+            filename = f'{subset_name}_RF-PCA_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
+            
+            if autosave == True:
+                
+                outputs_df.to_csv(output_path,index=False)
                   
     return(outputs_df)
 
@@ -316,13 +322,19 @@ def create_outputs(input_df,iterations = 1):
 
 #%% function for make and save outputs
 
-def make_and_save_outputs(input_df,output_path,iterations = 1):
-    outputs_df = create_outputs(input_df,iterations)
-    outputs_df.to_csv(output_path,index=False)
+# def make_and_save_outputs(input_df,output_path,iterations = 1):
+#     outputs_df = create_outputs(input_df,iterations)
+#     outputs_df.to_csv(output_path,index=False)
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-# outputs_df = create_outputs(abs_wq_df,iterations = 1) # all samples
+iterations = np.arange(0,20)
+
+output_fn = f'{subset_name}_RF-PCA_It{min(iterations)}-{max(iterations)}_results.csv'
+
+outputs_df = create_outputs(abs_wq_df,iterations = iterations,autosave=True,
+                            output_path = os.path.join(output_dir,output_fn))
+                                                       
 #%% make plots for all samples
 
 # make_plots(outputs_df,'HNSr')
@@ -334,7 +346,7 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
    
 #%% make and save output.
 
-outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'HNSr_RF-PCA_It0-19_results.csv',
-                      iterations = 20)
+# outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'HNSr_RF-PCA_It0-19_results.csv',
+#                       iterations = 20)
 
 #%%
