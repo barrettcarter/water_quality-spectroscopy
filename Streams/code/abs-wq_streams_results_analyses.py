@@ -82,15 +82,11 @@ for f in results_files:
 
 results_df.loc[:,'value']=results_df.loc[:,'value'].apply(lambda x: np.double(x))
 
-# select only iterations 0 - 9 to make all models consistent
-
-results_df = results_df.loc[results_df.iteration.isin(np.arange(0,10)),:]
-
 #%% make some useful variables
 
 species = results_df['species'].unique()
 species = list(species)
-species.sort(key = lambda x: x[-1])
+# species.sort(key = lambda x: x[-1])
 
 species_sub = [s for s in species if s not in ['Ammonium-N','OP']]
 

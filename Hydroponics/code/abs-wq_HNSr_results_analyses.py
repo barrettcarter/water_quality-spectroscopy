@@ -8,9 +8,9 @@ Created on Mon Nov 22 08:50:22 2021
 import pandas as pd
 
 import os
-# import numpy as np
+import numpy as np
 # import pandas as pd
-#from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 # from sklearn.preprocessing import MinMaxScaler
 # from sklearn.model_selection import train_test_split
 # from sklearn.decomposition import PCA
@@ -23,7 +23,7 @@ import os
 # import skopt
 # from scipy.signal import savgol_filter
 # from sklearn import linear_model
-# from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.metrics import mean_squared_error, r2_score
 # from sklearn.metrics import r2_score
 # from sklearn.metrics import mean_squared_error as MSE
 import seaborn as sns
@@ -32,28 +32,53 @@ from scipy import stats
 #%% Set parameters
 
 user = os.getlogin() 
-path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
-results_pls_fn = 'HNSr_PLS_It0-9_results_ALL-DATA.csv'
-results_dl_fn = 'HNSr_DL_It0-9_results.csv'
+results_pls_fn = 'HNSr_PLS_It0-19_results.csv'
+results_dl_fn = 'HNSr_DL_It0-19_results.csv'
+results_rf_fn = 'HNSr_RF-PCA_It0-19_results.csv'
+results_xgb_fn = 'HNSr_XGB-PCA_It0-19_results.csv'
 results_path = os.path.join(path_to_wqs,output_dir)
 
 # sns.set_style("ticks")
 # sns.set_palette('colorblind')
 sns.set(style = 'ticks',font_scale=2, palette = 'colorblind')
 
-#%% Bring in data
+#%% Bring in data and make combined dataframe
 
-results_pls_df=pd.read_csv(os.path.join(results_path,results_pls_fn))
-results_dl_df=pd.read_csv(os.path.join(results_path,results_dl_fn))
+results_files = [results_pls_fn, results_dl_fn, results_rf_fn, results_xgb_fn]
 
-#%% combine data frames
+i = 0
 
-# add model columns
-results_pls_df['model'] = 'pls'
-results_dl_df['model'] = 'dl'
-results_df = pd.concat([results_pls_df,results_dl_df],ignore_index=True)
-results_df.loc[:,'value']=results_df.loc[:,'value'].apply(lambda x: float(x))
+for f in results_files:
+    
+    if i == 0:
+        
+        results_df=pd.read_csv(os.path.join(results_path,f))
+        
+        model = f.split(sep='_')[1]
+        
+        model = model.split(sep='-')[0]
+        
+        results_df['model']=model
+
+    else:
+        
+        df = pd.read_csv(os.path.join(results_path,f))
+        
+        model = f.split(sep='_')[1]
+        
+        model = model.split(sep='-')[0]
+        
+        df['model']=model
+        
+        results_df = pd.concat([results_df,df],ignore_index = True)
+        
+    i += 1
+
+
+results_df.loc[:,'value']=results_df.loc[:,'value'].apply(lambda x: np.double(x))
 
 #%% make some useful variables
 
@@ -78,13 +103,91 @@ test_rmses.rename(columns = {'value':'test rmse (ppm)'},inplace = True)
 
 #%% make rmse violin plot plot
 
-test_rmse_plot = sns.catplot(x='model',y='test rmse (ppm)',col = 'species',col_wrap=3,
-                             data = test_rmses,kind = 'violin')
+test_rmse_plot = sns.catplot(x='model',y='test rmse (ppm)',col = 'species',col_wrap=4,
+                             data = test_rmses,kind = 'violin',sharey = False)
 
-#%% data wrangling for 1:1 plots
+#%% get r_squared values
+
+test_rsqrs = results_df.loc[results_df['output'] == 'test_rsq',:]
+test_rsqrs.reset_index(inplace = True)
+# test_rsqrs.value = test_rmses.value.apply(lambda x: float(x))
+test_rsqrs.rename(columns = {'value':'test r-squared'},inplace = True)
+
+#%% make r_squared violin plot plot
+
+test_rqrs_plot = sns.catplot(x='model',y='test r-squared',col = 'species',col_wrap=4,
+                             data = test_rsqrs,kind = 'violin',sharey = False)
+
+#%% make r_squared dataframe with r-sq < -1 removed
+
+test_rsqrs_2 = test_rsqrs.loc[test_rsqrs['test r-squared']>-1,:]
+
+#%% make new r_squared violin plot plot
+
+test_rqrs_plot = sns.catplot(x='model',y='test r-squared',col = 'species',col_wrap=4,
+                             data = test_rsqrs_2,kind = 'violin',sharey = False)
+#%% data wrangling for 1:1 plots and refined r_sqaured and rmse results
 
 y_hat_tests = results_df.loc[results_df.output=='y_hat_test',:].reset_index(drop=True)
 y_true_tests = results_df.loc[results_df.output=='y_true_test',:].reset_index(drop=True)
+
+#%% Remove results associated with non-positive observed concentrations
+
+is_pos = y_true_tests.value > 0
+
+y_true_tests = y_true_tests.loc[is_pos,:]
+
+y_hat_tests = y_hat_tests.loc[is_pos,:]   
+
+#%% calculate new rsqrs and rmses
+
+test_rmses_3 = pd.DataFrame(columns = y_hat_tests.columns)
+
+test_rsqrs_3 = pd.DataFrame(columns = y_hat_tests.columns)
+
+for i in y_hat_tests.iteration.unique():
+    
+    for m in y_hat_tests.model.unique():
+        
+        for s in y_hat_tests.species.unique():
+        
+            rmse_df = pd.DataFrame(columns = y_hat_tests.columns)
+            
+            rsq_df = pd.DataFrame(columns = y_hat_tests.columns)
+            
+            y_hats = y_hat_tests.loc[(y_hat_tests.iteration==i)&(y_hat_tests.model==m)&
+                                     (y_hat_tests.species==s),'value']
+            y_trues = y_true_tests.loc[(y_true_tests.iteration==i)&(y_true_tests.model==m)&
+                                     (y_true_tests.species==s),'value']
+            
+            rsq = r2_score(y_trues, y_hats)
+            
+            rmse = np.sqrt(mean_squared_error(y_trues, y_hats))
+            
+            rmse_df.loc[0,:] = ['test rmse (ppm)',s,i,rmse,m]
+            
+            rsq_df.loc[0,:] = ['test r-squared (ppm)',s,i,rsq,m]
+            
+            test_rmses_3 = pd.concat([test_rmses_3,rmse_df],ignore_index = True)
+            test_rsqrs_3 = pd.concat([test_rsqrs_3,rsq_df],ignore_index = True)
+        
+#%% make rmse violin plot plot
+
+test_rmses_3.rename(columns = {'value':'test rmse (ppm)'},inplace = True)
+
+test_rmses_3.loc[:,'test rmse (ppm)'] = test_rmses_3['test rmse (ppm)'].apply(lambda x:float(x))
+
+sns.catplot(x='model',y='test rmse (ppm)',col = 'species',col_wrap=4,
+            data = test_rmses_3,kind = 'violin',sharey = False) 
+
+#%% make new r_squared violin plot plot
+
+test_rsqrs_3.rename(columns = {'value':'test r-squared (ppm)'},inplace = True)
+
+test_rsqrs_3.loc[:,'test r-squared (ppm)'] = test_rsqrs_3['test r-squared (ppm)'].apply(lambda x:float(x))
+
+test_rqrs_plot = sns.catplot(x='model',y='test r-squared (ppm)',col = 'species',col_wrap=4,
+                             data = test_rsqrs_3,kind = 'violin',sharey = False)
 
 #%% make dataframe for plot
 
