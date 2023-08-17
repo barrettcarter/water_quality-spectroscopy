@@ -31,10 +31,10 @@ from joblib import dump
 
 #%% Set paths and bring in data
 
-# user = os.getlogin() 
+user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\' for OneDrive
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -45,12 +45,15 @@ abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
 
 #%% seperate into filtered and unfiltered sample sets
 
-# abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
-# abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
+abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
+abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
+
+subset_name_fil = 'streams_fil'
+subset_name_unf = 'streams_unf'
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1):
+def create_outputs(input_df,iterations = 1, autosave = False, output_path = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -139,6 +142,10 @@ def create_outputs(input_df,iterations = 1):
             filename = f'pls_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
+            
+            if autosave == True:
+                
+                outputs_df.to_csv(output_path,index=False)
                   
     return(outputs_df)
 
