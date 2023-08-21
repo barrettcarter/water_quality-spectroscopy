@@ -19,20 +19,20 @@ import os
 # import scipy
 # from scipy import stats
 # import seaborn as sns
-from sklearn.cross_decomposition import PLSRegression
-# from sklearn.metrics import r2_score
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import GridSearchCV
-# from sklearn.linear_model import LinearRegression
-# from sklearn.utils import resample
-from sklearn.metrics import mean_squared_error as MSE
-# from sklearn.ensemble import RandomForestRegressor
+# from sklearn.cross_decomposition import PLSRegression
+# # from sklearn.metrics import r2_score
+# from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import GridSearchCV
+# # from sklearn.linear_model import LinearRegression
+# # from sklearn.utils import resample
+# from sklearn.metrics import mean_squared_error as MSE
+# # from sklearn.ensemble import RandomForestRegressor
 
-#for looking up available scorers
-# import sklearn.metrics
-# sorted(sklearn.metrics.SCORERS.keys())
+# #for looking up available scorers
+# # import sklearn.metrics
+# # sorted(sklearn.metrics.SCORERS.keys())
 
-from joblib import dump
+# from joblib import dump
 
 #%% Set paths and bring in data
 
@@ -62,7 +62,7 @@ species = abs_wq_df.columns[0:8]
 
 sam_size_df = pd.DataFrame(columns = ['Species','Samp_size'])
 
-s = species[0]
+s = species[2]
 
 for s in species:
     

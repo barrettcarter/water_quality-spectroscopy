@@ -42,6 +42,7 @@ abs_wq_df_fn = 'abs_wq_df_streams.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
@@ -50,6 +51,11 @@ abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 subset_name_fil = 'streams_fil'
 subset_name_unf = 'streams_unf'
+
+input_df = abs_wq_df_unf # for testing
+
+species = input_df.columns[0:8]
+s = species[2] # for testing
                              
 #%% Create function for writing outputs
 
@@ -84,23 +90,32 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                       'RMSE_train','MAPE_test','MAPE_train','n_comp']
     
        
-    # iteration = 1 # this is for testing
+    iteration = 1 # this is for testing
     
     if type(iterations)==int:
         
         iterations = range(iterations)
-    
-    species = input_df.columns[0:9]
     
     for s in species:
         
         for iteration in iterations:
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
+            
+            samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            
             Y = input_df[s]
             keep = pd.notna(Y)
-            X = input_df.loc[keep,'band_1':'band_1024']
-            Y = Y[keep]
+            
+            input_df = input_df.loc[keep,:]
+            
+            if sum(keep)>samp_size:
+            
+                input_df = input_df.sample(n = samp_size, random_state = iteration)
+            
+            X = input_df.loc[:,'band_1':'band_1024']
+            
+            Y = input_df[s]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
                                                                 test_size = 0.3)
@@ -231,13 +246,18 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% function for make and save outputs
 
-def make_and_save_outputs(input_df,output_path,iterations = 1):
-    outputs_df = create_outputs(input_df,iterations)
-    outputs_df.to_csv(output_path,index=False)
+# def make_and_save_outputs(input_df,output_path,iterations = 1):
+#     outputs_df = create_outputs(input_df,iterations)
+#     outputs_df.to_csv(output_path,index=False)
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-# outputs_df = create_outputs(abs_wq_df) # all samples
+outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-fil_PLS_It0-19_results.csv')) # all samples
+
+outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-unf_PLS_It0-19_results.csv')) # all samples
+
 # outputs_df_fil = create_outputs(abs_wq_df_fil) # all samples
 # outputs_df_unf = create_outputs(abs_wq_df_unf) # all samples
  
@@ -253,5 +273,5 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
    
 #%% make and save output.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_PLS_It10-19_results.csv',
-                      iterations = np.arange(10,20))
+# make_and_save_outputs(abs_wq_df,output_dir+'streams_PLS_It10-19_results.csv',
+#                       iterations = np.arange(10,20))
