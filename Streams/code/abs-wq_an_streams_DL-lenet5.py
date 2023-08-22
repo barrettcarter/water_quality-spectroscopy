@@ -45,7 +45,9 @@ spectra_path = os.path.join(spectra_path,abs_wq_fn)
 os.path.exists(spectra_path)
 np.random.seed(7)
 
-#%%
+samp_sizes = pd.read_csv(os.path.join(spectra_path,'fil_sub_samp_sizes.csv'))
+
+#%% seperate into filtered and unfiltered sample sets
 
 species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
@@ -54,6 +56,9 @@ species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 # s = species[0]
 
 abs_wq_df=pd.read_csv(spectra_path)
+
+abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
+abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 specCols=[x for x in abs_wq_df.columns if x.startswith('band_')]
 
@@ -274,7 +279,8 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 #%% Create a function for making the outputs
 
 def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
-                 variable_names):
+                 variable_names, output_path = None, autosave = False,
+                 subset_name = None):
 
     print(f'working on species: {s}')
     print(f'iteration {iteration}')
@@ -343,7 +349,7 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     # APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
     # MAPE_train = float(np.mean(APE_train)*100) # this is percentage
     
-    filename = f'DL_{s}_It{iteration}.joblib'
+    filename = f'DL_streams-{subset_name}_{s}_It{iteration}.joblib'
     pickle_path = os.path.join(output_dir,'picklejar',filename)
     dump(lenet_mod,pickle_path)
     
@@ -362,6 +368,10 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
             print(e)
             import sys
             sys.exit(0)
+            
+    if autosave == True:
+        
+        outputs_df.to_csv(output_path,index=False)
             
     return(outputs_df)
     
@@ -476,6 +486,14 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 # outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
+outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-fil_DL_It0-19_results.csv'),
+                            subset_name = 'fil') # all samples
+
+outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
+                            subset_name = 'unf')
+
 #%% Define function for making plots
 
 # def make_plots(outputs_df, output_label):
@@ -578,14 +596,14 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 #%% make and save outputs
 
-def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
-    outputs_df = create_outputs(input_df,iterations = its, num_epochs = eps)
-    outputs_df.to_csv(output_path,index=False)
+# def make_and_save_outputs(input_df,output_path,its = 1,eps = 1000):
+#     outputs_df = create_outputs(input_df,iterations = its, num_epochs = eps)
+#     outputs_df.to_csv(output_path,index=False)
     
 #%% do it.
 
-make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0-19_results.csv',
-                      its = np.arange(0,20), eps = 5000)
+# make_and_save_outputs(abs_wq_df,output_dir+'streams_DL_It0-19_results.csv',
+#                       its = np.arange(0,20), eps = 5000)
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
