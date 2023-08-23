@@ -12,7 +12,7 @@ sample size.
 #%% import libraries
 
 import pandas as pd
-import numpy as np
+# import numpy as np
 import os
 # import datetime as dt
 # import matplotlib.pyplot as plt
@@ -66,8 +66,11 @@ s = species[2]
 
 for s in species:
     
-    df_s_fil = abs_wq_df_fil.loc[abs_wq_df_fil[s].isna()==False,s]
-    df_s_unf = abs_wq_df_unf.loc[abs_wq_df_unf[s].isna()==False,s]
+    # df_s_fil = abs_wq_df_fil.loc[abs_wq_df_fil[s].isna()==False,s]
+    # df_s_unf = abs_wq_df_unf.loc[abs_wq_df_unf[s].isna()==False,s]
+    
+    df_s_fil = abs_wq_df_fil.loc[abs_wq_df_fil[s]>0,s]
+    df_s_unf = abs_wq_df_unf.loc[abs_wq_df_unf[s]>0,s]
     
     n_s = min([df_s_fil.shape[0],df_s_unf.shape[0]])
 
