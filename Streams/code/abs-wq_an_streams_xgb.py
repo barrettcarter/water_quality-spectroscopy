@@ -180,7 +180,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
             
             Y = input_df[s]
-            keep = pd.notna(Y)
+            keep = Y>0
             
             input_df = input_df.loc[keep,:]
             
