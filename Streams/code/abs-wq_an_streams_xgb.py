@@ -362,13 +362,17 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 # outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 
-outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'streams-fil_XGB-PCA_It0-19_results.csv'),
-                            subset_name = 'fil') # all samples
+# outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+#                             output_path = os.path.join(output_dir,'streams-fil_XGB-PCA_It0-19_results.csv'),
+#                             subset_name = 'fil') # all samples
 
-outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'streams-unf_XGB-PCA_It0-19_results.csv'),
-                            subset_name = 'unf')
+# outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+#                             output_path = os.path.join(output_dir,'streams-unf_XGB-PCA_It0-19_results.csv'),
+#                             subset_name = 'unf')
+
+outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-comb_XGB-PCA_It0-19_results.csv'),
+                            subset_name = 'comb')
 
 # train_stop = dt.datetime.now()
  
