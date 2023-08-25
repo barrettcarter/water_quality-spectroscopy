@@ -38,14 +38,14 @@ print('modules loaded')
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
-spectra_path = os.path.join(path_to_wqs,'Streams/intermediates/')
+int_dir = os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 abs_wq_fn = 'abs_wq_df_streams.csv'
-spectra_path = os.path.join(spectra_path,abs_wq_fn)
+spectra_path = os.path.join(int_dir,abs_wq_fn)
 os.path.exists(spectra_path)
 np.random.seed(7)
 
-samp_sizes = pd.read_csv(os.path.join(spectra_path,'fil_sub_samp_sizes.csv'))
+samp_sizes = pd.read_csv(os.path.join(int_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
@@ -297,7 +297,7 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     
     X_train=df.loc[:,specCols]
 
-    y_train = df.loc[:,s]
+    y_train = df[s]
     
     # X_train = pd.DataFrame(X_train)
     
@@ -333,6 +333,8 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     
     y_train_ind = list(y_train.index)
     y_test_ind = list(y_test.index)
+    
+    y_train = list(y_train)
     
     Y_hat = list(lenet_mod.predict(X_test))
     # print(f' Y_hat: {Y_hat}')
@@ -450,7 +452,8 @@ resampling is performed. 'iterations' can be an integer, float, string, range,
 or 1-D numpy array.
 
 """
-def create_outputs(input_df,num_epochs = 1000,iterations = 1):
+def create_outputs(input_df,num_epochs = 1000,iterations = 1, autosave = False,
+                   output_path = None, subset_name = None):
     
     
     ### Create a model for every species
@@ -481,14 +484,16 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
         if type(iterations)==int:
             
             outputs_df = make_outputs(df,num_epochs,outputs_df,s,iterations,
-                         output_names,variable_names)
+                         output_names,variable_names, output_path = output_path,
+                         autosave = autosave, subset_name = subset_name)
         
         else:
         
             for iteration in iterations:
                 
                 outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
-                             output_names,variable_names)
+                             output_names,variable_names, output_path = output_path,
+                             autosave = autosave, subset_name = subset_name)
         
     return(outputs_df)
 
@@ -496,15 +501,15 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1):
 
 # outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
-outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = range(20), autosave = True,
                             output_path = os.path.join(output_dir,'streams-fil_DL_It0-19_results.csv'),
                             subset_name = 'fil') # all samples
 
-outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = range(20), autosave = True,
                             output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
                             subset_name = 'unf')
 
-outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
+outputs_df_comb = create_outputs(abs_wq_df, iterations = range(20), autosave = True,
                             output_path = os.path.join(output_dir,'streams-comb_DL_It0-19_results.csv'),
                             subset_name = 'comb')
 
