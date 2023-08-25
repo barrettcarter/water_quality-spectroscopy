@@ -285,9 +285,19 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     print(f'working on species: {s}')
     print(f'iteration {iteration}')
     
-    X_train=df.loc[df[s]>0,specCols]
+    samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+    
+    keep = df[s]>0
+    
+    df = df.loc[keep,:]
+    
+    if sum(keep)>samp_size:
+    
+        df = df.sample(n = samp_size, random_state = iteration)
+    
+    X_train=df.loc[:,specCols]
 
-    y_train = df.loc[df[s]>0,s]
+    y_train = df.loc[:,s]
     
     # X_train = pd.DataFrame(X_train)
     
@@ -493,6 +503,10 @@ outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
 outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
                             output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
                             subset_name = 'unf')
+
+outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-comb_DL_It0-19_results.csv'),
+                            subset_name = 'comb')
 
 #%% Define function for making plots
 
