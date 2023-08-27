@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 import os
 # import datetime as dt
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 # import scipy
 from scipy import stats
 # import seaborn as sns
@@ -26,8 +26,8 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import MinMaxScaler
 
 #for looking up available scorers
-import sklearn.metrics
-sorted(sklearn.metrics.SCORERS.keys())
+# import sklearn.metrics
+# sorted(sklearn.metrics.SCORERS.keys())
 
 from joblib import dump
 
@@ -36,10 +36,11 @@ from sklearn.base import BaseEstimator
 
 #%% Set paths and bring in data
 
-user = os.getlogin() 
+# user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
+# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
+path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy' # for HiPerGator
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
@@ -47,6 +48,7 @@ abs_wq_df_fn = 'abs_wq_df_streams.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
@@ -123,7 +125,8 @@ class pca_RF(BaseEstimator):
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1):
+def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
+                   subset_name = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -167,23 +170,21 @@ def create_outputs(input_df,iterations = 1):
         for iteration in iterations:
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
+            
+            samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            
             Y = input_df[s]
+            keep = Y>0
             
-            keep = pd.notna(Y)
+            input_df = input_df.loc[keep,:]
             
-            # keep = pd.notna(Y) & (Y>0.15)
+            if sum(keep)>samp_size:
             
-            # if sum(keep)<10:
-            #     keep = pd.notna(Y)
-        
-            X = input_df.loc[keep,'band_1':'band_1024']
+                input_df = input_df.sample(n = samp_size, random_state = iteration)
             
-            # dimensional reduction
-            # pca = PCA(n_components = 20)
-            # X = pd.DataFrame(pca.fit_transform(X))
-            # X = MinMaxScaler(X)
+            X = input_df.loc[:,'band_1':'band_1024']
             
-            Y = Y[keep]
+            Y = input_df[s]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, 
                                                                 random_state=iteration,
@@ -230,117 +231,129 @@ def create_outputs(input_df,iterations = 1):
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = outputs_df.append(sub_df,ignore_index=True)
                 
-            filename = f'RF-PCA_{s}_It{iteration}.joblib'
+            filename = f'RF-PCA_streams-{subset_name}_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
+            
+            if autosave == True:
+                
+                outputs_df.to_csv(output_path,index=False)
                   
     return(outputs_df)
 
 #%% Define function for making plots
 
-def make_plots(outputs_df, output_label):
+# def make_plots(outputs_df, output_label):
 
-    ## make plots for both filtered and unfiltered samples
+#     ## make plots for both filtered and unfiltered samples
         
-    fig, axs = plt.subplots(3,3)
-    fig.set_size_inches(15,15)
-    fig.suptitle(output_label,fontsize = 18)
-    fig.tight_layout(pad = 4)
-    axs[2, 2].axis('off')
-    row = 0
-    col = 0
-    species = outputs_df.species.unique()
-    for s in species:
-        y_true_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_train')),
-                                       'value']
+#     fig, axs = plt.subplots(3,3)
+#     fig.set_size_inches(15,15)
+#     fig.suptitle(output_label,fontsize = 18)
+#     fig.tight_layout(pad = 4)
+#     axs[2, 2].axis('off')
+#     row = 0
+#     col = 0
+#     species = outputs_df.species.unique()
+#     for s in species:
+#         y_true_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_train')),
+#                                        'value']
         
-        y_hat_train = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_train')),
-                                       'value']
+#         y_hat_train = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_train')),
+#                                        'value']
         
-        y_true_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_true_test')),
-                                       'value']
+#         y_true_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_true_test')),
+#                                        'value']
         
-        y_hat_test = outputs_df.loc[((outputs_df.species == s) &
-                                        (outputs_df.output == 'y_hat_test')),
-                                       'value']
+#         y_hat_test = outputs_df.loc[((outputs_df.species == s) &
+#                                         (outputs_df.output == 'y_hat_test')),
+#                                        'value']
         
-        line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))),
-                              max(np.concatenate((y_true_train,y_hat_train,
-                                                 y_true_test,y_hat_test))))
+#         line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))),
+#                               max(np.concatenate((y_true_train,y_hat_train,
+#                                                  y_true_test,y_hat_test))))
         
-        y_text = min(line11)+(max(line11)-min(line11))*0
-        x_text = max(line11)-(max(line11)-min(line11))*0.5
+#         y_text = min(line11)+(max(line11)-min(line11))*0
+#         x_text = max(line11)-(max(line11)-min(line11))*0.5
         
-        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
-                            (outputs_df.species==s)]
+#         train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&
+#                             (outputs_df.species==s)]
         
-        train_rsq = np.mean(train_rsq)
+#         train_rsq = np.mean(train_rsq)
         
-        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
-                            (outputs_df.species==s)]
+#         test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&
+#                             (outputs_df.species==s)]
         
-        test_rsq = np.mean(test_rsq)
+#         test_rsq = np.mean(test_rsq)
         
-        ax = axs[row,col]
+#         ax = axs[row,col]
         
-        for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-            label.set_fontsize(16)
+#         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
+#             label.set_fontsize(16)
         
-        axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
-        axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
-        axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
-        # axs[row,col].set_title(s)
-        axs[row,col].legend(loc = 'upper left',fontsize = 16)
-        axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
-        axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
-        # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
-                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
-        # ticks = ax.get_yticks()
-        # print(ticks)
-        # # tick_labels = ax.get_yticklabels()
-        # tick_labels =[str(round(x,1)) for x in ticks]
-        # tick_labels = tick_labels[1:-1]
-        # print(tick_labels)
-        # ax.set_xticks(ticks)
-        # ax.set_xticklabels(tick_labels)
+#         axs[row,col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set')
+#         axs[row,col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')
+#         axs[row,col].plot(line11,line11,'k--',label= '1:1 line')
+#         # axs[row,col].set_title(s)
+#         axs[row,col].legend(loc = 'upper left',fontsize = 16)
+#         axs[row,col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)
+#         axs[row,col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)
+#         # axs[row,col].get_xaxis().set_visible(False)
+#         ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'
+#                 +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
+#         # ticks = ax.get_yticks()
+#         # print(ticks)
+#         # # tick_labels = ax.get_yticklabels()
+#         # tick_labels =[str(round(x,1)) for x in ticks]
+#         # tick_labels = tick_labels[1:-1]
+#         # print(tick_labels)
+#         # ax.set_xticks(ticks)
+#         # ax.set_xticklabels(tick_labels)
         
-        if col == 2:
-            col = 0
-            row += 1
-        else:
-            col +=1
-    # fig.show()
+#         if col == 2:
+#             col = 0
+#             row += 1
+#         else:
+#             col +=1
+#     # fig.show()
 
 #%% function for make and save outputs
 
-def make_and_save_outputs(input_df,output_path,iterations = 1):
-    outputs_df = create_outputs(input_df,iterations)
-    outputs_df.to_csv(output_path,index=False)
+# def make_and_save_outputs(input_df,output_path,iterations = 1):
+#     outputs_df = create_outputs(input_df,iterations)
+#     outputs_df.to_csv(output_path,index=False)
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-outputs_df = create_outputs(abs_wq_df,iterations = 19) # all samples
-outputs_df_fil = create_outputs(abs_wq_df_fil) # all samples
-outputs_df_unf = create_outputs(abs_wq_df_unf) # all samples
+outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-fil_RF-PCA_It0-19_results.csv'),
+                            subset_name = 'fil') # all samples
+
+outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-unf_RF-PCA_It0-19_results.csv'),
+                            subset_name = 'unf')
+
+outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                            output_path = os.path.join(output_dir,'streams-comb_RF-PCA_It0-19_results.csv'),
+                            subset_name = 'comb')
  
 #%% make plots for all samples
 
-make_plots(outputs_df,'Filtered and Unfiltered Samples')
-make_plots(outputs_df_fil,'Filtered Samples')
-make_plots(outputs_df_unf,'Unfiltered Samples')
+# make_plots(outputs_df,'Filtered and Unfiltered Samples')
+# make_plots(outputs_df_fil,'Filtered Samples')
+# make_plots(outputs_df_unf,'Unfiltered Samples')
 
 #%% save output
 
-outputs_df.to_csv(output_dir+'streams_RF_It1-2_results.csv',index=False)
+# outputs_df.to_csv(output_dir+'streams_RF_It1-2_results.csv',index=False)
    
 #%% make and save output.
 
-outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'streams_RF-PCA_It0-19_results.csv',
-                      iterations = 20)
+# outputs_df = make_and_save_outputs(abs_wq_df,output_dir+'streams_RF-PCA_It0-19_results.csv',
+#                       iterations = 20)
 
 #%%
