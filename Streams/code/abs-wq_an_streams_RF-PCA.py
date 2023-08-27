@@ -229,7 +229,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             for out in range(len(output_names)):
                 # print(out)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
-                outputs_df = outputs_df.append(sub_df,ignore_index=True)
+                outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
             filename = f'RF-PCA_streams-{subset_name}_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
