@@ -495,23 +495,23 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1, autosave = False,
                              output_names,variable_names, output_path = output_path,
                              autosave = autosave, subset_name = subset_name)
         
-    return(outputs_df)
+    # return(outputs_df)
 
 #%% Create outputs
 
 # outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
-outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = range(20), autosave = True,
-                            output_path = os.path.join(output_dir,'streams-fil_DL_It0-19_results.csv'),
-                            subset_name = 'fil') # all samples
+# outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = range(20), autosave = True,
+#                             output_path = os.path.join(output_dir,'streams-fil_DL_It0-19_results.csv'),
+#                             subset_name = 'fil') # all samples
 
-outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = range(20), autosave = True,
-                            output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
-                            subset_name = 'unf')
+create_outputs(abs_wq_df_unf, iterations = range(20), autosave = True,
+               output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
+               subset_name = 'unf')
 
-outputs_df_comb = create_outputs(abs_wq_df, iterations = range(20), autosave = True,
-                            output_path = os.path.join(output_dir,'streams-comb_DL_It0-19_results.csv'),
-                            subset_name = 'comb')
+create_outputs(abs_wq_df, iterations = range(20), autosave = True,
+               output_path = os.path.join(output_dir,'streams-comb_DL_It0-19_results.csv'),
+               subset_name = 'comb')
 
 #%% Define function for making plots
 

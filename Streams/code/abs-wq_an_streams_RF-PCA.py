@@ -239,7 +239,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                 
                 outputs_df.to_csv(output_path,index=False)
                   
-    return(outputs_df)
+    # return(outputs_df)
 
 #%% Define function for making plots
 
@@ -329,17 +329,17 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'streams-fil_RF-PCA_It0-19_results.csv'),
-                            subset_name = 'fil') # all samples
+create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-fil_RF-PCA_It0-19_results.csv'),
+               subset_name = 'fil') # all samples
 
-outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'streams-unf_RF-PCA_It0-19_results.csv'),
-                            subset_name = 'unf')
+create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-unf_RF-PCA_It0-19_results.csv'),
+               subset_name = 'unf')
 
-outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'streams-comb_RF-PCA_It0-19_results.csv'),
-                            subset_name = 'comb')
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-comb_RF-PCA_It0-19_results.csv'),
+               subset_name = 'comb')
  
 #%% make plots for all samples
 
