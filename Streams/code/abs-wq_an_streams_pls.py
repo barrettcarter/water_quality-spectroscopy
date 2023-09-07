@@ -56,7 +56,7 @@ syn_abs_wq_df = syn_abs_wq_df.loc[syn_abs_wq_df.Storage_time==10,:]
 input_df = abs_wq_df # for testing
 
 species = input_df.columns[0:8]
-s = species[2] # for testing
+# s = species[2] # for testing
                              
 #%% Create function for writing outputs
 

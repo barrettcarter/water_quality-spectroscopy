@@ -41,25 +41,27 @@ from sklearn.base import BaseEstimator
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy'
+path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy' # for HiPerGator
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
 abs_wq_df_fn = 'abs_wq_df_streams.csv'
+syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+# samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
-abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
+# abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
-input_df = abs_wq_df_unf # for testing
+input_df = abs_wq_df_fil # for testing
 
 species = input_df.columns[0:8]
-s = species[2] # for testing
+# s = species[2] # for testing
 
 #%% make custom estimator combining PCA and XGB
 
