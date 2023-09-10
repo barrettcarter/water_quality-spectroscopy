@@ -36,8 +36,8 @@ user = os.getlogin()
 path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
-pls_real_fn = 'streams-fil_syn-aug-False_PLS_It0-19_results.csv'
-pls_syn_fn = 'streams-fil_syn-aug-True_PLS_It0-19_results.csv'
+pls_real_fn = 'streams-fil_syn-aug-False_nit-gt-1_PLS_It0-19_nitrate-results.csv'
+pls_syn_fn = 'streams-fil_syn-aug-True_nit-gt-1_PLS_It0-19_nitrate-results.csv'
 
 results_path = os.path.join(path_to_wqs,output_dir)
 
