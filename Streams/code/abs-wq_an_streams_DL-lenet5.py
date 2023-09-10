@@ -473,7 +473,7 @@ or 1-D numpy array.
 
 """
 def create_outputs(input_df,num_epochs = 1000,iterations = 1, autosave = False,
-                   output_path = None, subset_name = None):
+                   output_path = None, subset_name = None, syn_aug = False, syn_df = None):
     
     
     ### Create a model for every species
@@ -503,17 +503,14 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1, autosave = False,
         
         if type(iterations)==int:
             
-            outputs_df = make_outputs(df,num_epochs,outputs_df,s,iterations,
+            iterations = range(iterations)
+        
+        for iteration in iterations:
+            
+            outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
                          output_names,variable_names, output_path = output_path,
-                         autosave = autosave, subset_name = subset_name)
-        
-        else:
-        
-            for iteration in iterations:
-                
-                outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
-                             output_names,variable_names, output_path = output_path,
-                             autosave = autosave, subset_name = subset_name)
+                         autosave = autosave, subset_name = subset_name,
+                         syn_aug = syn_aug, syn_df = syn_df)
         
     # return(outputs_df)
 
