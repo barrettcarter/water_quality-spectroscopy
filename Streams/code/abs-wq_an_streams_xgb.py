@@ -51,7 +51,7 @@ syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
 syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
-# samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
+samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
@@ -167,7 +167,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                       'n_comp']
     
        
-    iteration = 1 # this is for testing
+    iteration = 14 # this is for testing
     
     species = input_df.columns[0:8]
     
@@ -181,20 +181,20 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             
             # samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
             
-            samp_size = 57
+            samp_size = samp_sizes['Samp_size'].min()
             
             Y = input_df[s]
             keep = Y>0
             
-            input_df = input_df.loc[keep,:]
+            inter_df = input_df.loc[keep,:]
             
             if sum(keep)>samp_size:
             
-                input_df = input_df.sample(n = samp_size, random_state = iteration)
+                inter_df = inter_df.sample(n = samp_size, random_state = iteration)
             
-            X = input_df.loc[:,'band_1':'band_1024']
+            X = inter_df.loc[:,'band_1':'band_1024']
             
-            Y = input_df[s]
+            Y = inter_df[s]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, 
                                                                 random_state=iteration,

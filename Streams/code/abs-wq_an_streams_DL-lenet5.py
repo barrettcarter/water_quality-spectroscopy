@@ -46,7 +46,7 @@ spectra_path = os.path.join(int_dir,abs_wq_fn)
 os.path.exists(spectra_path)
 np.random.seed(7)
 
-# samp_sizes = pd.read_csv(os.path.join(int_dir,'fil_sub_samp_sizes.csv'))
+samp_sizes = pd.read_csv(os.path.join(int_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
@@ -290,7 +290,7 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     
     # samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
     
-    samp_size = 57
+    samp_size = samp_sizes['Samp_size'].min()
     
     keep = df[s]>0
     

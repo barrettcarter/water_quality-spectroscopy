@@ -83,3 +83,26 @@ for s in species:
 #%% save output
 
 sam_size_df.to_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'),index=False)
+
+#%% determine sample size for each species for filtered samples only
+
+sam_size_df = pd.DataFrame(columns = ['Species','Samp_size'])
+
+s = species[2]
+
+for s in species:
+    
+    # df_s_fil = abs_wq_df_fil.loc[abs_wq_df_fil[s].isna()==False,s]
+    # df_s_unf = abs_wq_df_unf.loc[abs_wq_df_unf[s].isna()==False,s]
+    
+    # df_s_fil = abs_wq_df_fil.loc[abs_wq_df_fil[s]>0,s]
+    df_s_unf = abs_wq_df_unf.loc[abs_wq_df_unf[s]>0,s]
+    
+    # n_s = df_s_fil.shape[0]
+    n_s = df_s_unf.shape[0]
+
+    new_row = pd.DataFrame(columns = ['Species','Samp_size'])
+    
+    new_row.loc[0,:] = [s,n_s]
+    
+    sam_size_df = pd.concat([sam_size_df,new_row],ignore_index=True)
