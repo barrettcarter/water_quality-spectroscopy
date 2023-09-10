@@ -135,7 +135,7 @@ class pca_xgb(BaseEstimator):
 #%% Create function for writing outputs
 
 def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
-                   subset_name = None):
+                   subset_name = None, syn_aug = False, syn_df = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -179,7 +179,9 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             
-            samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            # samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            
+            samp_size = 57
             
             Y = input_df[s]
             keep = Y>0
@@ -201,6 +203,21 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             # X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train, 
             #                                                     random_state=iteration,
             #                                                     test_size = 0.2)
+            
+            if syn_aug:
+                
+                syn_samp_size = 46
+                
+                if syn_df.shape[0]>syn_samp_size:
+                
+                    syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
+                    
+                X_syn = syn_df.loc[:,'band_1':'band_1024']
+                
+                Y_syn = syn_df[s]
+                
+                X_train = pd.concat([X_train,X_syn],ignore_index = True)
+                y_train = pd.concat([y_train,Y_syn],ignore_index = True)
             
             mod = pca_xgb(random_state=iteration, detect_lim = -100)
             
@@ -246,7 +263,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
-            filename = f'XGB-PCA_streams-{subset_name}_{s}_It{iteration}.joblib'
+            filename = f'XGB-PCA_streams-{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
             
@@ -372,9 +389,17 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 #                             output_path = os.path.join(output_dir,'streams-unf_XGB-PCA_It0-19_results.csv'),
 #                             subset_name = 'unf')
 
-outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'streams-comb_XGB-PCA_It0-19_results.csv'),
-                            subset_name = 'comb')
+# outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
+#                             output_path = os.path.join(output_dir,'streams-comb_XGB-PCA_It0-19_results.csv'),
+#                             subset_name = 'comb')
+
+create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_XGB-PCA_It0-19_results.csv'),
+               subset_name = 'fil',syn_aug = False) # filtered samples, no synthetic samples
+
+create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_XGB-PCA_It0-19_results.csv'),
+               subset_name = 'fil',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
 # train_stop = dt.datetime.now()
  
