@@ -45,15 +45,17 @@ inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
 abs_wq_df_fn = 'abs_wq_df_streams.csv'
+syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
+# samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
 
 #%% seperate into filtered and unfiltered sample sets
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
-abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
+# abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 #%% make custom estimator combining PCA and RF
 
@@ -126,7 +128,7 @@ class pca_RF(BaseEstimator):
 #%% Create function for writing outputs
 
 def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
-                   subset_name = None):
+                   subset_name = None, syn_aug = False, syn_df = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -144,7 +146,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
         return(sub_df)
     
     ### Create a model for every species
-    s = 'Molybdenum'
+    # s = 'Molybdenum' # For Testing
     
     outputs_df = pd.DataFrame(columns= ['output','species','iteration','value']) #save outputs in dataframe
     
@@ -171,7 +173,9 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             
-            samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            # samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            
+            samp_size = 57
             
             Y = input_df[s]
             keep = Y>0
@@ -190,6 +194,21 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                                                                 random_state=iteration,
                                                                 test_size = 0.3)
                         
+            if syn_aug:
+                
+                syn_samp_size = 46
+                
+                if syn_df.shape[0]>syn_samp_size:
+                
+                    syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
+                    
+                X_syn = syn_df.loc[:,'band_1':'band_1024']
+                
+                Y_syn = syn_df[s]
+                
+                X_train = pd.concat([X_train,X_syn],ignore_index = True)
+                y_train = pd.concat([y_train,Y_syn],ignore_index = True)
+            
             mod = pca_RF(random_state=iteration,detect_lim = 0)
             
             param_grid = {'max_features':stats.uniform(loc = 0,scale = 1),
@@ -231,7 +250,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
-            filename = f'RF-PCA_streams-{subset_name}_{s}_It{iteration}.joblib'
+            filename = f'RF-PCA_streams-{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib'
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
             
@@ -329,17 +348,25 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
+# create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'streams-fil_RF-PCA_It0-19_results.csv'),
+#                subset_name = 'fil') # all samples
+
+# create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'streams-unf_RF-PCA_It0-19_results.csv'),
+#                subset_name = 'unf')
+
+# create_outputs(abs_wq_df, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'streams-comb_RF-PCA_It0-19_results.csv'),
+#                subset_name = 'comb')
+
 create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-fil_RF-PCA_It0-19_results.csv'),
-               subset_name = 'fil') # all samples
+               output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_RF-PCA_It0-19_results.csv'),
+               subset_name = 'fil',syn_aug = False) # filtered samples, no synthetic samples
 
-create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-unf_RF-PCA_It0-19_results.csv'),
-               subset_name = 'unf')
-
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-comb_RF-PCA_It0-19_results.csv'),
-               subset_name = 'comb')
+create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_RF-PCA_It0-19_results.csv'),
+               subset_name = 'fil',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
  
 #%% make plots for all samples
 
