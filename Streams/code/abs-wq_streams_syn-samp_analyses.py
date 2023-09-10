@@ -116,9 +116,9 @@ test_rsqrs.rename(columns = {'value':'test r-squared'},inplace = True)
 test_rqrs_plot = sns.catplot(x='syn_samp',y='test r-squared',col = 'species',col_wrap=3,
                              data = test_rsqrs,kind = 'violin',sharey=False)
 
-#%% make 1:1 plots for PLS and XGB for on Nitrate-N and Phosphate-P
+#%% make 1:1 plots for PLS for Nitrate-N and Phosphate-P
 
-models_sub = ['PLS','XGB']
+models_sub = ['False','True']
 species_sub = ['Nitrate-N','Phosphate-P']
 
 fig, axs = plt.subplots(nrows = 2, ncols = 2, dpi = 300, figsize = (15,10))
@@ -151,7 +151,7 @@ for m in models_sub:
         
         ax.set_xlabel(f'True {s}')
         ax.set_ylabel(f'Prediced {s}')
-        ax.set_title(m)
+        ax.set_title(f'syn. samps. = {m}')
         
         if col ==1:
             
@@ -161,8 +161,10 @@ for m in models_sub:
         else:
             
             col += 1
+
+#%% make a 1:1 plot for a specific model with sites separated by color
             
-#%% make 1:1 plots for PLS and XGB for on Nitrate-N and Phosphate-P
+#%% make 1:1 plots for specified model-analyte pairs
 
 species_model = [['TN','PLS'],['TN','DL'],['TP','PLS'],['TP','XGB']]
 
