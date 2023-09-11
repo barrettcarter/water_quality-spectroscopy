@@ -46,17 +46,17 @@ inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
 
 abs_wq_df_fn = 'abs_wq_df_streams.csv'
-syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
+# syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+# syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
 samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
-# abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
+abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 input_df = abs_wq_df_fil # for testing
 
@@ -179,9 +179,9 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             
-            # samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
+            samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0]
             
-            samp_size = samp_sizes['Samp_size'].min()
+            # samp_size = samp_sizes['Samp_size'].min()
             
             Y = input_df[s]
             keep = Y>0
@@ -262,8 +262,10 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
                 # print(out)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
-                
-            filename = f'XGB-PCA_streams-{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib'
+            
+            
+            filename = f'XGB-PCA_streams-{subset_name}_{s}_It{iteration}.joblib' # for filtration experiments
+            # filename = f'XGB-PCA_streams-{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib' # for experiments involving synthetic samples
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
             
@@ -381,25 +383,25 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 # outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
 
-# outputs_df_fil = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-#                             output_path = os.path.join(output_dir,'streams-fil_XGB-PCA_It0-19_results.csv'),
-#                             subset_name = 'fil') # all samples
-
-# outputs_df_unf = create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
-#                             output_path = os.path.join(output_dir,'streams-unf_XGB-PCA_It0-19_results.csv'),
-#                             subset_name = 'unf')
-
-# outputs_df_comb = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-#                             output_path = os.path.join(output_dir,'streams-comb_XGB-PCA_It0-19_results.csv'),
-#                             subset_name = 'comb')
-
 create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_XGB-PCA_It0-19_results.csv'),
-               subset_name = 'fil',syn_aug = False) # filtered samples, no synthetic samples
+               output_path = os.path.join(output_dir,'streams-fil_XGB-PCA_It0-19_results.csv'),
+               subset_name = 'fil') # filtered samples
 
-create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_XGB-PCA_It0-19_results.csv'),
-               subset_name = 'fil',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-unf_XGB-PCA_It0-19_results.csv'),
+               subset_name = 'unf') # unfiltered samples
+
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'streams-comb_XGB-PCA_It0-19_results.csv'),
+               subset_name = 'comb') # all samples
+
+# create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_XGB-PCA_It0-19_results.csv'),
+#                subset_name = 'fil',syn_aug = False) # filtered samples, no synthetic samples
+
+# create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_XGB-PCA_It0-19_results.csv'),
+#                subset_name = 'fil',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
 # train_stop = dt.datetime.now()
  
