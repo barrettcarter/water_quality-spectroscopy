@@ -48,18 +48,26 @@ samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
 
 #%% seperate into filtered and unfiltered sample sets
 
-abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
+# abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
 # abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
-abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['swb','swbup'])]
+# abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['swb','swbup'])]
 
 syn_abs_wq_df = syn_abs_wq_df.loc[syn_abs_wq_df.Storage_time==10,:]
 
-input_df = abs_wq_df # for testing
+syn_abs_wq_df['ID'] = syn_abs_wq_df['Name']
 
-# species = input_df.columns[0:8]
+syn_abs_wq_df['Name']='SWs'
+
+# input_df = abs_wq_df # for testing
+
+species = abs_wq_df.columns[0:8]
 # s = species[2] # for testing
-species = ['Nitrate-N']
+# species = ['Nitrate-N']
+
+abs_wq_df_aug = pd.concat([abs_wq_df,syn_abs_wq_df], ignore_index = True)
+
+names = abs_wq_df_aug.Name.unique()
                              
 #%% Create function for writing outputs
 
@@ -274,13 +282,15 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_swbs_PLS_It0-19_nitrate-results.csv'),
-               subset_name = 'fil_swbs',syn_aug = False) # filtered samples, no synthetic samples
+for name in names:
 
-create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_swbs_PLS_It0-19_nitrate-results.csv'),
-               subset_name = 'fil_swbs',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+    create_outputs(abs_wq_df_aug.loc[abs_wq_df_aug.Name==name,:], iterations = 20, autosave = True,
+                   output_path = os.path.join(output_dir,f'streams-{name}_syn-aug-False_PLS_It0-19_results.csv'),
+                   subset_name = name, syn_aug = False) # filtered samples, no synthetic samples
+
+# create_outputs(abs_wq_df_aug, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_swbs_PLS_It0-19_nitrate-results.csv'),
+#                subset_name = 'fil_swbs',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
 # create_outputs(abs_wq_df_unf, iterations = 20, autosave = True,
 #                output_path = os.path.join(output_dir,'streams-unf_PLS_It0-19_results.csv')) # all samples
