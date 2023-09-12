@@ -36,8 +36,8 @@ user = os.getlogin()
 path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
-pls_real_fn = 'streams-fil_syn-aug-False_nit-gt-1_PLS_It0-19_nitrate-results.csv'
-pls_syn_fn = 'streams-fil_syn-aug-True_nit-gt-1_PLS_It0-19_nitrate-results.csv'
+pls_real_fn = 'streams-fil_syn-aug-False_swbs_PLS_It0-19_nitrate-results.csv'
+pls_syn_fn = 'streams-fil_syn-aug-True_swbs_PLS_It0-19_nitrate-results.csv'
 
 results_path = os.path.join(path_to_wqs,output_dir)
 
@@ -119,19 +119,21 @@ test_rqrs_plot = sns.catplot(x='syn_samp',y='test r-squared',col = 'species',col
 #%% make 1:1 plots for PLS for Nitrate-N and Phosphate-P
 
 models_sub = ['False','True']
-species_sub = ['Nitrate-N','Phosphate-P']
+# species_sub = ['Nitrate-N','Phosphate-P']
+species_sub = ['Nitrate-N']
 
-fig, axs = plt.subplots(nrows = 2, ncols = 2, dpi = 300, figsize = (15,10))
+fig, axs = plt.subplots(nrows = len(species_sub), ncols = len(models_sub), dpi = 300, figsize = (15,5))
 fig.tight_layout(pad = 2)
 
 col = 0
 row = 0
 
-for m in models_sub:
+for s in species_sub:
     
-    for s in species_sub:
+    for m in models_sub:
         
-        ax = axs[row, col]
+        # ax = axs[row, col]
+        ax = axs[col] # for when there is only 1 row
         
         true_vals = results_df.loc[(results_df.syn_samp == m)&
                                    (results_df.species == s)&
