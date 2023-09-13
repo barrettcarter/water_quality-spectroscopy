@@ -44,13 +44,19 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
+# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+
+# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:57,:]
+# abs_wq_df = abs_wq_df.loc[0:56,:] # because the minimum of the two sample sizes (diluted versus undiluted) is 56
 
-subset_name = 'HNSrd30'
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+
+subset_name = abs_wq_df_fn.split(sep = '_')[1]
 
 #%% make custom estimator combining PCA and RF
 
@@ -122,7 +128,8 @@ class pca_RF(BaseEstimator):
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1,autosave = False,output_path = None):
+def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
+                   subset_name = None, syn_aug = False, syn_df = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -166,27 +173,40 @@ def create_outputs(input_df,iterations = 1,autosave = False,output_path = None):
         for iteration in iterations:
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
+            
+            samp_size = 50 # to be consistent with streams
+            
             Y = input_df[s]
+            keep = Y>0
             
-            keep = pd.notna(Y)
+            inter_df = input_df.loc[keep,:]
             
-            # keep = pd.notna(Y) & (Y>0.15)
+            if sum(keep)>samp_size:
             
-            # if sum(keep)<10:
-            #     keep = pd.notna(Y)
-        
-            X = input_df.loc[keep,'band_1':'band_1024']
+                inter_df = inter_df.sample(n = samp_size, random_state = iteration)
             
-            # dimensional reduction
-            # pca = PCA(n_components = 20)
-            # X = pd.DataFrame(pca.fit_transform(X))
-            # X = MinMaxScaler(X)
+            X = inter_df.loc[:,'band_1':'band_1024']
             
-            Y = Y[keep]
+            Y = inter_df[s]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, 
                                                                 random_state=iteration,
                                                                 test_size = 0.3)
+                        
+            if syn_aug:
+                
+                syn_samp_size = 46
+                
+                if syn_df.shape[0]>syn_samp_size:
+                
+                    syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
+                    
+                X_syn = syn_df.loc[:,'band_1':'band_1024']
+                
+                Y_syn = syn_df[s]
+                
+                X_train = pd.concat([X_train,X_syn],ignore_index = True)
+                y_train = pd.concat([y_train,Y_syn],ignore_index = True)
                         
             mod = pca_RF(random_state=iteration,detect_lim = 0)
             
@@ -229,7 +249,8 @@ def create_outputs(input_df,iterations = 1,autosave = False,output_path = None):
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
-            filename = f'{subset_name}_RF-PCA_{s}_It{iteration}.joblib'
+            # filename = f'RF-PCA_HNS-{subset_name}_{s}_It{iteration}.joblib'
+            filename = f'RF-PCA_{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib' # for experiments involving synthetic samples
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
             
@@ -237,7 +258,7 @@ def create_outputs(input_df,iterations = 1,autosave = False,output_path = None):
                 
                 outputs_df.to_csv(output_path,index=False)
                   
-    return(outputs_df)
+    # return(outputs_df)
 
 #%% Define function for making plots
 
@@ -328,12 +349,21 @@ def create_outputs(input_df,iterations = 1,autosave = False,output_path = None):
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-iterations = np.arange(0,20)
+# iterations = np.arange(0,20)
 
-output_fn = f'{subset_name}_RF-PCA_It{min(iterations)}-{max(iterations)}_results.csv'
+# output_fn = f'{subset_name}_RF-PCA_It{min(iterations)}-{max(iterations)}_results.csv'
 
-outputs_df = create_outputs(abs_wq_df,iterations = iterations,autosave=True,
-                            output_path = os.path.join(output_dir,output_fn))
+# outputs_df = create_outputs(abs_wq_df,iterations = iterations,autosave=True,
+#                             output_path = os.path.join(output_dir,output_fn))
+
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS_syn-aug-False_RF-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
+
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS_syn-aug-True_RF-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+
                                                        
 #%% make plots for all samples
 
