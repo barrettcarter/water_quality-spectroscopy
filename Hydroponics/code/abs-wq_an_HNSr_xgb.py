@@ -9,7 +9,7 @@ Created on Tue Mar 23 16:39:55 2021
 import pandas as pd
 import numpy as np
 import os
-import datetime as dt
+# import datetime as dt
 # import matplotlib.pyplot as plt
 # import scipy
 from scipy import stats
@@ -45,13 +45,19 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
+# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+
+# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:57,:]
+# abs_wq_df = abs_wq_df.loc[0:56,:] # because the minimum of the two sample sizes (diluted versus undiluted) is 56
 
-subset_name = 'HNSrd30'
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+
+subset_name = abs_wq_df_fn.split(sep = '_')[1]
 
 #%% make custom estimator combining PCA and XGB
 
@@ -124,7 +130,8 @@ class pca_xgb(BaseEstimator):
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1, autosave = False,output_path = None):
+def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
+                   subset_name = None, syn_aug = False, syn_df = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -170,26 +177,39 @@ def create_outputs(input_df,iterations = 1, autosave = False,output_path = None)
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
             
+            samp_size = 50 # to be consistent with streams
+            
             Y = input_df[s]
+            keep = Y>0
             
-            keep = pd.notna(Y)
+            inter_df = input_df.loc[keep,:]
             
-            # keep = pd.notna(Y) & (Y>0.2)
+            if sum(keep)>samp_size:
             
-            # if sum(keep)<10:
-            #     keep = pd.notna(Y)
-                
-            X = input_df.loc[keep,'band_1':'band_1024']
+                inter_df = inter_df.sample(n = samp_size, random_state = iteration)
             
-            Y = Y[keep]
+            X = inter_df.loc[:,'band_1':'band_1024']
+            
+            Y = inter_df[s]
             
             X_train, X_test, y_train, y_test = train_test_split(X, Y, 
                                                                 random_state=iteration,
                                                                 test_size = 0.3)
-            
-            # X_train, X_eval, y_train, y_eval = train_test_split(X_train, y_train, 
-            #                                                     random_state=iteration,
-            #                                                     test_size = 0.2)
+                        
+            if syn_aug:
+                
+                syn_samp_size = 46
+                
+                if syn_df.shape[0]>syn_samp_size:
+                
+                    syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
+                    
+                X_syn = syn_df.loc[:,'band_1':'band_1024']
+                
+                Y_syn = syn_df[s]
+                
+                X_train = pd.concat([X_train,X_syn],ignore_index = True)
+                y_train = pd.concat([y_train,Y_syn],ignore_index = True)
             
             mod = pca_xgb(random_state=iteration, detect_lim = 0)
             
@@ -235,7 +255,9 @@ def create_outputs(input_df,iterations = 1, autosave = False,output_path = None)
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
                 
-            filename = f'{subset_name}_XGB-PCA_{s}_It{iteration}.joblib'
+            # filename = f'XGB-PCA_{subset_name}_{s}_It{iteration}.joblib'
+            filename = f'XGB-PCA_{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib' # for experiments involving synthetic samples
+            
             pickle_path = os.path.join(output_dir,'picklejar',filename)
             dump(clf,pickle_path)
             
@@ -243,7 +265,7 @@ def create_outputs(input_df,iterations = 1, autosave = False,output_path = None)
                 
                 outputs_df.to_csv(output_path,index=False)
                   
-    return(outputs_df)
+    # return(outputs_df)
 
 #%% Define function for making plots
 
@@ -348,26 +370,14 @@ def create_outputs(input_df,iterations = 1, autosave = False,output_path = None)
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-train_start = dt.datetime.now()
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS_syn-aug-False_XGB-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = False) #  no synthetic samples
 
-iterations = np.arange(0,20)
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS_syn-aug-True_XGB-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # with synthetic samples
 
-output_fn = f'{subset_name}_XGB-PCA_It{min(iterations)}-{max(iterations)}_results.csv'
-
-outputs_df = create_outputs(abs_wq_df,iterations = iterations,autosave=True,
-                            output_path = os.path.join(output_dir,output_fn)) # all samples
-
-# outputs_df = create_outputs(abs_wq_df,iterations = np.linspace(3,19,17,dtype=int)) # all samples
-
-# outputs_df_fil = create_outputs(abs_wq_df_fil) # filtered samples
-
-# outputs_df_unf = create_outputs(abs_wq_df_unf) # unfiltered samples
-
-train_stop = dt.datetime.now()
-
-train_time = train_stop - train_start
-
-print(f'Total Run Time: {train_time}')
  
 #%% make plots for all samples
 
