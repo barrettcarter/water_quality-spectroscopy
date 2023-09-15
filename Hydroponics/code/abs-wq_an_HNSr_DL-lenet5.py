@@ -41,15 +41,21 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 inter_dir = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv'
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+# abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+
+syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+# syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:57,:]
+# abs_wq_df = abs_wq_df.loc[0:56,:] # because the minimum of the two sample sizes (diluted versus undiluted) is 56
+
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+
+subset_name = abs_wq_df_fn.split(sep = '_')[1]
 
 #%% Define useful variables
-
-subset_name = 'HNSrd30'
 
 np.random.seed(7)
 
@@ -278,14 +284,25 @@ def write_output_df(the_output,output_name,species_name,iteration_num):
 #%% Create a function for making the outputs
 
 def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
-                 variable_names, output_path = None, autosave = False):
+                 variable_names, output_path = None, autosave = False,
+                 subset_name = None, syn_aug = False, syn_df = None):
 
     print(f'working on species: {s}')
     print(f'iteration {iteration}')
     
-    X_train=df.loc[df[s]>0,specCols]
+    samp_size = 50 # make consistent with streams samples
+    
+    keep = df[s]>0
+    
+    df = df.loc[keep,:]
+    
+    if sum(keep)>samp_size:
+    
+        df = df.sample(n = samp_size, random_state = iteration)
+    
+    X_train=df.loc[:,specCols]
 
-    y_train = df.loc[df[s]>0,s]
+    y_train = df[s]
     
     # X_train = pd.DataFrame(X_train)
     
@@ -297,8 +314,20 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     X_train, X_val, y_train, y_val = train_test_split(X_train,y_train, test_size=0.20,
                                                           random_state=iteration)
     
-    y_train_ind = list(y_train.index)
-    y_test_ind = list(y_test.index)
+    if syn_aug:
+        
+        syn_samp_size = 46
+        
+        if syn_df.shape[0]>syn_samp_size:
+        
+            syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
+            
+        X_syn = syn_df.loc[:,'band_1':'band_1024']
+        
+        Y_syn = syn_df[s]
+        
+        X_train = pd.concat([X_train,X_syn],ignore_index = True)
+        y_train = pd.concat([y_train,Y_syn],ignore_index = True)
     
     print(s)
     print('Train set:',X_train.shape)
@@ -310,28 +339,27 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     lenet_mod = lenet()
     
     X_train = lenet_mod.prepare_x(X_train)
-    print(f' X_train: {X_train}')
+    # print(f' X_train shape: {X_train.shape}')
     
     
     X_val = lenet_mod.transform_x(X_val)
     X_test = lenet_mod.transform_x(X_test)
-    print(f' X_test: {X_test}')
+    # print(f' X_test shape: {X_test.shape}')
     
     lenet_mod.make_model(y_train,y_val,X_val,num_epochs = num_epochs)
     
+    # print(f'y_train shape: {y_train.shape}')
+    # print(f'y_train type: {type(y_train)}')
+    
+    y_train_ind = list(y_train.index)
+    y_test_ind = list(y_test.index)
+    
     y_train = list(y_train)
     
-    # print(f'y_train shape: {y_train.shape}')
-    print(f'y_train type: {type(y_train)}')
-    
-    
-    
     Y_hat = list(lenet_mod.predict(X_test))
-    print(f' Y_hat: {Y_hat}')
+    # print(f' Y_hat: {Y_hat}')
     Y_hat_train = list(lenet_mod.predict(X_train))
-    print(f' Y_hat_train: {Y_hat_train}')
-    
-    
+    # print(f' Y_hat_train: {Y_hat_train}')
     
     r_sq = float(r2_score(y_test,Y_hat))
     r_sq_train = float(r2_score(y_train,Y_hat_train))
@@ -353,7 +381,9 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     # APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
     # MAPE_train = float(np.mean(APE_train)*100) # this is percentage
     
-    filename = f'{subset_name}_DL_{s}_It{iteration}.joblib'
+    
+    # filename = f'DL_{subset_name}_{s}_It{iteration}.joblib' # for filtration experiments
+    filename = f'DL_{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib' # for synthetic sample experiments
     pickle_path = os.path.join(output_dir,'picklejar',filename)
     dump(lenet_mod,pickle_path)
     
@@ -362,9 +392,9 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     for out in range(len(output_names)):
         # print(type(out))
         try:
-            print(f'variable name: {variable_names[out]}')
-            print(f'output name: {output_names[out]}')
-            print(f'variable type: {type(eval(variable_names[out]))}')
+            # print(f'variable name: {variable_names[out]}')
+            # print(f'output name: {output_names[out]}')
+            # print(f'variable type: {type(eval(variable_names[out]))}')
             # print(type(eval(output_names[out])))
             sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
             outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
@@ -444,8 +474,8 @@ resampling is performed. 'iterations' can be an integer, float, string, range,
 or 1-D numpy array.
 
 """
-def create_outputs(input_df,num_epochs = 1000,iterations = 1,
-                   output_path = None, autosave = False):
+def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
+                   output_path = None, subset_name = None, syn_aug = False, syn_df = None):
     
     
     ### Create a model for every species
@@ -475,28 +505,29 @@ def create_outputs(input_df,num_epochs = 1000,iterations = 1,
         
         if type(iterations)==int:
             
-            outputs_df = make_outputs(df,num_epochs,outputs_df,s,iterations,
-                         output_names,variable_names)
+            iterations = range(iterations)
         
         else:
         
             for iteration in iterations:
                 
                 outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
-                             output_names,variable_names, output_path=output_path,
-                             autosave = autosave)
+                             output_names,variable_names, output_path = output_path,
+                             autosave = autosave, subset_name = subset_name,
+                             syn_aug = syn_aug, syn_df = syn_df)
         
-    return(outputs_df)
+    # return(outputs_df)
 
 #%% Create outputs
 
-iterations = np.arange(0,20)
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                output_path = os.path.join(output_dir,'HNS_syn-aug-False_DL_It0-19_results.csv'),
+                subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
 
-output_fn = f'{subset_name}_DL_It{min(iterations)}-{max(iterations)}_results.csv'
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                output_path = os.path.join(output_dir,'HNS_syn-aug-True_DL_It0-19_results.csv'),
+                subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
-outputs_df = create_outputs(abs_wq_df,num_epochs=5000,iterations = iterations, 
-                            output_path = os.path.join(output_dir,output_fn),
-                            autosave = True)
 
 #%% Define function for making plots
 

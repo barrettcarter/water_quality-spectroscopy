@@ -474,7 +474,7 @@ resampling is performed. 'iterations' can be an integer, float, string, range,
 or 1-D numpy array.
 
 """
-def create_outputs(input_df,num_epochs = 1000,iterations = 1, autosave = False,
+def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
                    output_path = None, subset_name = None, syn_aug = False, syn_df = None):
     
     
