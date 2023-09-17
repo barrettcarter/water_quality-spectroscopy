@@ -33,7 +33,7 @@ from joblib import dump
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\' for OneDrive
-path_to_wqs = 'C:\\Users\\'+user+'\\GitHub\\water_quality-spectroscopy\\' # for Laptop
+path_to_wqs = 'C:\\Users\\'+user+'\\Documents\\GitHub\\water_quality-spectroscopy\\' # for Laptop
 # path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
