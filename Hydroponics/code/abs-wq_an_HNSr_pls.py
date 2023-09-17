@@ -40,19 +40,23 @@ path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectros
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
 # abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
 
-syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
 # syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
+abs_wq_df_dil_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples by themselves
+abs_wq_df_und_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples by themselves
+
 # Bring in data
-abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+abs_wq_df_dil=pd.read_csv(inter_dir+abs_wq_df_dil_fn)
+abs_wq_df_und=pd.read_csv(inter_dir+abs_wq_df_und_fn)
 # abs_wq_df = abs_wq_df.loc[0:56,:] # because the minimum of the two sample sizes (diluted versus undiluted) is 56
 
-syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+# syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
 
-subset_name = abs_wq_df_fn.split(sep = '_')[1]
+# subset_name = abs_wq_df_fn.split(sep = '_')[1]
                              
 #%% Create function for writing outputs
 
@@ -262,14 +266,21 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% Run create_outputs function for testing
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_PLS_It0-19_results.csv'),
-               subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
+# create_outputs(abs_wq_df, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_PLS_It0-19_results.csv'),
+#                subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNSd30_syn-aug-True_PLS_It0-19_results.csv'),
-               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+# create_outputs(abs_wq_df, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'HNSd30_syn-aug-True_PLS_It0-19_results.csv'),
+#                subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
+create_outputs(abs_wq_df_dil, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNSsd30_PLS_It0-19_results.csv'),
+               syn_aug = False) # diluted synthetic samples by themselves
+
+create_outputs(abs_wq_df_und, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNSs_PLS_It0-19_results.csv'),
+               syn_aug = False) # diluted synthetic samples by themselves
  
 #%% make plots for all samples
 
