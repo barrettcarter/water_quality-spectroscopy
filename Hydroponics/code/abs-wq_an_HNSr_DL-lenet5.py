@@ -41,11 +41,11 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 inter_dir = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
-# abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
 
-syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
-# syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
+# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
