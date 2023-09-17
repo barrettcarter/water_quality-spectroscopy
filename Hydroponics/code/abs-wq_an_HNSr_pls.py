@@ -30,22 +30,34 @@ from joblib import dump
 
 #%% Set paths and bring in data
 
-user = os.getlogin()
-# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\' for OneDrive
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+#%% Set paths and bring in data
+
+user = os.getlogin() 
+# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-abs_wq_df_fn = 'abs-wq_HNSr_df.csv'
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+# abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+
+syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+# syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-abs_wq_df = abs_wq_df.loc[0:62,:]
+# abs_wq_df = abs_wq_df.loc[0:56,:] # because the minimum of the two sample sizes (diluted versus undiluted) is 56
+
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+
+subset_name = abs_wq_df_fn.split(sep = '_')[1]
                              
 #%% Create function for writing outputs
 
-def create_outputs(input_df,iterations = 1):
+def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
+                   subset_name = None, syn_aug = False, syn_df = None):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -81,20 +93,45 @@ def create_outputs(input_df,iterations = 1):
     
     species = input_df.columns[0:14]
     
-    
-    
     for s in species:
         for iteration in range(iterations):
             print('Analyzing '+s)
             print('Iteration - '+str(iteration))
-            Y = input_df[s]
-            keep = (pd.notna(Y)) & (Y>0)
-            X = input_df.loc[keep,'band_1':'band_1024']
-            Y = Y[keep]
             
-            X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
+            samp_size = 50 # to be consistent with streams
+            
+            Y = input_df[s]
+            keep = Y>0
+            
+            inter_df = input_df.loc[keep,:]
+            
+            if sum(keep)>samp_size:
+            
+                inter_df = inter_df.sample(n = samp_size, random_state = iteration)
+            
+            X = inter_df.loc[:,'band_1':'band_1024']
+            
+            Y = inter_df[s]
+            
+            X_train, X_test, y_train, y_test = train_test_split(X, Y, 
+                                                                random_state=iteration,
                                                                 test_size = 0.3)
-
+                        
+            if syn_aug:
+                
+                syn_samp_size = 46
+                
+                if syn_df.shape[0]>syn_samp_size:
+                
+                    syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
+                    
+                X_syn = syn_df.loc[:,'band_1':'band_1024']
+                
+                Y_syn = syn_df[s]
+                
+                X_train = pd.concat([X_train,X_syn],ignore_index = True)
+                y_train = pd.concat([y_train,Y_syn],ignore_index = True)
+            
             param_grid = [{'n_components':np.arange(1,20)}]
             pls = PLSRegression()
             clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
@@ -127,11 +164,15 @@ def create_outputs(input_df,iterations = 1):
                 sub_df = write_output_df(eval(variable_names[out]), output_names[out], s, iteration)
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)
             
-            filename = f'HNSr_pls_{s}_It{iteration}.joblib'
-            pickle_path = os.path.join(output_dir,'picklejar',filename)
-            dump(clf,pickle_path)
-        
-    return(outputs_df)
+            # filename = f'pls_{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib'
+            # pickle_path = os.path.join(output_dir,'picklejar',filename)
+            # dump(clf,pickle_path)
+            
+            if autosave == True:
+                
+                outputs_df.to_csv(output_path,index=False)
+                
+    # return(outputs_df)
 
 #%% Define function for making plots
 
@@ -213,15 +254,22 @@ def create_outputs(input_df,iterations = 1):
 
 #%% make and save outputs
 
-def make_and_save_outputs(input_df,output_path,iterations = 1):
-    outputs_df = create_outputs(input_df,iterations)
-    outputs_df.to_csv(output_path,index=False)
-#     make_plots(outputs_df,'Hydroponics')
-#     return(outputs_df)
+# def make_and_save_outputs(input_df,output_path,iterations = 1):
+#     outputs_df = create_outputs(input_df,iterations)
+#     outputs_df.to_csv(output_path,index=False)
+# #     make_plots(outputs_df,'Hydroponics')
+# #     return(outputs_df)
 
 #%% Run create_outputs function for testing
 
-# outputs_df = create_outputs(abs_wq_df) # all samples
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_PLS_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
+
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNSd30_syn-aug-True_PLS_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+
  
 #%% make plots for all samples
 
@@ -233,5 +281,5 @@ def make_and_save_outputs(input_df,output_path,iterations = 1):
    
 #%% make and save output.
 
-make_and_save_outputs(abs_wq_df,output_dir+'HNSr_PLS_It0-19_results.csv',
-                      iterations = 20)
+# make_and_save_outputs(abs_wq_df,output_dir+'HNSr_PLS_It0-19_results.csv',
+#                       iterations = 20)
