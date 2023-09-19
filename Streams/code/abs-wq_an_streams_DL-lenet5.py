@@ -41,7 +41,7 @@ path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for H
 int_dir = os.path.join(path_to_wqs,'Streams/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Streams/outputs/')
 abs_wq_fn = 'abs_wq_df_streams.csv'
-# syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
+syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
 spectra_path = os.path.join(int_dir,abs_wq_fn)
 os.path.exists(spectra_path)
 np.random.seed(7)
@@ -58,7 +58,7 @@ species=['Ammonium-N','Nitrate-N','TKN','ON','TN','Phosphate-P','TP','OP']
 
 abs_wq_df=pd.read_csv(spectra_path)
 
-# syn_abs_wq_df=pd.read_csv(int_dir+syn_abs_wq_df_fn)
+syn_abs_wq_df=pd.read_csv(int_dir+syn_abs_wq_df_fn)
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
 abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
@@ -288,9 +288,9 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     print(f'working on species: {s}')
     print(f'iteration {iteration}')
     
-    samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0] # for filtration experiments
+    # samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0] # for filtration experiments
     
-    # samp_size = samp_sizes['Samp_size'].min() # for synthetic sample experiments
+    samp_size = samp_sizes['Samp_size'].min() # for synthetic sample experiments
     
     keep = df[s]>0
     
@@ -382,8 +382,8 @@ def make_outputs(df,num_epochs,outputs_df,s,iteration,output_names,
     # MAPE_train = float(np.mean(APE_train)*100) # this is percentage
     
     
-    filename = f'DL_streams-{subset_name}_{s}_It{iteration}.joblib' # for filtration experiments
-    # filename = f'DL_streams-{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib' # for synthetic sample experiments
+    # filename = f'DL_streams-{subset_name}_{s}_It{iteration}.joblib' # for filtration experiments
+    filename = f'DL_streams-{subset_name}_syn-aug-{syn_aug}_{s}_It{iteration}.joblib' # for synthetic sample experiments
     pickle_path = os.path.join(output_dir,'picklejar',filename)
     dump(lenet_mod,pickle_path)
     
@@ -520,25 +520,25 @@ def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
 
 # outputs_df = create_outputs(abs_wq_df,num_epochs=1000,iterations = 0)
 
-create_outputs(abs_wq_df_fil, iterations = range(20), autosave = True,
-               output_path = os.path.join(output_dir,'streams-fil_DL_It0-19_results.csv'),
-               subset_name = 'fil') # filtered samples
+# create_outputs(abs_wq_df_fil, iterations = range(20), autosave = True,
+#                output_path = os.path.join(output_dir,'streams-fil_DL_It0-19_results.csv'),
+#                subset_name = 'fil') # filtered samples
 
-create_outputs(abs_wq_df_unf, iterations = range(20), autosave = True,
-                output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
-                subset_name = 'unf') # unfiltered samples
+# create_outputs(abs_wq_df_unf, iterations = range(20), autosave = True,
+#                 output_path = os.path.join(output_dir,'streams-unf_DL_It0-19_results.csv'),
+#                 subset_name = 'unf') # unfiltered samples
 
-create_outputs(abs_wq_df, iterations = range(20), autosave = True,
-                output_path = os.path.join(output_dir,'streams-comb_DL_It0-19_results.csv'),
-                subset_name = 'comb') # all samples
+# create_outputs(abs_wq_df, iterations = range(20), autosave = True,
+#                 output_path = os.path.join(output_dir,'streams-comb_DL_It0-19_results.csv'),
+#                 subset_name = 'comb') # all samples
 
-# create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-#                output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_DL_It0-19_results.csv'),
-#                subset_name = 'fil',syn_aug = False) # filtered samples, no synthetic samples
+create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+                output_path = os.path.join(output_dir,'streams-fil_syn-aug-False_DL_It0-19_results.csv'),
+                subset_name = 'fil',syn_aug = False) # filtered samples, no synthetic samples
 
-# create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
-#                output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_DL_It0-19_results.csv'),
-#                subset_name = 'fil',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+create_outputs(abs_wq_df_fil, iterations = 20, autosave = True,
+                output_path = os.path.join(output_dir,'streams-fil_syn-aug-True_DL_It0-19_results.csv'),
+                subset_name = 'fil',syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
 #%% Define function for making plots
 
