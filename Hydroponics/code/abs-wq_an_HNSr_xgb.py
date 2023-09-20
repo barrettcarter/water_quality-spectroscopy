@@ -167,7 +167,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
        
     iteration = 1 # this is for testing
     
-    species = input_df.columns[0:14]
+    species = input_df.columns[6:14]
     
     if type(iterations)==int:
         iterations = range(iterations)
@@ -370,9 +370,9 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_XGB-PCA_It0-19_results.csv'),
-               subset_name = subset_name,syn_aug = False) #  no synthetic samples
+# create_outputs(abs_wq_df, iterations = 20, autosave = True,
+#                output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_XGB-PCA_It0-19_results.csv'),
+#                subset_name = subset_name,syn_aug = False) #  no synthetic samples
 
 create_outputs(abs_wq_df, iterations = 20, autosave = True,
                output_path = os.path.join(output_dir,'HNSd30_syn-aug-True_XGB-PCA_It0-19_results.csv'),
