@@ -54,7 +54,7 @@ abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:]
 
 # abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['swb','swbup'])] # for site-based subsetting
 
-# syn_abs_wq_df = syn_abs_wq_df.loc[syn_abs_wq_df.Storage_time==10,:]
+syn_abs_wq_df = syn_abs_wq_df.loc[syn_abs_wq_df.Storage_time==10,:]
 
 # syn_abs_wq_df['ID'] = syn_abs_wq_df['Name']
 
@@ -200,7 +200,8 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
       
     if return_all:
         
-        return({'outputs_df':outputs_df, 'X_train':X_train, 'y_train':y_train})
+        return({'outputs_df':outputs_df, 'X_train':X_train, 'y_train':y_train,
+                'inter_df':inter_df})
 
 #%% Define function for making plots
 
