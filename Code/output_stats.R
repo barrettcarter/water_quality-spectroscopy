@@ -9,18 +9,21 @@
 
 library(ggplot2)
 library(tidyr)
+library(dunn.test)
 
 #### Bring in data
 
-# proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
+proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
 
-proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
 sample_type = 'Hydroponics' # used for defining directories
 
 output_dir = paste(proj_dir, sample_type, 'outputs', sep = '/')
 
-figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results'
+# figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
+
+figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
 
 output_files = as.vector(list.files(output_dir))
 
@@ -50,6 +53,8 @@ for (file in output_files[2:4]){
 
 outputs = unique(outputs_df$output)
 
+species = unique(outputs_df$species)
+
 ########### R-SQUARED PLOTS ####################
 
 test_rsqs = subset(outputs_df,output=='test_rsq')
@@ -62,8 +67,8 @@ p_rsq = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   
 p_rsq
 
-ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
-       device = 'png', dpi = 300)
+# ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
+#        device = 'png', dpi = 300)
 
 ### plot with removed outliers
 
@@ -77,8 +82,8 @@ p_rsq_no.outl = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   
 p_rsq_no.outl
 
-ggsave(filename = 'HNS_rsq_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir, 
-       device = 'png', dpi = 300)
+# ggsave(filename = 'HNS_rsq_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir, 
+#        device = 'png', dpi = 300)
 
 #### separated by species
 
@@ -190,20 +195,114 @@ m = 'PLS'
 
 for (m in unique(ys_wide$model)){
   
-  p_ys = ggplot(subset(ys_wide,model == m), aes(x = y_true_test, y = y_hat_test, fill = iteration)) +
-    geom_point()+
+  p_ys = ggplot(subset(ys_wide,model == m), aes(x = y_true_test, y = y_hat_test)) +
+    geom_point(color = 'grey')+
     stat_smooth(method = 'lm', formula = y~x, geom = 'smooth')+
+    geom_abline(slope = 1, intercept = 0, linetype = 'dashed',size = 1)+
     facet_wrap(~species, scale = 'free')+
-    scale_fill_brewer(palette = 'Set1')+
+    # scale_fill_brewer(palette = 'Set1')+
     ylab('Predicted Concentration (mg/L)')+
     xlab('True Concentration (mg/L)')+
     labs(title = paste0('Undiluted HNS - ',m))
   
   p_ys
   
+  ggsave(filename = paste0('HNS_fitplot_',m,'.png'),
+         plot = p_ys, path = figure_dir,
+         device = 'png', dpi = 150, width = 10, height = 7.5, units = 'in')
+  
 }
 
+### plot showing all models
 
+p_ys_m = ggplot(ys_wide, aes(x = y_true_test, y = y_hat_test, col = model)) +
+  # geom_point(alpha = 0.05)+
+  stat_smooth(method = 'lm', formula = y~x, geom = 'smooth')+
+  geom_abline(slope = 1, intercept = 0, linetype = 'dashed',size = 1, color = 'black')+
+  facet_wrap(~species, scale = 'free')+
+  scale_color_brewer(palette = 'Set1')+
+  ylab('Predicted Concentration (mg/L)')+
+  xlab('True Concentration (mg/L)')+
+  labs(title = paste0('Undiluted HNS - ',m))
 
-ggsave(filename = 'HNS_rmse-v-species_boxplot_no-outliers.png', plot = p_rmse_sp_no.outl, path = figure_dir, 
-       device = 'png', dpi = 150, width = 12, height = 10, units = 'in')
+p_ys_m
+
+ggsave(filename = paste0('HNS_fitplot_mods.png'),
+       plot = p_ys_m, path = figure_dir,
+       device = 'png', dpi = 150, width = 10, height = 7.5, units = 'in')
+  
+################## STATISTICS ########################################
+
+##### r-sq values
+
+## species, in general (all models)
+
+dunn_sp = dunn.test(test_rsqs$value,test_rsqs$species)
+
+dunn_sp_df = data.frame(comparison = dunn_sp$comparisons, p = dunn_sp$P)
+
+split_comp1 = function(x){
+  
+  unlist(strsplit(x, ' - '))[1]
+  
+}
+
+split_comp2 = function(x){
+  
+  unlist(strsplit(x, ' - '))[2]
+  
+}
+
+dunn_sp_df$comp1 = unlist(lapply(dunn_sp_df$comparison, FUN = split_comp1))
+dunn_sp_df$comp2 = unlist(lapply(dunn_sp_df$comparison, FUN = split_comp2))
+
+write.csv(dunn_sp_df, paste(output_dir,'HNS_r-sq_dunn_species.csv',sep='/'), row.names = F)
+
+dunn_sp_sig_df = subset(dunn_sp_df, p < 0.05)
+
+dunn_sp_ins_df = subset(dunn_sp_df, p > 0.05)
+
+dunn_sp_groups = list()
+
+for (s in species){
+  
+  dunn_sp_groups = append(dunn_sp_groups,list(s = c('z','z')))
+  
+}
+
+names(dunn_sp_groups) = species
+
+s = species[1]
+
+li = 1
+
+for (s in species){
+  
+  group_letter = letters[li]
+  
+  dunn_sp_ins_sub = dunn_sp_ins_df[grepl(s,dunn_sp_ins_df$comparison),]
+  
+  group_s = unique(append(dunn_sp_ins_sub$comp1,dunn_sp_ins_sub$comp2))
+  
+  for (ss in group_s){
+    
+    dunn_sp_groups[[ss]] = append(dunn_sp_groups[[ss]],group_letter)
+    
+  }
+  
+  li = li + 1
+  
+}
+
+dunn_sp_groups_unique = unique(dunn_sp_groups)
+
+dunn_sp_groups = append(dunn_sp_groups,list(A = c('a','b')))
+
+dunn_sp_groups$A = append(dunn_sp_groups$A,'c')
+
+dunn_sp_groups = append(dunn_sp_groups,list(B = c('d','e')))
+
+foo <- list(a = 1, b = list(c = "a", d = FALSE))
+bar <- modifyList(foo, list(e = 2, b = list(d = TRUE)))
+str(foo)
+str(bar)
