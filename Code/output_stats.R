@@ -13,17 +13,17 @@ library(dunn.test)
 
 #### Bring in data
 
-# proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
+proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
 
-proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
 sample_type = 'Hydroponics' # used for defining directories
 
 output_dir = paste(proj_dir, sample_type, 'outputs', sep = '/')
 
-figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
+# figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
 
-# figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
+figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
 
 output_files = as.vector(list.files(output_dir))
 
@@ -260,7 +260,11 @@ write.csv(dunn_sp_df, paste(output_dir,'HNS_r-sq_dunn_species.csv',sep='/'), row
 
 dunn_sp_sig_df = subset(dunn_sp_df, p < 0.05)
 
+write.csv(dunn_sp_sig_df, paste(output_dir,'HNS_r-sq_dunn-sig_species.csv',sep='/'), row.names = F)
+
 dunn_sp_ins_df = subset(dunn_sp_df, p > 0.05)
+
+write.csv(dunn_sp_ins_df, paste(output_dir,'HNS_r-sq_dunn-ins_species.csv',sep='/'), row.names = F)
 
 dunn_sp_groups = list()
 
@@ -274,9 +278,15 @@ names(dunn_sp_groups) = species
 
 dunn_grp_sp = list()
 
-s = species[1]
+s = species[3]
 
-li = 1
+li = 3
+
+listNlist = function(list_a,list_b){
+  
+  return(identical(list_a,list_b))
+  
+}
 
 for (s in species){
   
@@ -287,6 +297,20 @@ for (s in species){
   group_s = unique(append(dunn_sp_ins_sub$comp1,dunn_sp_ins_sub$comp2))
   
   group_s = sort(group_s)
+  
+  if (length(dunn_grp_sp)==0){
+    
+    dunn_grp_sp[[group_letter]]=group_s
+    
+  }
+  
+  group_exists_fun = function(groups_sublist, group_list = group_s){
+    
+    return(listNlist(groups_sublist,group_list))
+    
+  }
+  
+  group_exists = any(lapply(dunn_grp_sp,group_exists_fun))
   
   if (any(grepl(group_s,dunn_grp_sp))==F){
     
