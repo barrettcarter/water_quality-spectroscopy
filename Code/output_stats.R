@@ -278,9 +278,9 @@ names(dunn_sp_groups) = species
 
 dunn_grp_sp = list()
 
-s = species[3]
+s = species[3] # for testing
 
-li = 3
+li = 1 # can be used for testing, but must be set to 1 for official analysis
 
 listNlist = function(list_a,list_b){
   
@@ -312,29 +312,27 @@ for (s in species){
   
   group_exists = any(lapply(dunn_grp_sp,group_exists_fun))
   
-  if (any(grepl(group_s,dunn_grp_sp))==F){
+  if (group_exists==F){
     
     dunn_grp_sp[[group_letter]]=group_s
     
-  }
-  
-  for (ss in group_s){
+    for (ss in group_s){
+      
+      if (any(grepl(ss,names(dunn_sp_groups)))){
+        
+        dunn_sp_groups[[ss]] = append(dunn_sp_groups[[ss]],group_letter)  
+        
+      } else{
+        
+        dunn_sp_groups[[ss]] = group_letter
+        
+      }
     
-    if (any(grepl(ss,names(dunn_sp_groups)))){
-      
-      dunn_sp_groups[[ss]] = append(dunn_sp_groups[[ss]],group_letter)  
-      
-    } else{
-      
-      dunn_sp_groups[[ss]] = group_letter
-      
     }
     
-    
+    li = li + 1
     
   }
-  
-  li = li + 1
   
 }
 
