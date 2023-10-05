@@ -13,17 +13,17 @@ library(dunn.test)
 
 #### Bring in data
 
-proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
+# proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
 
-# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
 sample_type = 'Hydroponics' # used for defining directories
 
 output_dir = paste(proj_dir, sample_type, 'outputs', sep = '/')
 
-# figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
+figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
 
-figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
+# figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
 
 output_files = as.vector(list.files(output_dir))
 
@@ -292,9 +292,9 @@ for (s in species){
   
   group_letter = letters[li]
   
-  dunn_sp_ins_sub = dunn_sp_ins_df[grepl(s,dunn_sp_ins_df$comparison),]
+  dunn_sp_sig_sub = dunn_sp_sig_df[grepl(s,dunn_sp_ins_df$comparison),]
   
-  group_s = unique(append(dunn_sp_ins_sub$comp1,dunn_sp_ins_sub$comp2))
+  group_s = unique(append(dunn_sp_sig_sub$comp1,dunn_sp_sig_sub$comp2))
   
   group_s = sort(group_s)
   
@@ -335,6 +335,13 @@ for (s in species){
   }
   
 }
+
+
+
+
+#################################################################
+###     Scratch Code                              
+
 
 dunn_sp_groups_unique = unique(dunn_sp_groups)
 
