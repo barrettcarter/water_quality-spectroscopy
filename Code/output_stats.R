@@ -13,17 +13,17 @@ library(dunn.test)
 
 #### Bring in data
 
-# proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
+proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
 
-proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
 sample_type = 'Hydroponics' # used for defining directories
 
 output_dir = paste(proj_dir, sample_type, 'outputs', sep = '/')
 
-figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
+# figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
 
-# figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
+figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
 
 output_files = as.vector(list.files(output_dir))
 
@@ -337,6 +337,35 @@ for (s in species){
 }
 
 
+for (s in names(dunn_sp_groups)){
+  
+  dunn_sp_groups[[s]]=dunn_sp_groups[[s]][3:length(dunn_sp_groups[[s]])]
+  
+}
+
+### make plot showing groups
+
+bp_txt_fun = function(x){
+  
+  
+  return(quantile(x, 0.62))
+  
+}
+
+s = names(dunn_sp_groups[1])
+
+dunn_sp_groups_df = data.frame(s=dunn_sp_groups[[s]])
+
+p_rsq = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
+  geom_boxplot()+
+  scale_fill_brewer(palette = 'Set1')+
+  ylab('test r-sq')+
+  labs(title = 'Undiluted HNS')
+
+p_rsq
+
+# ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
+#        device = 'png', dpi = 300)
 
 
 #################################################################
