@@ -256,15 +256,15 @@ split_comp2 = function(x){
 dunn_sp_df$comp1 = unlist(lapply(dunn_sp_df$comparison, FUN = split_comp1))
 dunn_sp_df$comp2 = unlist(lapply(dunn_sp_df$comparison, FUN = split_comp2))
 
-write.csv(dunn_sp_df, paste(output_dir,'HNS_r-sq_dunn_species.csv',sep='/'), row.names = F)
+write.csv(dunn_sp_df, paste(output_dir,'stats','HNS_r-sq_dunn_species.csv',sep='/'), row.names = F)
 
 dunn_sp_sig_df = subset(dunn_sp_df, p < 0.05)
 
-write.csv(dunn_sp_sig_df, paste(output_dir,'HNS_r-sq_dunn-sig_species.csv',sep='/'), row.names = F)
+write.csv(dunn_sp_sig_df, paste(output_dir,'stats','HNS_r-sq_dunn-sig_species.csv',sep='/'), row.names = F)
 
 dunn_sp_ins_df = subset(dunn_sp_df, p > 0.05)
 
-write.csv(dunn_sp_ins_df, paste(output_dir,'HNS_r-sq_dunn-ins_species.csv',sep='/'), row.names = F)
+write.csv(dunn_sp_ins_df, paste(output_dir,'stats','HNS_r-sq_dunn-ins_species.csv',sep='/'), row.names = F)
 
 dunn_sp_groups = list()
 
@@ -352,19 +352,249 @@ bp_txt_fun = function(x){
   
 }
 
-s = names(dunn_sp_groups[1])
+s = names(dunn_sp_groups)[1]
 
-dunn_sp_groups_df = data.frame(s=dunn_sp_groups[[s]])
+gs = dunn_sp_groups[[s]]
+
+gs = paste0(gs,collapse ='')
+
+dunn_sp_groups_df = data.frame(species = s, groups = gs)
+
+for (s in names(dunn_sp_groups)[2:length(dunn_sp_groups)]){
+  
+  gs = dunn_sp_groups[[s]]
+  
+  gs = paste0(gs,collapse ='')
+  
+  dunn_sp_groups_df[nrow(dunn_sp_groups_df)+1,] = c(s,gs)
+  
+}
+
+text_locs = c(by(test_rsqs$value, test_rsqs$species, bp_txt_fun))
+
+dunn_sp_groups_df$text_locs = text_locs
+
+test_rsqs_grps = merge(test_rsqs, dunn_sp_groups_df[c('species','groups')],by = 'species')
+
+### This figure is not good ###
+
+# p_rsq = ggplot(test_rsqs, aes(x = species, y = value)) +
+#   geom_boxplot()+
+#   facet_wrap(~groups, scale = 'free')+
+#   scale_fill_brewer(palette = 'Set1')+
+#   geom_text(data = dunn_sp_groups_df, aes(x = species, y = text_locs, label = groups))+
+#   ylab('test r-sq')+
+#   labs(title = 'Undiluted HNS')
+# 
+# p_rsq
+
+# ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
+#        device = 'png', dpi = 300)
+
+
+###########################################################
+### Look at model only ###
+
+models = unique(test_rsqs$model)
+
+dunn_mod = dunn.test(test_rsqs$value,test_rsqs$model)
+
+dunn_mod_df = data.frame(comparison = dunn_mod$comparisons, p = dunn_mod$P)
+
+split_comp1 = function(x){
+  
+  unlist(strsplit(x, ' - '))[1]
+  
+}
+
+split_comp2 = function(x){
+  
+  unlist(strsplit(x, ' - '))[2]
+  
+}
+
+dunn_mod_df$comp1 = unlist(lapply(dunn_mod_df$comparison, FUN = split_comp1))
+dunn_mod_df$comp2 = unlist(lapply(dunn_mod_df$comparison, FUN = split_comp2))
+
+write.csv(dunn_mod_df, paste(output_dir,'stats','HNS_r-sq_dunn_model.csv',sep='/'), row.names = F)
+
+dunn_mod_sig_df = subset(dunn_mod_df, p < 0.05)
+
+write.csv(dunn_mod_sig_df, paste(output_dir,'stats','HNS_r-sq_dunn-sig_model.csv',sep='/'), row.names = F)
+
+dunn_mod_ins_df = subset(dunn_mod_df, p > 0.05)
+
+write.csv(dunn_mod_ins_df, paste(output_dir,'stats','HNS_r-sq_dunn-ins_model.csv',sep='/'), row.names = F)
+
+dunn_mod_groups = list()
+
+# for (s in models){
+#   
+#   dunn_mod_groups = append(dunn_mod_groups,list(s = c('z','z')))
+#   
+# }
+
+# names(dunn_mod_groups) = models
+
+dunn_grp_mod = list()
+
+s = models[1] # for testing
+
+li = 1 # can be used for testing, but must be set to 1 for official analysis
+
+listNlist = function(list_a,list_b){
+  
+  return(identical(list_a,list_b))
+  
+}
+
+for (s in models){
+  
+  group_letter = letters[li]
+  
+  # check to see if model is not significantly different from any others
+  
+  if(any(grepl(s,c(dunn_mod_ins_df$comp1,dunn_mod_ins_df$comp2)))){
+    
+    # make sub dataframe containing all rows with model
+    
+    dunn_mod_ins_sub = dunn_mod_ins_df[grepl(s,dunn_mod_ins_df$comparison),]
+    
+    # get list of all models in group and sort
+    
+    group_s = unique(append(dunn_mod_ins_sub$comp1,dunn_mod_ins_sub$comp2))
+    
+    group_s = sort(group_s)
+    
+    # see if model group already exists using function
+    
+    group_exists_fun = function(groups_sublist, group_list = group_s){
+      
+      return(listNlist(groups_sublist,group_list))
+      
+    }
+    
+    group_exists = any(lapply(dunn_grp_mod,group_exists_fun))
+    
+    # if group does not exist, create group
+    
+    if (group_exists==F){
+      
+      dunn_grp_mod[[group_letter]]=group_s
+      
+      ss = group_s[1] #for testing
+      
+      # also add group letter to every model in group
+      
+      for (ss in group_s){
+        
+        # append if model already has groups
+        
+        if (any(grepl(ss,names(dunn_mod_groups)))){
+          
+          dunn_mod_groups[[ss]] = append(dunn_mod_groups[[ss]],group_letter)  
+          
+        } else{
+          
+          # create model and assign group if model doesn't already have groups
+          
+          dunn_mod_groups[[ss]] = group_letter
+          
+        }
+        
+      }
+      
+      # go to next group letter
+      
+      li = li + 1
+      
+    }
+    
+  }else{
+    
+    # this is for the case that a model is significantly different from all others
+    # it is its own group.
+    
+    dunn_mod_groups[[s]] = group_letter
+    dunn_grp_mod[[group_letter]]=s
+    
+    li = li + 1
+    
+  }
+  
+}
+
+
+for (s in names(dunn_mod_groups)){
+  
+  dunn_mod_groups[[s]]=dunn_mod_groups[[s]][3:length(dunn_mod_groups[[s]])]
+  
+}
+
+### make plot showing groups
+
+bp_txt_fun = function(x){
+  
+  
+  # return(quantile(x, 0.62)) # based on percentile
+  
+  return(max(x)*2) # multiplier of the max
+  
+}
+
+s = names(dunn_mod_groups)[1]
+
+gs = dunn_mod_groups[[s]]
+
+gs = paste0(gs,collapse ='')
+
+dunn_mod_groups_df = data.frame(model = s, groups = gs)
+
+for (s in names(dunn_mod_groups)[2:length(dunn_mod_groups)]){
+  
+  gs = dunn_mod_groups[[s]]
+  
+  gs = paste0(gs,collapse ='')
+  
+  dunn_mod_groups_df[nrow(dunn_mod_groups_df)+1,] = c(s,gs)
+  
+}
+
+text_locs = c(by(test_rsqs$value, test_rsqs$model, bp_txt_fun)) # put label at location specified in bp_txt_fun
+
+# text_locs = c(by(test_rsqs$value, test_rsqs$model, max)) # put label at max
+
+dunn_mod_groups_df$text_locs = text_locs
+
+test_rsqs_grps = merge(test_rsqs, dunn_mod_groups_df[c('model','groups')],by = 'model')
+
+### This figure is not good ###
 
 p_rsq = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   geom_boxplot()+
   scale_fill_brewer(palette = 'Set1')+
+  geom_text(data = dunn_mod_groups_df, aes(x = model, y = text_locs, label = groups))+
   ylab('test r-sq')+
   labs(title = 'Undiluted HNS')
 
 p_rsq
 
 # ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
+#        device = 'png', dpi = 300)
+
+## outliers removed
+
+p_rsq_no.outl = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
+  geom_boxplot(outlier.shape = NA)+
+  scale_fill_brewer(palette = 'Set1')+
+  geom_text(data = dunn_mod_groups_df, aes(x = model, y = 1, label = groups))+
+  ylab('test r-sq')+
+  labs(title = 'Undiluted HNS - outliers removed')+
+  coord_cartesian(ylim = c(-1,1))
+
+p_rsq_no.outl
+
+# ggsave(filename = 'HNS_rsq_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir, 
 #        device = 'png', dpi = 300)
 
 
