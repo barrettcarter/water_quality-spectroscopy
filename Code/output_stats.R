@@ -268,14 +268,6 @@ write.csv(dunn_sp_ins_df, paste(output_dir,'stats','HNS_r-sq_dunn-ins_species.cs
 
 dunn_sp_groups = list()
 
-for (s in species){
-  
-  dunn_sp_groups = append(dunn_sp_groups,list(s = c('z','z')))
-  
-}
-
-names(dunn_sp_groups) = species
-
 dunn_grp_sp = list()
 
 s = species[3] # for testing
@@ -292,43 +284,71 @@ for (s in species){
   
   group_letter = letters[li]
   
-  dunn_sp_sig_sub = dunn_sp_sig_df[grepl(s,dunn_sp_ins_df$comparison),]
+  # check to see if species is not significantly different from any others
   
-  group_s = unique(append(dunn_sp_sig_sub$comp1,dunn_sp_sig_sub$comp2))
-  
-  group_s = sort(group_s)
-  
-  if (length(dunn_grp_sp)==0){
+  if(any(grepl(s,c(dunn_sp_ins_df$comp1,dunn_sp_ins_df$comp2)))){
     
-    dunn_grp_sp[[group_letter]]=group_s
+    # make sub dataframe containing all rows with species
     
-  }
-  
-  group_exists_fun = function(groups_sublist, group_list = group_s){
+    dunn_sp_ins_sub = dunn_sp_ins_df[grepl(s,dunn_sp_ins_df$comparison),]
     
-    return(listNlist(groups_sublist,group_list))
+    # get list of all species in group and sort
     
-  }
-  
-  group_exists = any(lapply(dunn_grp_sp,group_exists_fun))
-  
-  if (group_exists==F){
+    group_s = unique(append(dunn_sp_ins_sub$comp1,dunn_sp_ins_sub$comp2))
     
-    dunn_grp_sp[[group_letter]]=group_s
+    group_s = sort(group_s)
     
-    for (ss in group_s){
+    # see if species group already exists using function
+    
+    group_exists_fun = function(groups_sublist, group_list = group_s){
       
-      if (any(grepl(ss,names(dunn_sp_groups)))){
+      return(listNlist(groups_sublist,group_list))
+      
+    }
+    
+    group_exists = any(lapply(dunn_grp_sp,group_exists_fun))
+    
+    # if group does not exist, create group
+    
+    if (group_exists==F){
+      
+      dunn_grp_sp[[group_letter]]=group_s
+      
+      ss = group_s[1] #for testing
+      
+      # also add group letter to every species in group
+      
+      for (ss in group_s){
         
-        dunn_sp_groups[[ss]] = append(dunn_sp_groups[[ss]],group_letter)  
+        # append if species already has groups
         
-      } else{
-        
-        dunn_sp_groups[[ss]] = group_letter
+        if (any(grepl(ss,names(dunn_sp_groups)))){
+          
+          dunn_sp_groups[[ss]] = append(dunn_sp_groups[[ss]],group_letter)  
+          
+        } else{
+          
+          # create species and assign group if species doesn't already have groups
+          
+          dunn_sp_groups[[ss]] = group_letter
+          
+        }
         
       }
-    
+      
+      # go to next group letter
+      
+      li = li + 1
+      
     }
+    
+  }else{
+    
+    # this is for the case that a species is significantly different from all others
+    # it is its own group.
+    
+    dunn_sp_groups[[s]] = group_letter
+    dunn_grp_sp[[group_letter]]=s
     
     li = li + 1
     
@@ -336,21 +356,7 @@ for (s in species){
   
 }
 
-
-for (s in names(dunn_sp_groups)){
-  
-  dunn_sp_groups[[s]]=dunn_sp_groups[[s]][3:length(dunn_sp_groups[[s]])]
-  
-}
-
 ### make plot showing groups
-
-bp_txt_fun = function(x){
-  
-  
-  return(quantile(x, 0.62))
-  
-}
 
 s = names(dunn_sp_groups)[1]
 
@@ -370,25 +376,47 @@ for (s in names(dunn_sp_groups)[2:length(dunn_sp_groups)]){
   
 }
 
-text_locs = c(by(test_rsqs$value, test_rsqs$species, bp_txt_fun))
+sp_meds = c(by(test_rsqs$value, list(test_rsqs$species), median))
 
-dunn_sp_groups_df$text_locs = text_locs
+dunn_sp_groups_df = dunn_sp_groups_df[order(dunn_sp_groups_df$species),]
+
+dunn_sp_groups_df$median = sp_meds
+
+### Save group information
+
+write.csv(dunn_sp_groups_df, paste(output_dir,'stats','HNS_r-sq_dunn_sp_groups.csv',sep='/'), row.names = F)
+
 
 test_rsqs_grps = merge(test_rsqs, dunn_sp_groups_df[c('species','groups')],by = 'species')
 
-### This figure is not good ###
 
-# p_rsq = ggplot(test_rsqs, aes(x = species, y = value)) +
-#   geom_boxplot()+
-#   facet_wrap(~groups, scale = 'free')+
-#   scale_fill_brewer(palette = 'Set1')+
-#   geom_text(data = dunn_sp_groups_df, aes(x = species, y = text_locs, label = groups))+
-#   ylab('test r-sq')+
-#   labs(title = 'Undiluted HNS')
-# 
-# p_rsq
+### plot with subplots based on groups ###
 
-# ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
+p_rsq = ggplot(test_rsqs_grps, aes(x = species, y = value)) +
+  geom_boxplot()+
+  facet_wrap(~groups, scale = 'free')+
+  scale_fill_brewer(palette = 'Set1')+
+  # geom_text(data = dunn_sp_groups_df, aes(x = species, y = text_locs, label = groups))+
+  ylab('test r-sq')+
+  labs(title = 'Undiluted HNS - post-hoc comparisons')
+
+p_rsq
+
+# ggsave(filename = 'HNS_rsq_dunn-sp_boxplot.png', plot = p_rsq, path = figure_dir,
+#        device = 'png', dpi = 300)
+
+### plot with subplots based on groups - no outliers ###
+
+p_rsq_no.outl = ggplot(test_rsqs_grps, aes(x = species, y = value)) +
+  geom_boxplot(outlier.shape = NA)+
+  facet_wrap(~groups, scale = 'free')+
+  ylab('test r-sq')+
+  labs(title = 'Undiluted HNS - post-hoc comparisons - outliers removed')+
+  coord_cartesian(ylim = c(-1,1))
+
+p_rsq_no.outl
+
+# ggsave(filename = 'HNS_rsq_dunn-sp_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir,
 #        device = 'png', dpi = 300)
 
 
@@ -427,14 +455,6 @@ dunn_mod_ins_df = subset(dunn_mod_df, p > 0.05)
 write.csv(dunn_mod_ins_df, paste(output_dir,'stats','HNS_r-sq_dunn-ins_model.csv',sep='/'), row.names = F)
 
 dunn_mod_groups = list()
-
-# for (s in models){
-#   
-#   dunn_mod_groups = append(dunn_mod_groups,list(s = c('z','z')))
-#   
-# }
-
-# names(dunn_mod_groups) = models
 
 dunn_grp_mod = list()
 
@@ -524,13 +544,6 @@ for (s in models){
   
 }
 
-
-for (s in names(dunn_mod_groups)){
-  
-  dunn_mod_groups[[s]]=dunn_mod_groups[[s]][3:length(dunn_mod_groups[[s]])]
-  
-}
-
 ### make plot showing groups
 
 bp_txt_fun = function(x){
@@ -560,26 +573,30 @@ for (s in names(dunn_mod_groups)[2:length(dunn_mod_groups)]){
   
 }
 
-text_locs = c(by(test_rsqs$value, test_rsqs$model, bp_txt_fun)) # put label at location specified in bp_txt_fun
+mod_meds = c(by(test_rsqs$value, list(test_rsqs$model), median))
 
-# text_locs = c(by(test_rsqs$value, test_rsqs$model, max)) # put label at max
+dunn_mod_groups_df = dunn_mod_groups_df[order(dunn_mod_groups_df$model),]
 
-dunn_mod_groups_df$text_locs = text_locs
+dunn_mod_groups_df$median = mod_meds
+
+### Save group information
+
+write.csv(dunn_mod_groups_df, paste(output_dir,'stats','HNS_r-sq_dunn_mod_groups.csv',sep='/'), row.names = F)
 
 test_rsqs_grps = merge(test_rsqs, dunn_mod_groups_df[c('model','groups')],by = 'model')
 
-### This figure is not good ###
+### Make figure
 
 p_rsq = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   geom_boxplot()+
   scale_fill_brewer(palette = 'Set1')+
-  geom_text(data = dunn_mod_groups_df, aes(x = model, y = text_locs, label = groups))+
+  geom_text(data = dunn_mod_groups_df, aes(x = model, y = 2, label = groups))+
   ylab('test r-sq')+
-  labs(title = 'Undiluted HNS')
+  labs(title = 'Undiluted HNS - post-hoc comparisons')
 
 p_rsq
 
-# ggsave(filename = 'HNS_rsq_boxplot.png', plot = p_rsq, path = figure_dir, 
+# ggsave(filename = 'HNS_rsq_dunn-mod_boxplot.png', plot = p_rsq, path = figure_dir,
 #        device = 'png', dpi = 300)
 
 ## outliers removed
@@ -589,12 +606,12 @@ p_rsq_no.outl = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   scale_fill_brewer(palette = 'Set1')+
   geom_text(data = dunn_mod_groups_df, aes(x = model, y = 1, label = groups))+
   ylab('test r-sq')+
-  labs(title = 'Undiluted HNS - outliers removed')+
+  labs(title = 'Undiluted HNS - post-hoc comparisons - outliers removed')+
   coord_cartesian(ylim = c(-1,1))
 
 p_rsq_no.outl
 
-# ggsave(filename = 'HNS_rsq_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir, 
+# ggsave(filename = 'HNS_rsq_dunn-mod_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir,
 #        device = 'png', dpi = 300)
 
 
