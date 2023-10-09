@@ -223,7 +223,7 @@ p_ys_m = ggplot(ys_wide, aes(x = y_true_test, y = y_hat_test, col = model)) +
   scale_color_brewer(palette = 'Set1')+
   ylab('Predicted Concentration (mg/L)')+
   xlab('True Concentration (mg/L)')+
-  labs(title = paste0('Undiluted HNS - ',m))
+  labs(title ='Undiluted HNS')
 
 p_ys_m
 
@@ -615,6 +615,216 @@ p_rsq_no.outl
 #        device = 'png', dpi = 300)
 
 
+################################################################
+### Look at species and model together
+
+test_rsqs$spmod = paste(test_rsqs$species,test_rsqs$model,sep = '_')
+
+spmods = unique(test_rsqs$spmod)
+
+dunn_spmod = dunn.test(test_rsqs$value,test_rsqs$spmod)
+
+dunn_spmod_df = data.frame(comparison = dunn_spmod$comparisons, p = dunn_spmod$P)
+
+split_comp1 = function(x){
+  
+  unlist(strsplit(x, ' - '))[1]
+  
+}
+
+split_comp2 = function(x){
+  
+  unlist(strsplit(x, ' - '))[2]
+  
+}
+
+dunn_spmod_df$comp1 = unlist(lapply(dunn_spmod_df$comparison, FUN = split_comp1))
+dunn_spmod_df$comp2 = unlist(lapply(dunn_spmod_df$comparison, FUN = split_comp2))
+
+# reduce results down to only model comparisons for each species
+
+sp_split_spmod = function(x){
+  
+  return(unlist(strsplit(x,'_'))[1])
+  
+}
+
+mod_split_spmod = function(x){
+  
+  return(unlist(strsplit(x,'_'))[2])
+  
+}
+
+dunn_spmod_df$sp1 = unlist(lapply(dunn_spmod_df$comp1, FUN = sp_split_spmod))
+dunn_spmod_df$sp2 = unlist(lapply(dunn_spmod_df$comp2, FUN = sp_split_spmod))
+
+dunn_spmod_df$mod1 = unlist(lapply(dunn_spmod_df$comp1, FUN = mod_split_spmod))
+dunn_spmod_df$mod2 = unlist(lapply(dunn_spmod_df$comp2, FUN = mod_split_spmod))
+
+dunn_spmod_df = subset(dunn_spmod_df,sp1 == sp2)
+
+write.csv(dunn_spmod_df, paste(output_dir,'stats','HNS_r-sq_dunn_spmod.csv',sep='/'), row.names = F)
+
+dunn_spmod_sig_df = subset(dunn_spmod_df, p < 0.05)
+
+write.csv(dunn_spmod_sig_df, paste(output_dir,'stats','HNS_r-sq_dunn-sig_spmod.csv',sep='/'), row.names = F)
+
+dunn_spmod_ins_df = subset(dunn_spmod_df, p > 0.05)
+
+write.csv(dunn_spmod_ins_df, paste(output_dir,'stats','HNS_r-sq_dunn-ins_spmod.csv',sep='/'), row.names = F)
+
+
+
+dunn_spmod_groups = list()
+
+dunn_grp_spmod = list()
+
+s = spmods[1] # for testing
+
+li = 1 # can be used for testing, but must be set to 1 for official analysis
+
+listNlist = function(list_a,list_b){
+  
+  return(identical(list_a,list_b))
+  
+}
+
+for (s in spmods){
+  
+  group_letter = letters[li]
+  
+  # check to see if spmod is not significantly different from any others
+  
+  if(any(grepl(s,c(dunn_spmod_ins_df$comp1,dunn_spmod_ins_df$comp2)))){
+    
+    # make sub dataframe containing all rows with spmod
+    
+    dunn_spmod_ins_sub = dunn_spmod_ins_df[grepl(s,dunn_spmod_ins_df$comparison),]
+    
+    # get list of all spmods in group and sort
+    
+    group_s = unique(append(dunn_spmod_ins_sub$comp1,dunn_spmod_ins_sub$comp2))
+    
+    group_s = sort(group_s)
+    
+    # see if spmod group already exists using function
+    
+    group_exists_fun = function(groups_sublist, group_list = group_s){
+      
+      return(listNlist(groups_sublist,group_list))
+      
+    }
+    
+    group_exists = any(lapply(dunn_grp_spmod,group_exists_fun))
+    
+    # if group does not exist, create group
+    
+    if (group_exists==F){
+      
+      dunn_grp_spmod[[group_letter]]=group_s
+      
+      ss = group_s[1] #for testing
+      
+      # also add group letter to every spmod in group
+      
+      for (ss in group_s){
+        
+        # append if spmod already has groups
+        
+        if (any(grepl(ss,names(dunn_spmod_groups)))){
+          
+          dunn_spmod_groups[[ss]] = append(dunn_spmod_groups[[ss]],group_letter)  
+          
+        } else{
+          
+          # create spmod and assign group if spmod doesn't already have groups
+          
+          dunn_spmod_groups[[ss]] = group_letter
+          
+        }
+        
+      }
+      
+      # go to next group letter
+      
+      li = li + 1
+      
+    }
+    
+  }else{
+    
+    # this is for the case that a spmod is significantly different from all others
+    # it is its own group.
+    
+    dunn_spmod_groups[[s]] = group_letter
+    dunn_grp_spmod[[group_letter]]=s
+    
+    li = li + 1
+    
+  }
+  
+}
+
+### make plot showing groups
+
+s = names(dunn_spmod_groups)[1]
+
+gs = dunn_spmod_groups[[s]]
+
+gs = paste0(gs,collapse ='')
+
+dunn_spmod_groups_df = data.frame(spmod = s, groups = gs)
+
+for (s in names(dunn_spmod_groups)[2:length(dunn_spmod_groups)]){
+  
+  gs = dunn_spmod_groups[[s]]
+  
+  gs = paste0(gs,collapse ='')
+  
+  dunn_spmod_groups_df[nrow(dunn_spmod_groups_df)+1,] = c(s,gs)
+  
+}
+
+spmod_meds = c(by(test_rsqs$value, list(test_rsqs$spmod), median))
+
+dunn_spmod_groups_df = dunn_spmod_groups_df[order(dunn_spmod_groups_df$spmod),]
+
+dunn_spmod_groups_df$median = spmod_meds
+
+### Save group information
+
+write.csv(dunn_spmod_groups_df, paste(output_dir,'stats','HNS_r-sq_dunn_spmod_groups.csv',sep='/'), row.names = F)
+
+test_rsqs_grps = merge(test_rsqs, dunn_spmod_groups_df[c('spmod','groups')],by = 'spmod')
+
+### Make figure
+
+p_rsq = ggplot(test_rsqs, aes(x = spmod, y = value, fill = spmod)) +
+  geom_boxplot()+
+  scale_fill_brewer(palette = 'Set1')+
+  geom_text(data = dunn_spmod_groups_df, aes(x = spmod, y = 2, label = groups))+
+  ylab('test r-sq')+
+  labs(title = 'Undiluted HNS - post-hoc comparisons')
+
+p_rsq
+
+# ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot.png', plot = p_rsq, path = figure_dir,
+#        device = 'png', dpi = 300)
+
+## outliers removed
+
+p_rsq_no.outl = ggplot(test_rsqs, aes(x = spmod, y = value, fill = spmod)) +
+  geom_boxplot(outlier.shape = NA)+
+  scale_fill_brewer(palette = 'Set1')+
+  geom_text(data = dunn_spmod_groups_df, aes(x = spmod, y = 1, label = groups))+
+  ylab('test r-sq')+
+  labs(title = 'Undiluted HNS - post-hoc comparisons - outliers removed')+
+  coord_cartesian(ylim = c(-1,1))
+
+p_rsq_no.outl
+
+# ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir,
+#        device = 'png', dpi = 300)
 #################################################################
 ###     Scratch Code                              
 

@@ -1,0 +1,8 @@
+"comparison","p","comp1","comp2","sp1","sp2","mod1","mod2"
+"Molybdenum_DL - Molybdenum_PLS",0.0148240757316703,"Molybdenum_DL","Molybdenum_PLS","Molybdenum","Molybdenum","DL","PLS"
+"Nitrate-N_DL - Nitrate-N_RF-PCA",0.0115717668523136,"Nitrate-N_DL","Nitrate-N_RF-PCA","Nitrate-N","Nitrate-N","DL","RF-PCA"
+"Nitrate-N_DL - Nitrate-N_XGB-PCA",0.0466619884723897,"Nitrate-N_DL","Nitrate-N_XGB-PCA","Nitrate-N","Nitrate-N","DL","XGB-PCA"
+"pH_DL - pH_RF-PCA",0.0250452785735231,"pH_DL","pH_RF-PCA","pH","pH","DL","RF-PCA"
+"pH_PLS - pH_RF-PCA",0.026600709289412,"pH_PLS","pH_RF-PCA","pH","pH","PLS","RF-PCA"
+"Phosphorus_DL - Phosphorus_RF-PCA",0.0226050277749861,"Phosphorus_DL","Phosphorus_RF-PCA","Phosphorus","Phosphorus","DL","RF-PCA"
+"Zinc_DL - Zinc_RF-PCA",0.00836079070335208,"Zinc_DL","Zinc_RF-PCA","Zinc","Zinc","DL","RF-PCA"
