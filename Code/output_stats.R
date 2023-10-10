@@ -13,17 +13,17 @@ library(dunn.test)
 
 #### Bring in data
 
-proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
+# proj_dir = 'C:/Users/barre/Documents/GitHub/water_quality-spectroscopy' # For laptop
 
-# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
 sample_type = 'Hydroponics' # used for defining directories
 
 output_dir = paste(proj_dir, sample_type, 'outputs', sep = '/')
 
-# figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
+figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
 
-figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
+# figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
 
 output_files = as.vector(list.files(output_dir))
 
@@ -620,7 +620,7 @@ p_rsq_no.outl
 
 test_rsqs$spmod = paste(test_rsqs$species,test_rsqs$model,sep = '_')
 
-spmods = unique(test_rsqs$spmod)
+spmods = sort(unique(test_rsqs$spmod))
 
 dunn_spmod = dunn.test(test_rsqs$value,test_rsqs$spmod)
 
