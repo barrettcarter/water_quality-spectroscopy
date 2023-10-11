@@ -679,7 +679,7 @@ dunn_spmod_groups = list()
 
 dunn_grp_spmod = list()
 
-s = spmods[1] # for testing
+s = spmods[34] # for testing
 
 li = 1 # can be used for testing, but must be set to 1 for official analysis
 
@@ -697,15 +697,23 @@ for (s in spmods){
   
   if(any(grepl(s,c(dunn_spmod_ins_df$comp1,dunn_spmod_ins_df$comp2)))){
     
-    # make sub dataframe containing all rows with spmod
+    # make sub dataframes containing all rows with spmod
     
     dunn_spmod_ins_sub = dunn_spmod_ins_df[grepl(s,dunn_spmod_ins_df$comparison),]
+    
+    # dunn_spmod_sig_sub = dunn_spmod_sig_df[grepl(s,dunn_spmod_sig_df$comparison),]
     
     # get list of all spmods in group and sort
     
     group_s = unique(append(dunn_spmod_ins_sub$comp1,dunn_spmod_ins_sub$comp2))
     
     group_s = sort(group_s)
+    
+    # Check if any pair in group_s is significantly different
+    
+    sig_pairs = subset(dunn_spmod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+    
+    spmod_drop = unique(append(sig_pairs$comp1,sig_pairs$comp2))
     
     # see if spmod group already exists using function
     
