@@ -713,7 +713,39 @@ for (s in spmods){
     
     sig_pairs = subset(dunn_spmod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
     
-    spmod_drop = unique(append(sig_pairs$comp1,sig_pairs$comp2))
+    max_i = nrow(dunn_spmod_sig_df)
+    
+    i = 0
+    
+    while (nrow(sig_pairs)>0){
+      
+      spmod_sig_all = append(sig_pairs$comp1,sig_pairs$comp2)
+      
+      spmod_sig_unq = unique(spmod_sig_all)
+      
+      spmod_sig_cnt = data.frame(spmod_sig = spmod_sig_unq, count = 0)
+      
+      for (spmod_sig_i in 1:length(spmod_sig_unq)){
+        
+        spmod_sig_cnt$count[spmod_sig_i]=sum(spmod_sig_all==spmod_sig_unq[spmod_sig_i])
+        
+      }
+      
+      spmod_drop = spmod_sig_cnt$spmod_sig[spmod_sig_cnt$count==max(spmod_sig_cnt$count)]
+      
+      group_s = group_s[group_s != spmod_drop]
+      
+      sig_pairs = subset(dunn_spmod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+      
+      i = i + 1
+      
+      if (i == max_i){
+        
+        break
+        
+      }
+      
+    }
     
     # see if spmod group already exists using function
     
