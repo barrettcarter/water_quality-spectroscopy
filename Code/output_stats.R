@@ -661,9 +661,16 @@ dunn_spmod_df$sp2 = unlist(lapply(dunn_spmod_df$comp2, FUN = sp_split_spmod))
 dunn_spmod_df$mod1 = unlist(lapply(dunn_spmod_df$comp1, FUN = mod_split_spmod))
 dunn_spmod_df$mod2 = unlist(lapply(dunn_spmod_df$comp2, FUN = mod_split_spmod))
 
+write.csv(dunn_spmod_df, paste(output_dir,'stats','HNS_r-sq_dunn_spmod-ALL.csv',sep='/'), row.names = F)
+
+### This is where the results are subset so only same-species comparisons are included.
+### Uncomment if this is what it wanted for analysis.
+
 dunn_spmod_df = subset(dunn_spmod_df,sp1 == sp2)
 
 write.csv(dunn_spmod_df, paste(output_dir,'stats','HNS_r-sq_dunn_spmod.csv',sep='/'), row.names = F)
+
+### Continue with grouping analysis
 
 dunn_spmod_sig_df = subset(dunn_spmod_df, p < 0.05)
 
@@ -673,8 +680,7 @@ dunn_spmod_ins_df = subset(dunn_spmod_df, p > 0.05)
 
 write.csv(dunn_spmod_ins_df, paste(output_dir,'stats','HNS_r-sq_dunn-ins_spmod.csv',sep='/'), row.names = F)
 
-
-
+##### Grouping ##############
 dunn_spmod_groups = list()
 
 dunn_grp_spmod = list()
@@ -689,121 +695,131 @@ listNlist = function(list_a,list_b){
   
 }
 
-for (s in spmods){
+# for (sp in unique(dunn_spmod_df$sp1)){
+#   
+#   dunn_spmod_df_sp = subset(dunn_spmod_df,sp1 == sp)
+#   
+#   spmods = sort(unique(append(dunn_spmod_df_sp$comp1,dunn_spmod_df_sp$comp2)))
+#   
+#   li = 1
   
-  group_letter = letters[li]
-  
-  # check to see if spmod is not significantly different from any others
-  
-  if(any(grepl(s,c(dunn_spmod_ins_df$comp1,dunn_spmod_ins_df$comp2)))){
+  for (s in spmods){
     
-    # make sub dataframes containing all rows with spmod
+    group_letter = letters[li]
     
-    dunn_spmod_ins_sub = dunn_spmod_ins_df[grepl(s,dunn_spmod_ins_df$comparison),]
+    # check to see if spmod is not significantly different from any others
     
-    # dunn_spmod_sig_sub = dunn_spmod_sig_df[grepl(s,dunn_spmod_sig_df$comparison),]
-    
-    # get list of all spmods in group and sort
-    
-    group_s = unique(append(dunn_spmod_ins_sub$comp1,dunn_spmod_ins_sub$comp2))
-    
-    group_s = sort(group_s)
-    
-    # Check if any pair in group_s is significantly different
-    
-    sig_pairs = subset(dunn_spmod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
-    
-    max_i = nrow(dunn_spmod_sig_df)
-    
-    i = 0
-    
-    while (nrow(sig_pairs)>0){
+    if(any(grepl(s,c(dunn_spmod_ins_df$comp1,dunn_spmod_ins_df$comp2)))){
       
-      spmod_sig_all = append(sig_pairs$comp1,sig_pairs$comp2)
+      # make sub dataframes containing all rows with spmod
       
-      spmod_sig_unq = unique(spmod_sig_all)
+      dunn_spmod_ins_sub = dunn_spmod_ins_df[grepl(s,dunn_spmod_ins_df$comparison),]
       
-      spmod_sig_cnt = data.frame(spmod_sig = spmod_sig_unq, count = 0)
+      # dunn_spmod_sig_sub = dunn_spmod_sig_df[grepl(s,dunn_spmod_sig_df$comparison),]
       
-      for (spmod_sig_i in 1:length(spmod_sig_unq)){
-        
-        spmod_sig_cnt$count[spmod_sig_i]=sum(spmod_sig_all==spmod_sig_unq[spmod_sig_i])
-        
-      }
+      # get list of all spmods in group and sort
       
-      spmod_drop = spmod_sig_cnt$spmod_sig[spmod_sig_cnt$count==max(spmod_sig_cnt$count)]
+      group_s = unique(append(dunn_spmod_ins_sub$comp1,dunn_spmod_ins_sub$comp2))
       
-      group_s = group_s[group_s != spmod_drop]
+      group_s = sort(group_s)
+      
+      # Check if any pair in group_s is significantly different
       
       sig_pairs = subset(dunn_spmod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
       
-      i = i + 1
+      max_i = nrow(dunn_spmod_sig_df)
       
-      if (i == max_i){
+      i = 0
+      
+      while (nrow(sig_pairs)>0){
         
-        break
+        spmod_sig_all = append(sig_pairs$comp1,sig_pairs$comp2)
         
-      }
-      
-    }
-    
-    # see if spmod group already exists using function
-    
-    group_exists_fun = function(groups_sublist, group_list = group_s){
-      
-      return(listNlist(groups_sublist,group_list))
-      
-    }
-    
-    group_exists = any(lapply(dunn_grp_spmod,group_exists_fun))
-    
-    # if group does not exist, create group
-    
-    if (group_exists==F){
-      
-      dunn_grp_spmod[[group_letter]]=group_s
-      
-      ss = group_s[1] #for testing
-      
-      # also add group letter to every spmod in group
-      
-      for (ss in group_s){
+        spmod_sig_unq = unique(spmod_sig_all)
         
-        # append if spmod already has groups
+        spmod_sig_cnt = data.frame(spmod_sig = spmod_sig_unq, count = 0)
         
-        if (any(grepl(ss,names(dunn_spmod_groups)))){
+        for (spmod_sig_i in 1:length(spmod_sig_unq)){
           
-          dunn_spmod_groups[[ss]] = append(dunn_spmod_groups[[ss]],group_letter)  
+          spmod_sig_cnt$count[spmod_sig_i]=sum(spmod_sig_all==spmod_sig_unq[spmod_sig_i])
           
-        } else{
+        }
+        
+        spmod_drop = spmod_sig_cnt$spmod_sig[spmod_sig_cnt$count==max(spmod_sig_cnt$count)]
+        
+        group_s = group_s[group_s != spmod_drop]
+        
+        sig_pairs = subset(dunn_spmod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+        
+        i = i + 1
+        
+        if (i == max_i){
           
-          # create spmod and assign group if spmod doesn't already have groups
-          
-          dunn_spmod_groups[[ss]] = group_letter
+          break
           
         }
         
       }
       
-      # go to next group letter
+      # see if spmod group already exists using function
+      
+      group_exists_fun = function(groups_sublist, group_list = group_s){
+        
+        return(listNlist(groups_sublist,group_list))
+        
+      }
+      
+      group_exists = any(lapply(dunn_grp_spmod,group_exists_fun))
+      
+      # if group does not exist, create group
+      
+      if (group_exists==F){
+        
+        dunn_grp_spmod[[group_letter]]=group_s
+        
+        ss = group_s[1] #for testing
+        
+        # also add group letter to every spmod in group
+        
+        for (ss in group_s){
+          
+          # append if spmod already has groups
+          
+          if (any(grepl(ss,names(dunn_spmod_groups)))){
+            
+            dunn_spmod_groups[[ss]] = append(dunn_spmod_groups[[ss]],group_letter)  
+            
+          } else{
+            
+            # create spmod and assign group if spmod doesn't already have groups
+            
+            dunn_spmod_groups[[ss]] = group_letter
+            
+          }
+          
+        }
+        
+        # go to next group letter
+        
+        li = li + 1
+        
+      }
+      
+    }else{
+      
+      # this is for the case that a spmod is significantly different from all others
+      # it is its own group.
+      
+      dunn_spmod_groups[[s]] = group_letter
+      dunn_grp_spmod[[group_letter]]=s
       
       li = li + 1
       
     }
     
-  }else{
-    
-    # this is for the case that a spmod is significantly different from all others
-    # it is its own group.
-    
-    dunn_spmod_groups[[s]] = group_letter
-    dunn_grp_spmod[[group_letter]]=s
-    
-    li = li + 1
-    
   }
   
-}
+# }
 
 ### make plot showing groups
 
