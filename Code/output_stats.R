@@ -685,7 +685,7 @@ dunn_spmod_groups = list()
 
 dunn_grp_spmod = list()
 
-s = spmods[34] # for testing
+s = spmods[1] # for testing
 
 li = 1 # can be used for testing, but must be set to 1 for official analysis
 
@@ -771,13 +771,31 @@ listNlist = function(list_a,list_b){
       
       group_exists = any(lapply(dunn_grp_spmod,group_exists_fun))
       
+      # see if spmods are already grouped together (sub-group)
+      
+      for (group_spmod in names(dunn_grp_spmod)){
+        
+        if (all(group_s %in% dunn_grp_spmod[[group_spmod]])){
+          
+          sub_group = TRUE
+          
+          break
+          
+        }else{
+          
+          sub_group = F
+          
+        }
+        
+      }
+      
       # if group does not exist, create group
       
-      if (group_exists==F){
+      if (group_exists==F & sub_group == F){
         
         dunn_grp_spmod[[group_letter]]=group_s
         
-        ss = group_s[1] #for testing
+        ss = group_s[3] #for testing
         
         # also add group letter to every spmod in group
         
