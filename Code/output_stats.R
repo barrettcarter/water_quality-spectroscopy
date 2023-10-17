@@ -789,6 +789,12 @@ listNlist = function(list_a,list_b){
         
       }
       
+      if (length(dunn_grp_spmod)==0){
+        
+        sub_group = F
+        
+      }
+      
       # if group does not exist, create group
       
       if (group_exists==F & sub_group == F){
@@ -865,6 +871,10 @@ dunn_spmod_groups_df = dunn_spmod_groups_df[order(dunn_spmod_groups_df$spmod),]
 
 dunn_spmod_groups_df$median = spmod_meds
 
+dunn_spmod_groups_df$species = unlist(lapply(dunn_spmod_groups_df$spmod, FUN = sp_split_spmod))
+
+dunn_spmod_groups_df$model = unlist(lapply(dunn_spmod_groups_df$spmod, FUN = mod_split_spmod))
+
 ### Save group information
 
 write.csv(dunn_spmod_groups_df, paste(output_dir,'stats','HNS_r-sq_dunn_spmod_groups.csv',sep='/'), row.names = F)
@@ -873,17 +883,18 @@ test_rsqs_grps = merge(test_rsqs, dunn_spmod_groups_df[c('spmod','groups')],by =
 
 ### Make figure
 
-p_rsq = ggplot(test_rsqs, aes(x = spmod, y = value, fill = spmod)) +
+p_rsq = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   geom_boxplot()+
   scale_fill_brewer(palette = 'Set1')+
-  geom_text(data = dunn_spmod_groups_df, aes(x = spmod, y = 2, label = groups))+
+  facet_wrap(~species, scale = 'free')+
+  geom_text(data = dunn_spmod_groups_df, aes(x = model, y = 2, label = groups))+
   ylab('test r-sq')+
   labs(title = 'Undiluted HNS - post-hoc comparisons')
 
 p_rsq
 
-# ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot.png', plot = p_rsq, path = figure_dir,
-#        device = 'png', dpi = 300)
+ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot.png', plot = p_rsq, path = figure_dir,
+       device = 'png', dpi = 150, width = 12, height = 10, units = 'in')
 
 ## outliers removed
 
