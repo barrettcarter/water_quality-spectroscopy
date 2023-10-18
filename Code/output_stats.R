@@ -284,13 +284,15 @@ for (s in species){
   
   group_letter = letters[li]
   
-  # check to see if species is not significantly different from any others
+  # check to see if sp is not significantly different from any others
   
   if(any(grepl(s,c(dunn_sp_ins_df$comp1,dunn_sp_ins_df$comp2)))){
     
-    # make sub dataframe containing all rows with species
+    # make sub dataframes containing all rows with sp
     
     dunn_sp_ins_sub = dunn_sp_ins_df[grepl(s,dunn_sp_ins_df$comparison),]
+    
+    # dunn_sp_sig_sub = dunn_sp_sig_df[grepl(s,dunn_sp_sig_df$comparison),]
     
     # get list of all species in group and sort
     
@@ -298,7 +300,45 @@ for (s in species){
     
     group_s = sort(group_s)
     
-    # see if species group already exists using function
+    # Check if any pair in group_s is significantly different
+    
+    sig_pairs = subset(dunn_sp_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+    
+    max_i = nrow(dunn_sp_sig_df)
+    
+    i = 0
+    
+    while (nrow(sig_pairs)>0){
+      
+      sp_sig_all = append(sig_pairs$comp1,sig_pairs$comp2)
+      
+      sp_sig_unq = unique(sp_sig_all)
+      
+      sp_sig_cnt = data.frame(sp_sig = sp_sig_unq, count = 0)
+      
+      for (sp_sig_i in 1:length(sp_sig_unq)){
+        
+        sp_sig_cnt$count[sp_sig_i]=sum(sp_sig_all==sp_sig_unq[sp_sig_i])
+        
+      }
+      
+      sp_drop = sp_sig_cnt$sp_sig[sp_sig_cnt$count==max(sp_sig_cnt$count)]
+      
+      group_s = group_s[group_s != sp_drop]
+      
+      sig_pairs = subset(dunn_sp_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+      
+      i = i + 1
+      
+      if (i == max_i){
+        
+        break
+        
+      }
+      
+    }
+    
+    # see if sp group already exists using function
     
     group_exists_fun = function(groups_sublist, group_list = group_s){
       
@@ -308,19 +348,43 @@ for (s in species){
     
     group_exists = any(lapply(dunn_grp_sp,group_exists_fun))
     
+    # see if species are already grouped together (sub-group)
+    
+    for (group_sp in names(dunn_grp_sp)){
+      
+      if (all(group_s %in% dunn_grp_sp[[group_sp]])){
+        
+        sub_group = TRUE
+        
+        break
+        
+      }else{
+        
+        sub_group = F
+        
+      }
+      
+    }
+    
+    if (length(dunn_grp_sp)==0){
+      
+      sub_group = F
+      
+    }
+    
     # if group does not exist, create group
     
-    if (group_exists==F){
+    if (group_exists==F & sub_group == F){
       
       dunn_grp_sp[[group_letter]]=group_s
       
-      ss = group_s[1] #for testing
+      ss = group_s[3] #for testing
       
-      # also add group letter to every species in group
+      # also add group letter to every sp in group
       
       for (ss in group_s){
         
-        # append if species already has groups
+        # append if sp already has groups
         
         if (any(grepl(ss,names(dunn_sp_groups)))){
           
@@ -328,7 +392,7 @@ for (s in species){
           
         } else{
           
-          # create species and assign group if species doesn't already have groups
+          # create sp and assign group if sp doesn't already have groups
           
           dunn_sp_groups[[ss]] = group_letter
           
@@ -344,7 +408,7 @@ for (s in species){
     
   }else{
     
-    # this is for the case that a species is significantly different from all others
+    # this is for the case that a sp is significantly different from all others
     # it is its own group.
     
     dunn_sp_groups[[s]] = group_letter
@@ -402,8 +466,8 @@ p_rsq = ggplot(test_rsqs_grps, aes(x = species, y = value)) +
 
 p_rsq
 
-# ggsave(filename = 'HNS_rsq_dunn-sp_boxplot.png', plot = p_rsq, path = figure_dir,
-#        device = 'png', dpi = 300)
+ggsave(filename = 'HNS_rsq_dunn-sp_boxplot.png', plot = p_rsq, path = figure_dir,
+       device = 'png', dpi = 150, width = 8, height = 8, units = 'in')
 
 ### plot with subplots based on groups - no outliers ###
 
@@ -416,8 +480,8 @@ p_rsq_no.outl = ggplot(test_rsqs_grps, aes(x = species, y = value)) +
 
 p_rsq_no.outl
 
-# ggsave(filename = 'HNS_rsq_dunn-sp_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir,
-#        device = 'png', dpi = 300)
+ggsave(filename = 'HNS_rsq_dunn-sp_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir,
+       device = 'png', dpi = 150, width = 8, height = 8, units = 'in')
 
 
 ###########################################################
@@ -472,13 +536,15 @@ for (s in models){
   
   group_letter = letters[li]
   
-  # check to see if model is not significantly different from any others
+  # check to see if mod is not significantly different from any others
   
   if(any(grepl(s,c(dunn_mod_ins_df$comp1,dunn_mod_ins_df$comp2)))){
     
-    # make sub dataframe containing all rows with model
+    # make sub dataframes containing all rows with mod
     
     dunn_mod_ins_sub = dunn_mod_ins_df[grepl(s,dunn_mod_ins_df$comparison),]
+    
+    # dunn_mod_sig_sub = dunn_mod_sig_df[grepl(s,dunn_mod_sig_df$comparison),]
     
     # get list of all models in group and sort
     
@@ -486,7 +552,45 @@ for (s in models){
     
     group_s = sort(group_s)
     
-    # see if model group already exists using function
+    # Check if any pair in group_s is significantly different
+    
+    sig_pairs = subset(dunn_mod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+    
+    max_i = nrow(dunn_mod_sig_df)
+    
+    i = 0
+    
+    while (nrow(sig_pairs)>0){
+      
+      mod_sig_all = append(sig_pairs$comp1,sig_pairs$comp2)
+      
+      mod_sig_unq = unique(mod_sig_all)
+      
+      mod_sig_cnt = data.frame(mod_sig = mod_sig_unq, count = 0)
+      
+      for (mod_sig_i in 1:length(mod_sig_unq)){
+        
+        mod_sig_cnt$count[mod_sig_i]=sum(mod_sig_all==mod_sig_unq[mod_sig_i])
+        
+      }
+      
+      mod_drop = mod_sig_cnt$mod_sig[mod_sig_cnt$count==max(mod_sig_cnt$count)]
+      
+      group_s = group_s[group_s != mod_drop]
+      
+      sig_pairs = subset(dunn_mod_sig_df, comp1 %in% group_s & comp2 %in% group_s)
+      
+      i = i + 1
+      
+      if (i == max_i){
+        
+        break
+        
+      }
+      
+    }
+    
+    # see if mod group already exists using function
     
     group_exists_fun = function(groups_sublist, group_list = group_s){
       
@@ -496,19 +600,43 @@ for (s in models){
     
     group_exists = any(lapply(dunn_grp_mod,group_exists_fun))
     
+    # see if models are already grouped together (sub-group)
+    
+    for (group_mod in names(dunn_grp_mod)){
+      
+      if (all(group_s %in% dunn_grp_mod[[group_mod]])){
+        
+        sub_group = TRUE
+        
+        break
+        
+      }else{
+        
+        sub_group = F
+        
+      }
+      
+    }
+    
+    if (length(dunn_grp_mod)==0){
+      
+      sub_group = F
+      
+    }
+    
     # if group does not exist, create group
     
-    if (group_exists==F){
+    if (group_exists==F & sub_group == F){
       
       dunn_grp_mod[[group_letter]]=group_s
       
-      ss = group_s[1] #for testing
+      ss = group_s[3] #for testing
       
-      # also add group letter to every model in group
+      # also add group letter to every mod in group
       
       for (ss in group_s){
         
-        # append if model already has groups
+        # append if mod already has groups
         
         if (any(grepl(ss,names(dunn_mod_groups)))){
           
@@ -516,7 +644,7 @@ for (s in models){
           
         } else{
           
-          # create model and assign group if model doesn't already have groups
+          # create mod and assign group if mod doesn't already have groups
           
           dunn_mod_groups[[ss]] = group_letter
           
@@ -532,7 +660,7 @@ for (s in models){
     
   }else{
     
-    # this is for the case that a model is significantly different from all others
+    # this is for the case that a mod is significantly different from all others
     # it is its own group.
     
     dunn_mod_groups[[s]] = group_letter
@@ -898,18 +1026,19 @@ ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot.png', plot = p_rsq, path = figure_
 
 ## outliers removed
 
-p_rsq_no.outl = ggplot(test_rsqs, aes(x = spmod, y = value, fill = spmod)) +
+p_rsq_no.outl = ggplot(test_rsqs, aes(x = model, y = value, fill = model)) +
   geom_boxplot(outlier.shape = NA)+
   scale_fill_brewer(palette = 'Set1')+
-  geom_text(data = dunn_spmod_groups_df, aes(x = spmod, y = 1, label = groups))+
+  facet_wrap(~species, scale = 'free')+
+  geom_text(data = dunn_spmod_groups_df, aes(x = model, y = 1, label = groups))+
   ylab('test r-sq')+
   labs(title = 'Undiluted HNS - post-hoc comparisons - outliers removed')+
-  coord_cartesian(ylim = c(-1,1))
+  coord_cartesian(ylim = c(-2,1))
 
 p_rsq_no.outl
 
-# ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot_no-outliers.png', plot = p_rsq_no.outl, path = figure_dir,
-#        device = 'png', dpi = 300)
+ggsave(filename = 'HNS_rsq_dunn-spmod_boxplot_outliers-removed.png', plot = p_rsq_no.outl, path = figure_dir,
+       device = 'png', dpi = 150, width = 12, height = 10, units = 'in')
 #################################################################
 ###     Scratch Code                              
 
