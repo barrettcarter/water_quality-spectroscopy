@@ -1558,6 +1558,20 @@ test_rmses$spmod = paste(test_rmses$species,test_rmses$model,sep = '_')
 
 spmods = sort(unique(test_rmses$spmod))
 
+### make qqplot
+
+qqplot = ggplot(test_rmses, aes(sample = value, color = factor(model)))+
+  facet_wrap(~species, scale = 'free')+
+  scale_color_brewer(palette = 'Set1')+
+  labs(title = 'Undiluted HNS - QQ Plot')+
+  stat_qq()+
+  stat_qq_line()
+
+qqplot
+
+ggsave(filename = 'HNS_rmse_spmod_QQplot.png', plot = qqplot, path = figure_dir,
+       device = 'png', dpi = 150, width = 12, height = 10, units = 'in')
+
 dunn_spmod = dunn.test(test_rmses$value,test_rmses$spmod)
 
 dunn_spmod_df = data.frame(comparison = dunn_spmod$comparisons, p = dunn_spmod$P)
@@ -1824,7 +1838,7 @@ p_rmse = ggplot(test_rmses, aes(x = model, y = value, fill = model)) +
   scale_fill_brewer(palette = 'Set1')+
   facet_wrap(~species, scale = 'free')+
   geom_text(data = dunn_spmod_groups_df, aes(x = model, y = 2, label = groups))+
-  ylab('test rmse')+
+  ylab('test RMSE (mg/L)')+
   labs(title = 'Undiluted HNS - post-hoc comparisons')
 
 p_rmse
@@ -1839,9 +1853,9 @@ p_rmse_no.outl = ggplot(test_rmses, aes(x = model, y = value, fill = model)) +
   scale_fill_brewer(palette = 'Set1')+
   facet_wrap(~species, scale = 'free')+
   geom_text(data = dunn_spmod_groups_df, aes(x = model, y = 1, label = groups))+
-  ylab('test rmse')+
-  labs(title = 'Undiluted HNS - post-hoc comparisons - outliers removed')+
-  coord_cartesian(ylim = c(-2,1))
+  ylab('test RMSE (mg/L)')+
+  labs(title = 'Undiluted HNS - post-hoc comparisons - outliers removed')
+  # coord_cartesian(ylim = c(-2,1))
 
 p_rmse_no.outl
 
