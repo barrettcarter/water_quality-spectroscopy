@@ -21,7 +21,7 @@ sample_type = 'Hydroponics' # used for defining directories
 
 output_dir = paste(proj_dir, sample_type, 'outputs', sep = '/')
 
-figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for work computer
+figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results\\R' # for work computer
 
 # figure_dir = 'C:\\Users\\barre\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results' # for laptop
 
