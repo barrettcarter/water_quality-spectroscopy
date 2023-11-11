@@ -39,7 +39,7 @@ sample_type = 'Hydroponics' # used for navigating directories and other purposes
 
 # proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
-proj_dir = r'C:\Users\barre\Documents\GitHub\water_quality-spectroscopy' # for work computer
+proj_dir = r'C:\Users\barre\Documents\GitHub\water_quality-spectroscopy' # for laptop
 
 output_dir = os.path.join(proj_dir, sample_type, 'outputs')
 
@@ -82,6 +82,8 @@ models = outputs_df.model.unique()
 test_rmses = outputs_df.loc[outputs_df.output=='test_rmse',:]
 
 test_rsqs = outputs_df.loc[outputs_df.output=='test_rsq',:]
+
+alphabet = string.ascii_lowercase
 
 #%% transform values to make more normally distributed
 
@@ -165,8 +167,88 @@ for perf_met in list(perf_mets.keys()):
         
         tukey_results = pd.concat([tukey_results,pm_results],ignore_index=True)
         
+#%% Define grouping function
+
+# define variables for testing
+
+results_df = tukey_results
+factor_cols = ['mod1','mod2']
+block_col = 'species'
+conclusion_col = 'reject'
+response_col = 'perf_met'
+
+def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
+                    response_col):
+    
+    results_df = results_df.copy()
+    
+    # make list of unique block labels
+    
+    blocks = results_df[block_col].unique()
+        
+    # make list of unique factor labels
+        
+    factor_levs = results_df[factor_cols[0]]
+    
+    for factor_col in factor_cols[1:]:
+    
+        factor_levs = pd.concat([factor_levs,results_df[factor_col]],
+                           ignore_index=True)
+        
+    factor_levs = factor_levs.unique()
+    
+    responses = results_df[response_col].unique()
+    
+    ID_cols = pd.concat([pd.Series(block_col),pd.Series(response_col)])
+    
+    fl_cols = pd.concat([ID_cols,pd.Series(['factor_lev','letters'])])
+    
+    lf_cols = pd.concat([ID_cols,pd.Series(['letter','factor_levs'])])
+    
+    factor_letters = pd.DataFrame(columns = fl_cols)
+    
+    letter_factors = pd.DataFrame(columns = lf_cols)
+    
+    response = responses[0] # for testing
+
+    for response in responses:
+        
+        res_sub = results_df.loc[results_df[response_col]==response,:].reset_index(drop = True)
+        
+        res_sig = res_sub.loc[res_sub[conclusion_col],:]
+        
+        res_ins = res_sub.loc[res_sub[conclusion_col]==False,:]
+        
+        block = blocks[0] # for testing
+        
+        for block in blocks:
+            
+            letter = alphabet[0] # reset grouping letters
+            
+            res_ins_bl = res_ins.loc[res_ins[block_col]==block,:]
+            
+            res_sig_bl = res_sig.loc[res_sig[block_col]==block,:]
+            
+            factor_lev = factor_levs[0] # for testing
+            
+            # see if factor level was in any non-significantly different pairs
+            
+            for factor_lev in factor_levs:
+                
+                if (res_ins_bl[factor_cols]==factor_lev).any(axis = None):
+                    
+                    res_ins_bl_f = res_ins_bl.loc[(res_ins_bl[factor_cols]==factor_lev).any(axis = 1),:]
+            
+                    group_fac_levs = np.unique(res_ins_bl_f[factor_cols].values)
+                    
+                    sig_pairs = (res_sig_bl[factor_cols].isin(group_fac_levs)).all(axis=1)
+                    
+                    new_row_lf = pd.DataFrame({block_col: block, response_col:response,
+                                               'letter':letter,factor_levs})
+        
 #%% Save results
 
 tukey_results.to_csv(os.path.join(output_dir,'stats',
                                   f'{abbrv}_rsq-rmse_Tukey-by-sp.csv'),
                      index=False)
+
