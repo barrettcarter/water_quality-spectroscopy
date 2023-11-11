@@ -207,6 +207,20 @@ def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
     
     factor_letters = pd.DataFrame(columns = fl_cols)
     
+    for response in responses:
+        
+        for block in blocks:
+            
+            for factor_lev in factor_levs:
+                
+                new_row = pd.DataFrame(columns = fl_cols)
+                
+                new_row.loc[0,block_col:'factor_lev'] = [block, response, factor_lev]
+                
+                factor_letters = pd.concat([factor_letters,new_row],ignore_index=True)
+    
+    factor_letters['letters']='A'
+    
     letter_factors = pd.DataFrame(columns = lf_cols)
     
     response = responses[0] # for testing
@@ -221,9 +235,11 @@ def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
         
         block = blocks[0] # for testing
         
+        block = 'Phosphorus' # for testing
+        
         for block in blocks:
             
-            letter = alphabet[0] # reset grouping letters
+            li = 0   # reset grouping letters
             
             res_ins_bl = res_ins.loc[res_ins[block_col]==block,:]
             
@@ -231,24 +247,122 @@ def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
             
             factor_lev = factor_levs[0] # for testing
             
-            # see if factor level was in any non-significantly different pairs
+            factor_lev = 'PLS' # for testing
             
             for factor_lev in factor_levs:
+                
+                letter = alphabet[li]
+                
+                # see if factor level was in any non-significantly different pairs
                 
                 if (res_ins_bl[factor_cols]==factor_lev).any(axis = None):
                     
                     res_ins_bl_f = res_ins_bl.loc[(res_ins_bl[factor_cols]==factor_lev).any(axis = 1),:]
             
-                    group_fac_levs = np.unique(res_ins_bl_f[factor_cols].values)
+                    group_fac_levs = np.unique(res_ins_bl_f[factor_cols].values).flatten()
                     
-                    sig_pairs = (res_sig_bl[factor_cols].isin(group_fac_levs)).all(axis=1)
+                    sig_pairs_cond = (res_sig_bl[factor_cols].isin(group_fac_levs)).all(axis=1)
                     
-                    new_row_lf = pd.DataFrame({block_col: block, response_col:response,
-                                               'letter':letter,factor_levs})
-        
+                    sig_pairs = res_sig_bl.loc[sig_pairs_cond,factor_cols]
+                    
+                    fac_lev_drop = np.unique(sig_pairs.values).flatten()
+                    
+                    fac_lev_drop = fac_lev_drop[fac_lev_drop != factor_lev]
+                    
+                    group_fac_levs = group_fac_levs[np.isin(group_fac_levs,fac_lev_drop)==False]
+                    
+                    group_fac_levs = np.sort(group_fac_levs)
+                    
+                    # if only one is left, that means the group is redundant
+                    # need to move on to next iteration
+                    
+                    if len(group_fac_levs)==1:
+                        
+                        continue
+    
+                        
+                else: 
+                    
+                    # In the case where the factor level is different from all others, it's its own group
+                    
+                    group_fac_levs = np.array([factor_lev])
+                    
+                # # put group_factors into a series for putting into the letter_factors dataframe
+                
+                ### This may not be the best way to go about it
+                    
+                # gf_sr = pd.Series(np.array([]),dtype=object)
+                        
+                # gf_sr[0] = group_fac_levs
+                
+                
+                # make letter group into a string
+                
+                gf_str = ' '.join(group_fac_levs)
+                
+                if letter_factors.shape[0]==0: # for the first iteration
+                    
+                    new_row_lf = pd.DataFrame(columns = letter_factors.columns)
+                    
+                    # new_row_lf.loc[0,:] = [block,response,letter,gf_sr[0]]
+                    
+                    new_row_lf.loc[0,:] = [block,response,letter,gf_str]
+                    
+                    letter_factors = pd.concat([letter_factors,new_row_lf],ignore_index=True)
+                    
+                    fac_let_rows = (factor_letters[block_col] == block)&\
+                        (factor_letters[response_col] == response)&\
+                            (factor_letters.factor_lev.isin(group_fac_levs))
+                    
+                    factor_letters.loc[fac_let_rows,'letters'] =\
+                        factor_letters.loc[fac_let_rows,'letters']+letter
+                        
+                    li += 1
+                
+                elif (letter_factors.loc[(letter_factors[block_col] == block)&\
+                        (letter_factors[response_col] == response),'factor_levs']==gf_str).sum()==0: # making sure group doesdn't already exists
+                    
+                    new_row_lf = pd.DataFrame(columns = letter_factors.columns)
+                    
+                    # new_row_lf.loc[0,:] = [block,response,letter,gf_sr[0]]
+                    new_row_lf.loc[0,:] = [block,response,letter,gf_str]
+                    
+                    letter_factors = pd.concat([letter_factors,new_row_lf],ignore_index=True)
+                    
+                    fac_let_rows = (factor_letters[block_col] == block)&\
+                        (factor_letters[response_col] == response)&\
+                            (factor_letters.factor_lev.isin(group_fac_levs))
+                    
+                    factor_letters.loc[fac_let_rows,'letters'] =\
+                        factor_letters.loc[fac_let_rows,'letters']+letter
+                    
+                    li += 1
+                    
+    factor_letters['letters'] = factor_letters.letters.apply(lambda x: x[1:])
+    
+    # return({'letter_factors':letter_factors,'factor_letters':factor_letters})
+                    
+#%% run grouping function
+
+grouping_dict = post_hoc_groups(results_df = tukey_results,factor_cols = ['mod1','mod2'],
+                                block_col = 'species',
+                                conclusion_col = 'reject',
+                                response_col = 'perf_met')    
+
+factor_letters = grouping_dict['factor_letters']   
+letter_factors = grouping_dict['letter_factors']
+
 #%% Save results
 
 tukey_results.to_csv(os.path.join(output_dir,'stats',
                                   f'{abbrv}_rsq-rmse_Tukey-by-sp.csv'),
+                     index=False)
+
+factor_letters.to_csv(os.path.join(output_dir,'stats',
+                                  f'{abbrv}_rsq-rmse_Tukey-by-sp_factor-letters.csv'),
+                     index=False)
+
+letter_factors.to_csv(os.path.join(output_dir,'stats',
+                                  f'{abbrv}_rsq-rmse_Tukey-by-sp_letter-factors.csv'),
                      index=False)
 
