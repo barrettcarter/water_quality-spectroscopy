@@ -4,26 +4,22 @@ Nitrate-N,test_rmse,b,PLS RF-PCA XGB-PCA
 Ammonium-N,test_rmse,a,DL PLS RF-PCA XGB-PCA
 Phosphorus,test_rmse,a,DL XGB-PCA
 Phosphorus,test_rmse,b,PLS RF-PCA XGB-PCA
-Potassium,test_rmse,a,DL RF-PCA
+Potassium,test_rmse,a,DL RF-PCA XGB-PCA
 Potassium,test_rmse,b,DL PLS RF-PCA
-Potassium,test_rmse,c,DL RF-PCA XGB-PCA
 Calcium,test_rmse,a,DL PLS RF-PCA XGB-PCA
-Magnesium,test_rmse,a,DL XGB-PCA
+Magnesium,test_rmse,a,DL RF-PCA XGB-PCA
 Magnesium,test_rmse,b,DL PLS XGB-PCA
-Magnesium,test_rmse,c,DL RF-PCA XGB-PCA
 Sulfate,test_rmse,a,DL PLS RF-PCA XGB-PCA
 Boron,test_rmse,a,DL PLS RF-PCA XGB-PCA
 Zinc,test_rmse,a,DL PLS XGB-PCA
-Zinc,test_rmse,b,PLS XGB-PCA
-Zinc,test_rmse,c,PLS RF-PCA XGB-PCA
+Zinc,test_rmse,b,PLS RF-PCA XGB-PCA
 Manganese,test_rmse,a,DL
 Manganese,test_rmse,b,PLS RF-PCA XGB-PCA
 Iron,test_rmse,a,DL PLS RF-PCA XGB-PCA
 Copper,test_rmse,a,DL PLS RF-PCA XGB-PCA
 Molybdenum,test_rmse,a,DL PLS RF-PCA XGB-PCA
 pH,test_rmse,a,DL PLS XGB-PCA
-pH,test_rmse,b,PLS XGB-PCA
-pH,test_rmse,c,PLS RF-PCA XGB-PCA
+pH,test_rmse,b,PLS RF-PCA XGB-PCA
 Nitrate-N,test_rsq,a,DL PLS
 Nitrate-N,test_rsq,b,PLS RF-PCA XGB-PCA
 Ammonium-N,test_rsq,a,DL PLS RF-PCA XGB-PCA
@@ -31,21 +27,17 @@ Phosphorus,test_rsq,a,DL
 Phosphorus,test_rsq,b,PLS RF-PCA XGB-PCA
 Potassium,test_rsq,a,DL PLS RF-PCA XGB-PCA
 Calcium,test_rsq,a,DL PLS RF-PCA XGB-PCA
-Magnesium,test_rsq,a,DL XGB-PCA
+Magnesium,test_rsq,a,DL RF-PCA XGB-PCA
 Magnesium,test_rsq,b,DL PLS XGB-PCA
-Magnesium,test_rsq,c,DL RF-PCA XGB-PCA
 Sulfate,test_rsq,a,DL PLS RF-PCA XGB-PCA
 Boron,test_rsq,a,DL PLS RF-PCA XGB-PCA
 Zinc,test_rsq,a,DL PLS XGB-PCA
-Zinc,test_rsq,b,PLS XGB-PCA
-Zinc,test_rsq,c,PLS RF-PCA XGB-PCA
+Zinc,test_rsq,b,PLS RF-PCA XGB-PCA
 Manganese,test_rsq,a,DL
 Manganese,test_rsq,b,PLS RF-PCA XGB-PCA
 Iron,test_rsq,a,DL PLS RF-PCA XGB-PCA
 Copper,test_rsq,a,DL PLS RF-PCA XGB-PCA
 Molybdenum,test_rsq,a,DL RF-PCA XGB-PCA
 Molybdenum,test_rsq,b,PLS RF-PCA XGB-PCA
-Molybdenum,test_rsq,c,RF-PCA XGB-PCA
 pH,test_rsq,a,DL PLS XGB-PCA
-pH,test_rsq,b,PLS XGB-PCA
-pH,test_rsq,c,PLS RF-PCA XGB-PCA
+pH,test_rsq,b,PLS RF-PCA XGB-PCA
