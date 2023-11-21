@@ -65,15 +65,17 @@ for rcparam in rc.keys():
     
 #%% set directories and bring in data
 
+user = os.getlogin()
+
 sample_type = 'Hydroponics' # used for navigating directories and other purposes
 
-proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
-# proj_dir = r'C:\Users\barre\Documents\GitHub\water_quality-spectroscopy' # for laptop
+proj_dir = r'C:\Users\barre\Documents\GitHub\water_quality-spectroscopy' # for laptop
 
 output_dir = os.path.join(proj_dir, sample_type, 'outputs')
 
-figure_dir = 'C:\\Users\\carter_j\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results\\python' # for work computer
+figure_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images\\HNS results\\python' # for work computer
 
 output_files = np.array(os.listdir(output_dir))
 
@@ -104,10 +106,13 @@ for file in output_files[1:]:
 abbrv = 'HNSr'
 
 outputs = outputs_df.output.unique()
+outputs = np.sort(outputs)
 
 species = outputs_df.species.unique()
+species = np.sort(species)
 
 models = outputs_df.model.unique()
+models = np.sort(models)
 
 test_rmses = outputs_df.loc[outputs_df.output=='test_rmse',:]
 
@@ -158,10 +163,6 @@ perf_met = 'test_rmse' # for testing
 tukey_results = pd.DataFrame(columns = ['perf_met','species','mod1','mod2','meandiff',
                                     'pvalue','reject'])
 
-mod_grps = pd.DataFrame(columns = ['perf_met','species','model','group_letters'])
-
-grp_mods = pd.DataFrame(columns = ['perf_met','species','group_letter','models'])
-
 for perf_met in list(perf_mets.keys()):
     
     pm_df = perf_mets[perf_met]
@@ -207,6 +208,13 @@ block_col = 'species'
 conclusion_col = 'reject'
 response_col = 'perf_met'
 
+# for testing species comparisons
+results_df = tukey_results
+factor_cols = ['sp1','sp2']
+block_col = 'model'
+conclusion_col = 'reject'
+response_col = 'perf_met'
+
 def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
                     response_col):
     
@@ -234,6 +242,8 @@ def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
     fl_cols = pd.concat([ID_cols,pd.Series(['factor_lev','letters'])])
     
     lf_cols = pd.concat([ID_cols,pd.Series(['letter','factor_levs'])])
+    
+    # create factor_letters dataframe
     
     factor_letters = pd.DataFrame(columns = fl_cols)
     
@@ -265,7 +275,7 @@ def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
         
         block = blocks[0] # for testing
         
-        block = 'Potassium' # for testing
+        # block = 'Potassium' # for testing
         
         for block in blocks:
             
@@ -295,17 +305,43 @@ def post_hoc_groups(results_df,factor_cols,block_col,conclusion_col,
                     
                     sig_pairs = res_sig_bl.loc[sig_pairs_cond,factor_cols]
                     
+                    max_i = res_sig_bl.shape[0]
+                    
                     i = 0
                     
                     while sig_pairs.shape[0]>0:
                         
-                        sig_fac_levs = np.unique(sig_pairs.values).flatten()
+                        sig_fac_all = sig_pairs.values.flatten()
+                        
+                        sig_fac_unq = np.unique(sig_fac_all)
+                        
+                        sig_fac_cnt = pd.DataFrame(columns = ['Factor_lev','Count'])
+                        
+                        for sig_fac_i in range(len(sig_fac_unq)):
+                          
+                          sig_fac_cnt.loc[sig_fac_i,'Count']=sum(sig_fac_all==sig_fac_unq[sig_fac_i])
+                          sig_fac_cnt.loc[sig_fac_i,'Factor_lev']=sig_fac_unq[sig_fac_i]
+                        
+        
+                        fac_drop = sig_fac_cnt.Factor_lev[sig_fac_cnt.Count==max(sig_fac_cnt.Count)].values[0]
+                        
+                        group_fac_levs = group_fac_levs[group_fac_levs != fac_drop]
+                        
+                        sig_pairs_cond = (res_sig_bl[factor_cols].isin(group_fac_levs)).all(axis=1)
                     
-                    fac_lev_drop = np.unique(sig_pairs.values).flatten()
+                        sig_pairs = res_sig_bl.loc[sig_pairs_cond,factor_cols]
                     
-                    fac_lev_drop = fac_lev_drop[fac_lev_drop != factor_lev]
+                        i = i + 1
+                        
+                        if i == max_i:
+                          
+                          break
                     
-                    group_fac_levs = group_fac_levs[np.isin(group_fac_levs,fac_lev_drop)==False]
+                    # fac_lev_drop = np.unique(sig_pairs.values).flatten()
+                    
+                    # fac_lev_drop = fac_lev_drop[fac_lev_drop != factor_lev]
+                    
+                    # group_fac_levs = group_fac_levs[np.isin(group_fac_levs,fac_lev_drop)==False]
                     
                     group_fac_levs = np.sort(group_fac_levs)
                     
@@ -475,7 +511,171 @@ for perf_met in perf_mets:
             
             # sns.violinplot(pm_sp,x = 'model', y = 'trans_val',ax = ax, cut = 0)
             
-            sns.boxplot(pm_sp,x = 'model', y = 'trans_val',ax = ax)
+            sns.boxplot(data = pm_sp,x = 'model', y = 'trans_val',ax = ax)
+            
+            ax.set_xlabel('')
+            ax.set_ylabel('')
+            ax.set_title(sp)
+            
+            if ((row+1)*4 + (col+1)) <= num_figs:
+                
+                ax.set_xticklabels('')
+            
+            for i_text in range(len(text)):
+            
+                ax.text(x_text[i_text],y_text,text[i_text],color = 'red',ha = 'center',
+                        bbox = {'facecolor':'white','alpha':0.7,'boxstyle':'Round, pad=0.1'})
+            
+            i_sp +=1
+            
+            fig_num +=1
+            
+            if col == fig_dim - 1:
+                
+                col = 0
+                row +=1
+            
+            else:
+                
+                col += 1
+                
+#%% compare results between species
+
+model_subsets = {'All':models,'DL':['DL'],'PLS':['PLS'],'RF-PCA':['RF-PCA'],
+                 'XGB-PCA':['XGB-PCA']}
+
+tukey_results = pd.DataFrame(columns = ['perf_met','model','sp1','sp2','meandiff',
+                                        'pvalue','reject'])
+
+for pm in perf_mets:
+    
+    pm_df = perf_met_dict[pm]
+
+    for mod_sub in list(model_subsets.keys()):
+        
+        mods = model_subsets[mod_sub]
+        
+        pm_mods = pm_df.loc[pm_df.model.isin(mods),:]
+        
+        pm_tukey = sm.stats.multicomp.pairwise_tukeyhsd(pm_mods.trans_val,
+                                                        pm_mods.species)
+        
+        
+        fig,ax = plt.subplots(figsize = [3.25,3.25])
+        pm_tukey.plot_simultaneous(ax = ax, xlabel = f'trans({perf_met})', ylabel = 'species')
+        ax.set_title(mod_sub)
+        
+        pm_species = pm_tukey.groupsunique
+        pm_pairinds = pm_tukey._multicomp.pairindices
+
+        pm_sp1 = pm_species[pm_pairinds[0]]
+        pm_sp2 = pm_species[pm_pairinds[1]]
+        
+        pm_results = pd.DataFrame(columns = tukey_results.columns)
+        
+        pm_results['sp1'] = pm_sp1
+        pm_results['sp2'] = pm_sp2
+        pm_results['meandiff'] = pm_tukey.meandiffs
+        pm_results['pvalue'] = pm_tukey.pvalues
+        pm_results['reject'] = pm_tukey.reject
+        
+        pm_results['perf_met'] = pm
+        pm_results['model'] = mod_sub
+        
+        tukey_results = pd.concat([tukey_results,pm_results],ignore_index=True)
+        
+#%% determine species groups for each model subset
+
+grouping_dict = post_hoc_groups(results_df = tukey_results,factor_cols = ['sp1','sp2'],
+                                block_col = 'model',
+                                conclusion_col = 'reject',
+                                response_col = 'perf_met')    
+
+factor_letters = grouping_dict['factor_letters']   
+letter_factors = grouping_dict['letter_factors']
+
+#%% Save results
+
+tukey_results.to_csv(os.path.join(output_dir,'stats',
+                                  f'{abbrv}_rsq-rmse_Tukey-by-mod.csv'),
+                     index=False)
+
+factor_letters.to_csv(os.path.join(output_dir,'stats',
+                                  f'{abbrv}_rsq-rmse_Tukey-by-mod_factor-letters.csv'),
+                     index=False)
+
+letter_factors.to_csv(os.path.join(output_dir,'stats',
+                                  f'{abbrv}_rsq-rmse_Tukey-by-mod_letter-factors.csv'),
+                     index=False)
+
+#%% Make figures
+
+perf_met_labs = {'test_rmse':'log(test RMSE (mg/L))',
+                 'test_rsq':'log(1 - test R-sq (unitless))'}
+
+num_figs = len(species)
+
+fig_dim = int(num_figs**0.5)+1
+
+for perf_met in perf_mets:
+    
+    pm_df = perf_met_dict[perf_met]
+    
+    perf_met_lab = perf_met_labs[perf_met]
+
+    fig, axs = plt.subplots(nrows = fig_dim, ncols = fig_dim, figsize = (16,12),
+                            dpi = 300, sharex = False)
+    
+    plt.subplots_adjust(hspace = 0.2)
+    
+    fig.text(0.5, 0.08, 'ML Algorithm', ha='center', va='center',size=16) # figure x label
+    fig.text(0.08, 0.5, perf_met_lab, ha='center', va='center', 
+             rotation='vertical',size=16) # figure y label
+    
+    row = 0 # for testing
+    col = 0 # for testing
+    
+    i_sp = 0 # required
+    fig_num = 1 # required
+    
+    for row in range(fig_dim):
+        
+        for col in range(fig_dim):
+            
+            ax = axs[row,col]
+            
+            if fig_num > num_figs:
+                
+                ax.axis('off') # turn off extra axes
+                
+                if fig_num == fig_dim**2:
+                    
+                    plt.savefig(os.path.join(figure_dir,f'{abbrv}_{perf_met}_boxplot.png'))
+                
+                fig_num+=1
+                
+                continue
+            
+            sp = species[i_sp]
+        
+            pm_sp = pm_df.loc[pm_df.species==sp,:]
+            
+            pm_sp = pm_sp.sort_values(by = 'model')
+            
+            letters_sp_pm = factor_letters.loc[(factor_letters.species==sp)&
+                                               (factor_letters.perf_met==perf_met),:].reset_index()
+            
+            y_text = pm_sp['trans_val'].max() -\
+                0.1*(pm_sp['trans_val'].max() -\
+                     pm_sp['trans_val'].min())
+                    
+            x_text = [0,1,2,3]
+            
+            text = letters_sp_pm.letters.to_numpy()
+            
+            # sns.violinplot(pm_sp,x = 'model', y = 'trans_val',ax = ax, cut = 0)
+            
+            sns.boxplot(data = pm_sp,x = 'model', y = 'trans_val',ax = ax)
             
             ax.set_xlabel('')
             ax.set_ylabel('')

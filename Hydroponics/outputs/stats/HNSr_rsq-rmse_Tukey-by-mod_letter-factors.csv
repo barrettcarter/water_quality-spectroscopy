@@ -1,0 +1,71 @@
+model,perf_met,letter,factor_levs
+All,test_rmse,a,Ammonium-N
+All,test_rmse,b,Boron Copper
+All,test_rmse,c,Calcium
+All,test_rmse,d,Iron Manganese Zinc
+All,test_rmse,e,Magnesium
+All,test_rmse,f,Molybdenum
+All,test_rmse,g,Nitrate-N Potassium
+All,test_rmse,h,Phosphorus
+All,test_rmse,i,Sulfate
+All,test_rmse,j,pH
+DL,test_rmse,a,Ammonium-N
+DL,test_rmse,b,Boron Copper
+DL,test_rmse,c,Calcium Phosphorus Sulfate
+DL,test_rmse,d,Iron Manganese Zinc
+DL,test_rmse,e,Magnesium
+DL,test_rmse,f,Molybdenum
+DL,test_rmse,g,Nitrate-N Potassium
+DL,test_rmse,h,Manganese pH
+PLS,test_rmse,a,Ammonium-N Magnesium
+PLS,test_rmse,b,Boron Copper
+PLS,test_rmse,c,Calcium Sulfate
+PLS,test_rmse,d,Iron Manganese Zinc
+PLS,test_rmse,e,Molybdenum
+PLS,test_rmse,f,Nitrate-N Potassium
+PLS,test_rmse,g,Calcium Phosphorus
+PLS,test_rmse,h,pH
+RF-PCA,test_rmse,a,Ammonium-N
+RF-PCA,test_rmse,b,Boron Copper
+RF-PCA,test_rmse,c,Calcium
+RF-PCA,test_rmse,d,Iron Manganese Zinc
+RF-PCA,test_rmse,e,Magnesium
+RF-PCA,test_rmse,f,Molybdenum
+RF-PCA,test_rmse,g,Nitrate-N Sulfate
+RF-PCA,test_rmse,h,Phosphorus
+RF-PCA,test_rmse,i,Nitrate-N Potassium
+RF-PCA,test_rmse,j,pH
+XGB-PCA,test_rmse,a,Ammonium-N
+XGB-PCA,test_rmse,b,Boron Copper
+XGB-PCA,test_rmse,c,Calcium Phosphorus
+XGB-PCA,test_rmse,d,Iron Manganese Zinc
+XGB-PCA,test_rmse,e,Magnesium
+XGB-PCA,test_rmse,f,Molybdenum
+XGB-PCA,test_rmse,g,Nitrate-N Potassium
+XGB-PCA,test_rmse,h,Sulfate
+XGB-PCA,test_rmse,i,pH
+All,test_rsq,a,Ammonium-N Boron Nitrate-N Phosphorus Zinc pH
+All,test_rsq,b,Boron Manganese Nitrate-N Phosphorus Zinc pH
+All,test_rsq,c,Calcium Magnesium Sulfate
+All,test_rsq,d,Copper Potassium
+All,test_rsq,e,Iron
+All,test_rsq,f,Ammonium-N Boron Molybdenum pH
+DL,test_rsq,a,Ammonium-N Boron Manganese Molybdenum Nitrate-N Phosphorus Zinc pH
+DL,test_rsq,b,Calcium Magnesium Potassium Sulfate
+DL,test_rsq,c,Ammonium-N Boron Copper Molybdenum pH
+DL,test_rsq,d,Calcium Iron Magnesium Sulfate
+DL,test_rsq,e,Ammonium-N Boron Copper Molybdenum Potassium
+PLS,test_rsq,a,Ammonium-N Boron Manganese Nitrate-N Phosphorus Zinc pH
+PLS,test_rsq,b,Calcium Iron Magnesium Sulfate
+PLS,test_rsq,c,Ammonium-N Boron Copper Molybdenum Phosphorus pH
+PLS,test_rsq,d,Ammonium-N Boron Manganese Molybdenum Phosphorus Zinc pH
+PLS,test_rsq,e,Copper Potassium
+RF-PCA,test_rsq,a,Ammonium-N Boron Molybdenum Nitrate-N Phosphorus Zinc pH
+RF-PCA,test_rsq,b,Calcium Magnesium Sulfate
+RF-PCA,test_rsq,c,Copper Potassium
+RF-PCA,test_rsq,d,Iron
+RF-PCA,test_rsq,e,Ammonium-N Boron Manganese Nitrate-N Phosphorus Zinc
+XGB-PCA,test_rsq,a,Ammonium-N Boron Manganese Molybdenum Nitrate-N Phosphorus Zinc pH
+XGB-PCA,test_rsq,b,Calcium Iron Magnesium Sulfate
+XGB-PCA,test_rsq,c,Copper Molybdenum Nitrate-N Potassium
+XGB-PCA,test_rsq,d,Molybdenum Nitrate-N Potassium pH
