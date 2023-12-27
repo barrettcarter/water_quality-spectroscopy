@@ -20,31 +20,6 @@ import seaborn as sns
 
 sns.set_theme(style = 'whitegrid',font_scale=1)
 #sns.set(font_scale=2)
-sns.set_style(rc = {'axes.edgecolor':'0.1',
-                      'axes.labelcolor':'0.1',
-                      'grid.linestyle': '--',
-                      'text.color':'0.1',
-                      'xtick.color':'0.1',
-                      'ytick.color':'0.1',
-                      'xtick.direction': 'in',
-                      'ytick.direction': 'in',
-                      'patch.edgecolor': 'w',
-                      'patch.force_edgecolor': True,
-                      'image.cmap': 'Set1',
-                      'font.family': ['sans-serif'],
-                      'font.sans-serif': ['Arial',
-                      'DejaVu Sans',
-                      'Liberation Sans',
-                      'Bitstream Vera Sans',
-                      'sans-serif'],
-                      'xtick.bottom': True,
-                      'xtick.top': True,
-                      'ytick.left': True,
-                      'ytick.right': True,
-                      'axes.spines.left': True,
-                      'axes.spines.bottom': True,
-                      'axes.spines.right': True,
-                      'axes.spines.top': True})
 
 import matplotlib as mpl
 # plt.style.use('seaborn-whitegrid')
@@ -55,13 +30,16 @@ rc = {'axes.edgecolor':'0.1','axes.labelcolor':'0.1','grid.linestyle': '--',
       'image.cmap': 'Set1','font.family': ['sans-serif'],
       'font.sans-serif': ['Arial','DejaVu Sans','Liberation Sans','Bitstream Vera Sans',
                           'sans-serif'],
-      'xtick.bottom': True,'xtick.top': True,'ytick.left': True,'ytick.right': True,
       'axes.spines.left': True,'axes.spines.bottom': True,'axes.spines.right': True,
       'axes.spines.top': True,'figure.dpi': 300}
 
 for rcparam in rc.keys():
     
     mpl.rcParams[rcparam] = rc[rcparam]
+
+sns.set_style(rc = rc)
+
+
     
 #%% set directories and bring in data
 
@@ -69,9 +47,9 @@ user = os.getlogin()
 
 sample_type = 'Hydroponics' # used for navigating directories and other purposes
 
-# proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
+proj_dir = 'D:/GitHub/PhD/water_quality-spectroscopy' # for work computer
 
-proj_dir = r'C:\Users\barre\Documents\GitHub\water_quality-spectroscopy' # for laptop
+# proj_dir = r'C:\Users\barre\Documents\GitHub\water_quality-spectroscopy' # for laptop
 
 output_dir = os.path.join(proj_dir, sample_type, 'outputs')
 
@@ -443,6 +421,14 @@ letter_factors.to_csv(os.path.join(output_dir,'stats',
 perf_met_dict = perf_mets
 
 perf_mets = list(perf_met_dict.keys())
+
+#%% save perf_met dataframes for later
+
+for perf_met in perf_mets:
+    
+    pm_df = perf_met_dict[perf_met]
+    
+    pm_df.to_csv(os.path.join(output_dir,'performance metrics',f'{perf_met}.csv'),index = False)
 
 #%% Make figures
 
