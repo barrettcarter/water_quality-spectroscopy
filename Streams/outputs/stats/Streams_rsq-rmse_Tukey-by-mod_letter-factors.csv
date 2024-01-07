@@ -1,0 +1,54 @@
+model,perf_met,letter,factor_levs
+All,test_rmse,a,Ammonium-N
+All,test_rmse,b,Nitrate-N
+All,test_rmse,c,ON
+All,test_rmse,d,OP
+All,test_rmse,e,Phosphate-P TP
+All,test_rmse,f,TKN
+All,test_rmse,g,TN
+DL,test_rmse,a,Ammonium-N
+DL,test_rmse,b,Nitrate-N ON Phosphate-P TKN TP
+DL,test_rmse,c,OP
+DL,test_rmse,d,TN
+PLS,test_rmse,a,Ammonium-N
+PLS,test_rmse,b,Nitrate-N ON TKN
+PLS,test_rmse,c,OP
+PLS,test_rmse,d,Phosphate-P TP
+PLS,test_rmse,e,TN
+RF-PCA,test_rmse,a,Ammonium-N
+RF-PCA,test_rmse,b,Nitrate-N
+RF-PCA,test_rmse,c,ON TKN
+RF-PCA,test_rmse,d,OP
+RF-PCA,test_rmse,e,Phosphate-P TP
+RF-PCA,test_rmse,f,TN
+XGB-PCA,test_rmse,a,Ammonium-N
+XGB-PCA,test_rmse,b,Nitrate-N
+XGB-PCA,test_rmse,c,ON TKN
+XGB-PCA,test_rmse,d,OP
+XGB-PCA,test_rmse,e,Phosphate-P TP
+XGB-PCA,test_rmse,f,TN
+All,test_rsq,a,Ammonium-N ON
+All,test_rsq,b,Nitrate-N
+All,test_rsq,c,OP
+All,test_rsq,d,Phosphate-P TKN TP
+All,test_rsq,e,TN
+DL,test_rsq,a,Ammonium-N OP
+DL,test_rsq,b,Nitrate-N
+DL,test_rsq,c,ON Phosphate-P TKN TP
+DL,test_rsq,d,TN
+PLS,test_rsq,a,Ammonium-N Phosphate-P TKN TP
+PLS,test_rsq,b,Nitrate-N
+PLS,test_rsq,c,Ammonium-N ON Phosphate-P TP
+PLS,test_rsq,d,ON OP
+PLS,test_rsq,e,TN
+RF-PCA,test_rsq,a,Ammonium-N TKN TP
+RF-PCA,test_rsq,b,Nitrate-N
+RF-PCA,test_rsq,c,Ammonium-N ON TKN
+RF-PCA,test_rsq,d,Ammonium-N ON OP
+RF-PCA,test_rsq,e,Phosphate-P TKN TP
+RF-PCA,test_rsq,f,TN
+XGB-PCA,test_rsq,a,Ammonium-N ON TKN
+XGB-PCA,test_rsq,b,Nitrate-N
+XGB-PCA,test_rsq,c,Ammonium-N ON OP
+XGB-PCA,test_rsq,d,Phosphate-P TKN TP
+XGB-PCA,test_rsq,e,TN

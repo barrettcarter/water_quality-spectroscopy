@@ -1,0 +1,31 @@
+species,perf_met,letter,factor_levs
+Ammonium-N,test_rmse,a,DL PLS RF-PCA XGB-PCA
+Nitrate-N,test_rmse,a,DL
+Nitrate-N,test_rmse,b,PLS
+Nitrate-N,test_rmse,c,RF-PCA XGB-PCA
+ON,test_rmse,a,DL
+ON,test_rmse,b,PLS RF-PCA XGB-PCA
+OP,test_rmse,a,DL PLS RF-PCA XGB-PCA
+Phosphate-P,test_rmse,a,DL RF-PCA XGB-PCA
+Phosphate-P,test_rmse,b,PLS
+TKN,test_rmse,a,DL
+TKN,test_rmse,b,PLS RF-PCA XGB-PCA
+TN,test_rmse,a,DL PLS
+TN,test_rmse,b,RF-PCA XGB-PCA
+TP,test_rmse,a,DL RF-PCA XGB-PCA
+TP,test_rmse,b,PLS RF-PCA
+Ammonium-N,test_rsq,a,DL PLS XGB-PCA
+Ammonium-N,test_rsq,b,PLS RF-PCA XGB-PCA
+Nitrate-N,test_rsq,a,DL
+Nitrate-N,test_rsq,b,PLS
+Nitrate-N,test_rsq,c,RF-PCA XGB-PCA
+ON,test_rsq,a,DL PLS RF-PCA XGB-PCA
+OP,test_rsq,a,DL PLS RF-PCA
+OP,test_rsq,b,PLS XGB-PCA
+Phosphate-P,test_rsq,a,DL RF-PCA XGB-PCA
+Phosphate-P,test_rsq,b,PLS
+TKN,test_rsq,a,DL PLS RF-PCA XGB-PCA
+TN,test_rsq,a,DL PLS
+TN,test_rsq,b,PLS RF-PCA XGB-PCA
+TP,test_rsq,a,DL RF-PCA XGB-PCA
+TP,test_rsq,b,PLS
