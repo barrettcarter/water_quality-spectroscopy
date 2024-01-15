@@ -92,29 +92,36 @@ groups_dict = {'g1':['Nitrate-N','Potassium','Calcium','Sulfate'],
 
 group_stype = {'g1':'HNS','g2':'HNS','g3':'HNS','g4':'HNS','g5':'stream','g6':'stream'}
 
-group_subplot = {'g1':'fig.add_subplot(5,5,(1,4))',
-                 'g2':'fig.add_subplot(5,5,(6,7))',
-                 'g3':'fig.add_subplot(5,5,(8,10))',
-                 'g4':'fig.add_subplot(5,5,(11,15))',
-                 'g5':'fig.add_subplot(5,5,(16,19))',
-                 'g6':'fig.add_subplot(5,5,(21,24))'}
+# group_subplot = {'g1':'fig.add_subplot(5,5,(1,4))',
+#                  'g2':'fig.add_subplot(5,5,(6,7))',
+#                  'g3':'fig.add_subplot(5,5,(8,10))',
+#                  'g4':'fig.add_subplot(5,5,(11,15))',
+#                  'g5':'fig.add_subplot(5,5,(16,19))',
+#                  'g6':'fig.add_subplot(5,5,(21,24))'}
+
+group_subplot = {'g1':'fig.add_subplot(3,16,(1,9))',
+                 'g2':'fig.add_subplot(3,16,(17,21))',
+                 'g3':'fig.add_subplot(3,16,(11,16))',
+                 'g4':'fig.add_subplot(3,16,(23,32))',
+                 'g5':'fig.add_subplot(3,32,(65,79))',
+                 'g6':'fig.add_subplot(3,32,(82,96))'}
 
 labels_df = pd.DataFrame({'name':['Nitrate-N','Potassium','Calcium','Sulfate',
                                   'Phosphorus','Magnesium','Ammonium-N','pH',
                                   'Iron','Manganese','Boron','Zinc','Copper',
                                   'Molybdenum','TKN','ON','TN','Phosphate-P',
                                   'TP','OP'],
-                          'label':['NO3-N','K','Ca','S','P','Mg','NH4-N','pH',
+                          'label':['NO3-N','K','Ca','SO4','P','Mg','NH4-N','pH',
                                    'Fe','Mn','B','Zn','Cu','Mb','TKN','ON','TN',
                                    'PO4-P','TP','OP']})
 
 stype_colors = {'HNS':'tab:red','stream':'tab:blue'}
 
-fig = plt.figure(dpi = 300,figsize = [6.5,6.5],tight_layout = True)
+fig = plt.figure(dpi = 300,figsize = [6.5,6.5],constrained_layout = True)
 
-plt.figtext(0.5,0,'Chemical Analyte',ha = 'center',va = 'center')
+plt.figtext(0.5,0.05,'Chemical Analyte',ha = 'center',va = 'center')
 
-plt.figtext(0,0.5,'Concentration (mg/L; unitless for pH)',rotation = 'vertical',
+plt.figtext(0.05,0.5,'Concentration (mg/L)',rotation = 'vertical',
          va = 'center',ha = 'center')
 
 group = 'g1' # for testing
