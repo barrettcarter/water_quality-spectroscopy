@@ -15,16 +15,44 @@ import pandas as pd
 import numpy as np
 import os
 
+import matplotlib.pyplot as plt
+
+import seaborn as sns
+
+sns.set_theme(style = 'whitegrid',font_scale=1)
+#sns.set(font_scale=2)
+
+import matplotlib as mpl
+# plt.style.use('seaborn-whitegrid')
+
+rc = {'axes.edgecolor':'0.1','axes.labelcolor':'0.1','grid.linestyle': '--',
+      'text.color':'0.1','xtick.color':'0.1','ytick.color':'0.1','xtick.direction': 'in',
+      'ytick.direction': 'in','patch.edgecolor': 'w','patch.force_edgecolor': True,
+      'image.cmap': 'Set1','font.family': ['sans-serif'],
+      'font.sans-serif': ['Arial','DejaVu Sans','Liberation Sans','Bitstream Vera Sans',
+                          'sans-serif'],
+      'axes.spines.left': True,'axes.spines.bottom': True,'axes.spines.right': True,
+      'axes.spines.top': True,'figure.dpi': 300}
+
+for rcparam in rc.keys():
+    
+    mpl.rcParams[rcparam] = rc[rcparam]
+
+sns.set_style(rc = rc)
+
 #%% Set paths
 
 user = os.getlogin()
 
-path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
-# path_to_wqs = f'C:\\Users\\{user}\\Documents\\GitHub\\water_quality-spectroscopy' # for laptop
+# path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
+path_to_wqs = f'C:\\Users\\{user}\\Documents\\GitHub\\water_quality-spectroscopy' # for laptop
 
 perf_mets = ['test_rmse','test_rsq']
 
 sample_types = ['Streams','Hydroponics']
+
+
+fig_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images'
 
 #%% bring in performance metric data for each sample type and find the model with
 ### the minimum average RMSE and maximum average R-sq
@@ -80,50 +108,139 @@ pm_summary.to_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary.csv')
 
 #%% compile the true and predicted values for the optimal models
 
-opt_ests = pd.DataFrame(columns = ['sample_type','species','model','y_true','y_pred'])
+pm_summary = pd.read_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary.csv'))
 
-proj_dir = path_to_wqs
+# opt_ests = pd.DataFrame(columns = ['sample_type','species','model','y_true','y_pred'])
+
+# proj_dir = path_to_wqs
 
 stype = 'Streams' # for testing.
+stype = sample_types[-1]
+
+aliases = {'Streams':'streams','Hydroponics':'HNSr'}
 
 for stype in sample_types:
     
-    sample_type = stype
+    stype_al = aliases[stype]
     
-    st_rsq = pm_summary.loc[(pm_summary.perf_met=='test_rsq')&(pm_summary.sample_type==stype),:]
+    compiled_outputs = pd.read_csv(os.path.join(path_to_wqs,stype,'outputs',
+                                                f'{stype_al}_ML_results_compiled.csv'))
     
-    spmod_opts = st_rsq.species + '_' + st_rsq.model
+    compiled_outputs.sample_type = stype
     
-    st_rsq['spmod'] = spmod_opts
+    stype_pm_opt = pm_summary.loc[pm_summary.sample_type==stype,:]
+    
+    valid_comb = stype_pm_opt.set_index(['sample_type','species','model']).index
 
-    output_dir = os.path.join(proj_dir, sample_type, 'outputs')
+    compiled_outputs = compiled_outputs[compiled_outputs.set_index(['sample_type','species','model']).index.isin(valid_comb)]
     
-    output_files = np.array(os.listdir(output_dir))
+    compiled_outputs = compiled_outputs[compiled_outputs.output.isin(['y_true_test','y_hat_test'])]
     
-    output_files = output_files[[44,48,49,53,63]] # select ML results files corresponding to experiment
+    if stype == sample_types[0]:
     
-    file = output_files[0]
-    
-    outputs_df = pd.DataFrame(columns = pd.read_csv(os.path.join(output_dir,file)).columns)
-    
-    for file in output_files:
+        true_tests = compiled_outputs
         
-        file_mod = file.split('_')[1]
+    else:
         
-        if (st_rsq.model==file_mod).any() == False:
+        true_tests = pd.concat([true_tests,compiled_outputs],ignore_index=True)
+        
+#%% reshape dataframe
+
+true_tests['sample type, chemical analyte, ML algorithm'] = true_tests['sample_type']+\
+    ', '+true_tests['species']+', '+true_tests['model']
+
+y_true_test = true_tests[true_tests.output=='y_true_test'].reset_index(drop=True)
+
+y_hat_test = true_tests[true_tests.output=='y_hat_test'].reset_index(drop=True)
+
+true_ests = y_true_test.copy()
+
+true_ests.rename(columns = {'value':'True Concentration'},inplace=True)
+
+true_ests['Estimated Concentration'] = y_hat_test['value']
+
+ID_col = 'sample type, chemical analyte, ML algorithm'
+
+true_ests.sort_values(by = ID_col,inplace=True)
+#%% make 1:1 plot
+
+g = sns.lmplot(data = true_ests, x = 'True Concentration', y = 'Estimated Concentration',
+           col = ID_col,col_wrap = 4,height = 5,
+           facet_kws = {'sharey':False,'sharex':False},
+           scatter_kws = {'color':'grey','alpha': 0.5})
+
+g.set_titles('{col_name}')
+
+plt.savefig(os.path.join(fig_dir,'Exp1_opt_11_plots.png'),dpi = 300)
+
+#%% make subset for 2 best fits for each sample type
+
+stype = 'Streams'
+
+for stype in sample_types:
+    
+    stype_pm_opt = pm_summary.loc[(pm_summary.sample_type==stype)&\
+                                  (pm_summary.perf_met=='test_rsq'),:].sort_values(by = 'value',
+                                                                                  ascending=False)
+        
+    stype_pm_opt = stype_pm_opt.iloc[[0,1],:]
+    
+    if stype == sample_types[0]:
+        
+        pm_opt = stype_pm_opt
+        
+    else:
+        
+        pm_opt = pd.concat([pm_opt,stype_pm_opt],ignore_index=False)
+    
+
+pm_opt_ids = pm_opt.set_index(['sample_type','species','model']).index
+
+#%% make 1:1 plots for best fits
+
+plt.figure(dpi = 300)
+
+true_ests_best = true_ests[true_ests.set_index(['sample_type','species','model']).index.isin(pm_opt_ids)]
+
+true_ests_best.rename(columns = {'True Concentration':'True Concentration (mg/L)',
+                                 'Estimated Concentration':'Estimated Concentration (mg/L)'},inplace = True)
+
+g = sns.lmplot(data = true_ests_best, x = 'True Concentration (mg/L)', y = 'Estimated Concentration (mg/L)',
+           col = ID_col,col_wrap = 2,height = 5,
+           facet_kws = {'sharey':False,'sharex':False},
+           scatter_kws = {'color':'grey','alpha': 0.5})
+
+g.set_titles('{col_name}')
+
+plt.savefig(os.path.join(fig_dir,'Exp1_opt_best_11_plots.png'),dpi = 300)
+
+#%% Scratch
+
+A = pd.DataFrame({'x':['a','b','c'],'y':['d','e','f'],'z':[1,2,3]})
+
+B = pd.DataFrame({'x':['b','a','c','d','a','b','c','d'],
+                  'y':['d','e','f','n','d','e','f','n'],
+                  'z':[4,5,6,7,4,5,6,7]})
+
+valid_comb = A.set_index(['x','y']).index
+
+# B.loc[B.loc[:,['x','y']].isin(A.loc[:,['x','y']].to_dict(orient='list')).all(axis=1),:]
+
+B[B.set_index(['x','y']).index.isin(valid_comb)]
+
+###
+
+valid_comb = stype_pm_opt.set_index(['sample_type','species','model']).index
+
+compiled_outputs[compiled_outputs.set_index(['sample_type','species','model']).index.isin(valid_comb)]
+
+# compiled_outputs.\
+#     loc[:,['sample_type','species','model']].\
+#         isin(stype_pm_opt.loc[:,['sample_type','species','model']].to_dict(orient='list')).\
+#             all(axis=1)
             
-            continue
-        
-        output_df = pd.read_csv(os.path.join(output_dir,file))
-        
-        output_df = output_df.loc[output_df.output.notna(),:] # get rid of empty rows
-          
-        output_df['sample_type'] = file.split('_')[0]
-          
-        output_df['model'] = file.split('_')[1]
-        
-        outputs_df = pd.concat([outputs_df,output_df],ignore_index = True)
-        
-        output_df['spmod'] = output_df.species + '_' + output_df.model
-        
-        output_df = output_df.loc[output_df.spmod.isin(spmod_opts),:]
+# compiled_outputs.loc[(compiled_outputs.sample_type=='Streams')&\
+#                      (compiled_outputs.species=='Ammonium-N')&\
+#                          (compiled_outputs.model=='RF-PCA'),:].shape
+
+# pd.Series(compiled_outputs.model.unique()).isin(stype_pm_opt.model.unique())
