@@ -55,29 +55,7 @@ output_dir = os.path.join(proj_dir, sample_type, 'outputs')
 
 figure_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images\\Stream results\\python' # for work computer
 
-output_files = np.array(os.listdir(output_dir))
-
-output_files = output_files[[42,46,47,51,61]] # select ML results files corresponding to experiment
-
-file = output_files[0]
-
-outputs_df = pd.read_csv(os.path.join(output_dir,file))
-
-outputs_df['sample_type'] = file.split('_')[0]
-
-outputs_df['model'] = file.split('_')[1]
-
-for file in output_files[1:]:
-  
-  output_df = pd.read_csv(os.path.join(output_dir,file))
-  
-  output_df = output_df.loc[output_df.output.notna(),:] # get rid of empty rows
-
-  output_df['sample_type'] = file.split('_')[0]
-
-  output_df['model'] = file.split('_')[1]
-  
-  outputs_df = pd.concat([outputs_df,output_df],ignore_index = True)
+outputs_df = pd.read_csv(os.path.join(output_dir,'streams_ML_results_compiled.csv'))
   
 #%% create some useful variables
 
