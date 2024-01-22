@@ -4,8 +4,8 @@ Created on Tue Mar 23 16:39:55 2021
 
 @author: jbarrett.carter
 """
-#Case 1: Two-year data set (hogdn samples only) used to train model & model tested on 50 new samples
-#Changed synthetic code (syn) to comments
+# Case 1: Two-year data set (hogdn samples only) used to train model & model tested on 50 new samples
+# Edited by Ethan Lantzy in 2023-24
 #%% import libraries
 
 import pandas as pd
@@ -25,7 +25,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import mean_squared_error as MSE
 # from sklearn.ensemble import RandomForestRegressor
 
-#for looking up available scorers
+# for looking up available scorers
 # import sklearn.metrics
 # sorted(sklearn.metrics.SCORERS.keys())
 
@@ -33,54 +33,34 @@ from joblib import dump
 
 #%% Set paths and bring in data
 
-user = os.getlogin() 
-# path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\' for OneDrive
-path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' # for Laptop
-# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
-# path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
-inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')
-output_dir=os.path.join(path_to_wqs,'Streams/outputs/')
+path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' # for Laptop; path to relevant files
+inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/') #file path for input data folder
+output_dir=os.path.join(path_to_wqs,'Streams/outputs/') #file path to send results folder
 
-abs_wq_df_fn = 'abs_wq_df_streams.csv'
-#syn_abs_wq_df_fn = 'abs-wq_SWs_OO.csv'
+abs_wq_df_fn = 'abs_wq_df_streams.csv' #input data file (absorbance and lab results)
 
-# Bring in data
-abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
-#syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
-samp_sizes = pd.read_csv(os.path.join(inter_dir,'fil_sub_samp_sizes.csv'))
+abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn) #translate computer file into program variable
 
-#%% seperate into filtered and unfiltered sample sets; creating subset 
+#%% seperate into filtered and unfiltered sample sets; subset by sampling site
 
-abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]
-#abs_wq_df_unf = abs_wq_df.loc[abs_wq_df['Filtered']==False,:] #Used to filter for False samples
+abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:] #Used to filter for true samples
 
-abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn'])] # for site-based subsetting
+# abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn'])] # for site-based subsetting
 
-# syn_abs_wq_df = syn_abs_wq_df.loc[syn_abs_wq_df.Storage_time==10,:]
+input_df = abs_wq_df_fil # define variable as the input for future functions
 
-# syn_abs_wq_df['ID'] = syn_abs_wq_df['Name']
-
-# syn_abs_wq_df['Name']='SWs'
-
-# input_df = abs_wq_df # for testing
-
-species = abs_wq_df.columns[0:8]
-s = species[2] # for testing 
-species = ['Nitrate-N', 'OP'] #ensure names and column headers match
-
-# abs_wq_df_aug = pd.concat([abs_wq_df,syn_abs_wq_df], ignore_index = True)
-
-# names = abs_wq_df_aug.Name.unique()
+species = abs_wq_df.columns[0:8] # create list from column headings
+s = species[2]                   # defines the third element from the list of column headings as 's'
+species = ['Nitrate-N', 'OP']    # ensure names and column headers match
                              
 #%% Create function for writing outputs
 
 def create_outputs(input_df,iterations = 1, autosave = False, return_df = False, 
-                   return_all = False, output_path = None, subset_name = 'hogdn_only', 
-                   syn_aug = False, syn_df = None ):
+                   return_all = False, output_path = None, subset_name = 'hogdn_only'):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
-        if isinstance(the_output,float):
+        if isinstance(the_output,float): #Place output in data frame depending on if it is of float or list form
             sub_df = pd.DataFrame([[output_name,species_name,iteration_num,the_output]],
                                            columns= ['output','species','iteration','value'])
         elif isinstance(the_output,list):
@@ -109,77 +89,58 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
        
     iteration = 1 # this is for testing
     
-    if type(iterations)==int:
+    if type(iterations)==int: #check if the variable is of an integer type
         
-        iterations = range(iterations)
+        iterations = range(iterations) #if so, the variable is converted to a range object
     
-    for s in species:
+    for s in species: #starts for loop in which s takes on each value in the list species
         
         for iteration in iterations:
-            print('Analyzing '+s)
-            print('Iteration - '+str(iteration))
+            print('Analyzing '+s) #will print Analyzing (chemical name) each iteration
+            print('Iteration - '+str(iteration)) #will print Interation - (iteration #) each iteration
             
-            #samp_size = samp_sizes.loc[samp_sizes.Species==s,'Samp_size'].values[0] # For filtration experiment
+            Y = input_df[s] #extract a specific column ('s') from the data frame
+            keep = Y>0 #filter extraction to only keep values that are greater than zero 
             
-            samp_size = samp_sizes['Samp_size'].min() # For synthetic samples experiment
-            
-            Y = input_df[s]
-            keep = Y>0
-            
-            inter_df = input_df.loc[keep,:]
+            inter_df = input_df.loc[keep,:] #Filter rows in 'input_df' to columns found in the previous lines
             
             if sum(keep)>samp_size: #randomly select certain values if sample size is limiting
             
-                inter_df = inter_df.sample(n = samp_size, random_state = iteration)
+                inter_df = inter_df.sample(n = samp_size, random_state = iteration) #randomly sample rows from inter_df
             
-            X = inter_df.loc[:,'band_1':'band_1024']
+            X = inter_df.loc[:,'band_1':'band_1024'] #Extract a subset of inter_df for all rows and columns from 'band_1' to 'band_1024'.
             
-            Y = inter_df[s]
+            Y = inter_df[s] #Extract the column specified by s
             
-            X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration,
+            X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration, #Split into 30% test and 70% training set
                                                                 test_size = 0.3)
             
-            #if syn_aug:
-                
-                #syn_samp_size = 46
-                
-                #if syn_df.shape[0]>syn_samp_size:
-                
-                    #syn_df = syn_df.sample(n = syn_samp_size, random_state = iteration)
-                    
-                #X_syn = syn_df.loc[:,'band_1':'band_1024']
-                
-                #Y_syn = syn_df[s]
-                
-                #X_train = pd.concat([X_train,X_syn],ignore_index = True)
-                #y_train = pd.concat([y_train,Y_syn],ignore_index = True)
-
-            param_grid = [{'n_components':np.arange(1,20)}]
-            pls = PLSRegression()
-            clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error')
-
-            clf.fit(X_train,y_train)
-            n_comp = float(clf.best_params_['n_components'])
-            pls_opt = clf.best_estimator_
-            Y_hat = list(pls_opt.predict(X_test)[:,0])
-            Y_hat_train = list(pls_opt.predict(X_train)[:,0])
+            param_grid = [{'n_components':np.arange(1,20)}] #defines grid for hyperparameter to be tuned
+            pls = PLSRegression() #create PLSRegression
+            clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error') #perform hyperparameter tuning for pls model; search parameter grid and identify best using neg. MAE
             
-            r_sq = float(pls_opt.score(X_test,y_test))
-            r_sq_train = float(pls_opt.score(X_train,y_train))
+            clf.fit(X_train,y_train) #fit model to data to find best parameters
+            n_comp = float(clf.best_params_['n_components']) #Extract optimal # of components from the best parameters
+            pls_opt = clf.best_estimator_ #extract best model (which includes best hyperparameters)
+            Y_hat = list(pls_opt.predict(X_test)[:,0]) #testing set predictions using the best model
+            Y_hat_train = list(pls_opt.predict(X_train)[:,0]) #training set predictions using the best model
             
-            MSE_test = MSE(y_test,Y_hat)
-            RMSE_test = float(np.sqrt(MSE_test))
+            r_sq = float(pls_opt.score(X_test,y_test)) #r^2 for testing set
+            r_sq_train = float(pls_opt.score(X_train,y_train)) #r^2 for training set
+    
+            MSE_test = MSE(y_test,Y_hat) #calculate MSE by comparing actual (y_test) to predicted (Y_hat_) --> test set
+            RMSE_test = float(np.sqrt(MSE_test)) #takes square root of MSE; converts type to float --> test set
             
-            MSE_train = MSE(y_train,Y_hat_train)
-            RMSE_train = float(np.sqrt(MSE_train))
+            MSE_train = MSE(y_train,Y_hat_train) #calculate MSE by comparing actual (y_test) to predicted (Y_hat_) --> training set
+            RMSE_train = float(np.sqrt(MSE_train)) #takes square root of MSE; converts type to float --> training set
             
-            abs_test_errors = abs(y_test-Y_hat)
-            APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal
+            abs_test_errors = abs(y_test-Y_hat) #absolute errors for testing set
+            APE_test = abs_test_errors/y_test # APE = absolute percent error,decimal (absolute error as a percentage of actual values)
             MAPE_test = float(np.mean(APE_test)*100) # this is percentage
             
-            abs_train_errors = abs(y_train-Y_hat_train)
-            APE_train = abs_train_errors/y_train # APE = absolute percent error,decimal
-            MAPE_train = float(np.mean(APE_train)*100) # this is percentage
+            abs_train_errors = abs(y_train-Y_hat_train) #difference between training and test values (absolute values)
+            APE_train = abs_train_errors/y_train # APE = Absolute Percent Error, decimal
+            MAPE_train = float(np.mean(APE_train)*100) #MAPE: Mean Average Percent Error, percentage
             
             for out in range(len(output_names)):
                 # print(out)
