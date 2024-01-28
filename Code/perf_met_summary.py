@@ -54,6 +54,51 @@ sample_types = ['Streams','Hydroponics']
 
 fig_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images'
 
+#%% bring in performance metric data for each sample type and save descriptive 
+### stats for each performance metric, chemical analyte, and ML algorithm.
+
+pm_summary = pd.DataFrame(columns = ['sample_type','species','model','perf_met',
+                                     'mean','std','min','25%','50%','75%','max'])
+
+pm = perf_mets[0]
+
+stype = sample_types[0]
+
+for pm in perf_mets:
+    
+    for stype in sample_types:
+        
+        output_dir = os.path.join(path_to_wqs,stype,'outputs','performance metrics')
+        
+        output_fn = f'{stype}_{pm}.csv'
+        
+        pm_df = pd.read_csv(os.path.join(output_dir,output_fn))
+
+        species = pm_df.species.unique()
+        
+        models = pm_df.model.unique()
+        
+        sp = species[0] # for testing
+        
+        mod = models[0] # for testing
+
+        for sp in species:
+            
+            for mod in models:
+            
+                pm_spmod = pm_df[(pm_df.species==sp)&(pm_df.model==mod)]
+                
+                spmod_stats = pd.DataFrame(pm_spmod.value.describe()['mean':'max']).T.reset_index(drop=True)
+                
+                spmod_stats[['sample_type','species','model','perf_met']] =\
+                    [stype,sp,mod,pm]
+            
+                pm_summary = pd.concat([pm_summary,spmod_stats],ignore_index = True)
+            
+#%% save summary table
+
+pm_summary.to_csv(os.path.join(path_to_wqs,'Outputs','perf_met_summary.csv'),index = False)
+
 #%% bring in performance metric data for each sample type and find the model with
 ### the minimum average RMSE and maximum average R-sq
 
