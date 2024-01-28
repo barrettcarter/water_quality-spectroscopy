@@ -42,8 +42,8 @@ sns.set_style(rc = rc)
 
 user = os.getlogin()
 
-path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
-# path_to_wqs = f'C:\\Users\\{user}\\Documents\\GitHub\\water_quality-spectroscopy' # for laptop
+# path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
+path_to_wqs = f'C:\\Users\\{user}\\Documents\\GitHub\\water_quality-spectroscopy' # for laptop
 
 fig_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images'
 
@@ -147,3 +147,47 @@ for group in list(groups_dict.keys()):
     ax.set_xticklabels(labels)
     
     # ax.set_title(stype)
+    
+#%% make heatmaps
+
+labels_df = pd.DataFrame({'name':['Nitrate-N','Potassium','Calcium','Sulfate',
+                                  'Phosphorus','Magnesium','Ammonium-N','pH',
+                                  'Iron','Manganese','Boron','Zinc','Copper',
+                                  'Molybdenum','TKN','ON','TN','Phosphate-P',
+                                  'TP','OP'],
+                          'label':['NO3-N','K','Ca','SO4','P','Mg','NH4-N','pH',
+                                   'Fe','Mn','B','Zn','Cu','Mb','TKN','ON','TN',
+                                   'PO4-P','TP','OP']})
+
+stype = sample_types[0] # for testing
+
+for stype in sample_types:
+    
+    wq_df = wq_dict[stype]
+    wq = wq_df[wq_df.isna().any(axis=1)==False]
+    
+    for col in list(wq.columns):
+        
+        label = labels_df[labels_df.name==col]['label'].values[0]
+        wq.rename(columns = {col:label},inplace=True)
+    
+    wq_ar = wq.to_numpy()
+    wq_corrs = np.corrcoef(wq_ar,rowvar = False)
+    wq_map = np.empty(wq_corrs.shape)
+    
+    for r in range(wq_map.shape[0]):
+        for c in range(wq_map.shape[1]):
+            if r>c:
+                wq_map[r,c]=False
+            else:
+                wq_map[r,c]=True
+     
+    plt.figure(dpi = 300)
+    
+    plt.title(stype)
+    
+    sns.heatmap(wq_corrs,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
+                vmin = -1, vmax = 1,center =0, cmap = 'coolwarm',
+                annot = True,annot_kws={'size':'x-small'},fmt = '.2f')
+    
+    plt.savefig(os.path.join(fig_dir,f'{stype}_WQ_heatmap.png'),dpi=300,bbox_inches='tight')
