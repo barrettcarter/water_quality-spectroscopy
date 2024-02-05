@@ -4,7 +4,11 @@ Created on Tue Mar 23 16:39:55 2021
 
 @author: jbarrett.carter
 """
-# Case 1: Two-year data set (hogdn samples only) used to train model & model tested on 50 new samples
+#Case 1: To test temporal variability, could past data return accurate results for the same sites?	
+#Model will be trained on the hogdn and hogup values of the 2-year sampling
+#Model will be tested on hogup and hogdn values of the new sampling
+#First run will only look at orthophosphate (Phosphate-P)
+			
 # Edited by Ethan Lantzy in 2023-24
 #%% import libraries
 
@@ -35,7 +39,7 @@ from joblib import dump
 
 path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' #for Laptop; path to relevant files
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')                   #file path for input data folder
-output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #file path to send results folder
+output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #file path for outputs data folder
 abs_wq_df_fn = 'abs_wq_df_streams.csv'                                         #input data file (absorbance and lab results)
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)                                  #translate computer file into program variable
 
@@ -43,19 +47,19 @@ abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)                                  #
 
 abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]                   #used to filter for true samples
 
-# abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn'])]        #for site-based subsetting
+abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn', 'hogup'])] #for site-based subsetting
  
 input_df = abs_wq_df_fil                                                       #define variable as the input for future functions
 
 species = abs_wq_df.columns[0:8]                                               #create list from column headings
 s = species[2]                                                                 #defines the third element from the list of column headings as 's'
-species = ['Nitrate-N', 'OP']                                                  #ensure names and column headers match
+species = ['Nitrate-N']                                                 #creates list for variable 'species'
                              
-#%% Create function for writing outputs
+#%% Create function for writing outputs                                        #Define function for creating outputs (to use later)
 
 def create_outputs(input_df,iterations = 1, autosave = False, return_df = False, 
-                   return_all = False, output_path = None, subset_name = 'hogdn_only'):
-    
+                   return_all = False, output_path = None, subset_name = 'hogdn_and_hogup__only_case1'):
+    #input traindf and test df
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
         if isinstance(the_output,float):                                       #place output in data frame depending on if it is of float or list form
@@ -102,16 +106,14 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
             
             inter_df = input_df.loc[keep,:]                                    #filter rows in 'input_df' to columns found in the previous lines
             
-            if sum(keep)>samp_size:                                            #randomly select certain values if sample size is limiting
-            
-                inter_df = inter_df.sample(n = samp_size, random_state = iteration) #randomly sample rows from inter_df
-            
             X = inter_df.loc[:,'band_1':'band_1024']                           #extract a subset of inter_df for all rows and columns from 'band_1' to 'band_1024'.
             
             Y = inter_df[s]                                                    #extract the column specified by s
             
+            #if there is one dataset
             X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration, #split into 30% test and 70% training set
                                                                 test_size = 0.3)
+            #no random split needed if not
             
             param_grid = [{'n_components':np.arange(1,20)}]                    #defines grid for hyperparameter to be tuned
             pls = PLSRegression() #create PLSRegression
@@ -164,7 +166,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
         return({'outputs_df':outputs_df, 'X_train':X_train, 'y_train':y_train,
                 'inter_df':inter_df})
 
-#%% Define function for making plots
+#%% Define function for making plots                                           #Define function for making plots (to use later)
 
 def make_plots(outputs_df, output_label):                                      #define plot
 
@@ -244,30 +246,14 @@ def make_plots(outputs_df, output_label):                                      #
         col +=1                                                                #increment the value of 'col'
         fig.show()                                                             #show figure
 
-#%% Create outputs for models trained with samples
+#%% create outputs for models trained with samples and save to exported file (use the create_outputs function)
 
-### Sites experiment ###
-
-outputs_dict = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True, #filtered samples, no synthetic samples
-               output_path = os.path.join(output_dir,'pls_streams-hogdn_only-syn-aug-FALSE_PLS_It0-19.joblib')
-               ,syn_aug = False)                                               #creare outputs and save
-
-### For Testing ###
-
-#outputs_dict = create_outputs(abs_wq_df_fil, iterations = 1, autosave = False,
-               # return_all = True, syn_aug = True, syn_df = syn_abs_wq_df)
+outputs_df = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True, #filtered samples, no synthetic samples
+               output_path = os.path.join(output_dir,'streams_PLS_results.csv'),
+               return_df = True) #create outputs and save
 
  
-#%% make plots for all samples
+#%% make plots for all samples and show (use the make_plots function)
 
-outputs_df = outputs_dict['outputs_df']
-make_plots(outputs_df,'Filtered and Synthetic Samples')
+make_plots(outputs_df,'Filtered Samples')
 
-#%% save output
-
-# outputs_df.to_csv(output_dir+'streams_PLS_B10_results.csv',index=False)
-   
-#%% make and save output.
-
-# make_and_save_outputs(abs_wq_df,output_dir+'streams_PLS_It10-19_results.csv',
-#                       iterations = np.arange(10,20))
