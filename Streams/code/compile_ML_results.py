@@ -2,8 +2,9 @@
 """
 Created on Sun Jan 21 11:15:51 2024
 
-This script if for compiling all ML modeling results for each experiment to be 
-used for statistical analyses and producing figures and tables.
+This script if for compiling all ML modeling results for the general experiment
+to be HUM performance experiment (Ch. 2). Results are used by other scripts
+for statistical analyses and producing figures and tables.
 
 @author: barre
 """

@@ -1,0 +1,85 @@
+species_model,perf_met,letter,factor_levs
+Ammonium-N_DL,test_rmse,a,comb fil unf
+Ammonium-N_PLS,test_rmse,a,comb fil unf
+Ammonium-N_RF-PCA,test_rmse,a,comb fil unf
+Ammonium-N_XGB-PCA,test_rmse,a,comb fil unf
+Nitrate-N_DL,test_rmse,a,comb fil unf
+Nitrate-N_PLS,test_rmse,a,comb fil unf
+Nitrate-N_RF-PCA,test_rmse,a,comb fil unf
+Nitrate-N_XGB-PCA,test_rmse,a,comb fil unf
+ON_DL,test_rmse,a,comb
+ON_DL,test_rmse,b,fil unf
+ON_PLS,test_rmse,a,comb fil unf
+ON_RF-PCA,test_rmse,a,comb fil unf
+ON_XGB-PCA,test_rmse,a,comb
+ON_XGB-PCA,test_rmse,b,fil unf
+OP_DL,test_rmse,a,comb unf
+OP_DL,test_rmse,b,fil
+OP_PLS,test_rmse,a,comb unf
+OP_PLS,test_rmse,b,fil
+OP_RF-PCA,test_rmse,a,comb
+OP_RF-PCA,test_rmse,b,fil
+OP_RF-PCA,test_rmse,c,unf
+OP_XGB-PCA,test_rmse,a,comb
+OP_XGB-PCA,test_rmse,b,fil
+OP_XGB-PCA,test_rmse,c,unf
+Phosphate-P_DL,test_rmse,a,comb fil unf
+Phosphate-P_PLS,test_rmse,a,comb fil
+Phosphate-P_PLS,test_rmse,b,fil unf
+Phosphate-P_RF-PCA,test_rmse,a,comb fil
+Phosphate-P_RF-PCA,test_rmse,b,fil unf
+Phosphate-P_XGB-PCA,test_rmse,a,comb fil unf
+TKN_DL,test_rmse,a,comb fil unf
+TKN_PLS,test_rmse,a,comb fil unf
+TKN_RF-PCA,test_rmse,a,comb fil unf
+TKN_XGB-PCA,test_rmse,a,comb fil unf
+TN_DL,test_rmse,a,comb fil
+TN_DL,test_rmse,b,fil unf
+TN_PLS,test_rmse,a,comb fil unf
+TN_RF-PCA,test_rmse,a,comb fil unf
+TN_XGB-PCA,test_rmse,a,comb fil unf
+TP_DL,test_rmse,a,comb fil unf
+TP_PLS,test_rmse,a,comb fil unf
+TP_RF-PCA,test_rmse,a,comb fil unf
+TP_XGB-PCA,test_rmse,a,comb fil unf
+Ammonium-N_DL,test_rsq,a,comb fil unf
+Ammonium-N_PLS,test_rsq,a,comb fil unf
+Ammonium-N_RF-PCA,test_rsq,a,comb fil unf
+Ammonium-N_XGB-PCA,test_rsq,a,comb fil unf
+Nitrate-N_DL,test_rsq,a,comb fil unf
+Nitrate-N_PLS,test_rsq,a,comb fil unf
+Nitrate-N_RF-PCA,test_rsq,a,comb fil unf
+Nitrate-N_XGB-PCA,test_rsq,a,comb fil unf
+ON_DL,test_rsq,a,comb fil unf
+ON_PLS,test_rsq,a,comb fil unf
+ON_RF-PCA,test_rsq,a,comb fil unf
+ON_XGB-PCA,test_rsq,a,comb fil
+ON_XGB-PCA,test_rsq,b,fil unf
+OP_DL,test_rsq,a,comb unf
+OP_DL,test_rsq,b,fil unf
+OP_PLS,test_rsq,a,comb fil unf
+OP_RF-PCA,test_rsq,a,comb fil unf
+OP_XGB-PCA,test_rsq,a,comb unf
+OP_XGB-PCA,test_rsq,b,comb fil
+Phosphate-P_DL,test_rsq,a,comb unf
+Phosphate-P_DL,test_rsq,b,comb fil
+Phosphate-P_PLS,test_rsq,a,comb fil unf
+Phosphate-P_RF-PCA,test_rsq,a,comb unf
+Phosphate-P_RF-PCA,test_rsq,b,fil
+Phosphate-P_XGB-PCA,test_rsq,a,comb fil unf
+TKN_DL,test_rsq,a,comb fil unf
+TKN_PLS,test_rsq,a,comb fil unf
+TKN_RF-PCA,test_rsq,a,comb fil
+TKN_RF-PCA,test_rsq,b,fil unf
+TKN_XGB-PCA,test_rsq,a,comb fil unf
+TN_DL,test_rsq,a,comb fil
+TN_DL,test_rsq,b,unf
+TN_PLS,test_rsq,a,comb fil unf
+TN_RF-PCA,test_rsq,a,comb fil unf
+TN_XGB-PCA,test_rsq,a,comb fil unf
+TP_DL,test_rsq,a,comb fil unf
+TP_PLS,test_rsq,a,comb fil unf
+TP_RF-PCA,test_rsq,a,comb unf
+TP_RF-PCA,test_rsq,b,fil
+TP_XGB-PCA,test_rsq,a,comb unf
+TP_XGB-PCA,test_rsq,b,comb fil
