@@ -53,7 +53,7 @@ streams_output_dir = os.path.join(path_to_wqs,'Streams','outputs')
 
 streams_fig_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images\\Stream results\\python'
 
-#%% Make Streams boxplots for Chapter 3
+#%% Pring in performance metric data and create useful variables
 
 abbrv = 'Streams-filtration'
 
@@ -79,6 +79,9 @@ lev_trans = {'comb':'combined','fil':'filtered','unf':'unfiltered'}
 labels_dict = {'Nitrate-N':'NO3-N','TKN':'TKN','ON':'ON','TN':'TN',
                'Ammonium-N':'NH4-N','Phosphate-P':'PO4-P','TP':'TP','OP':'OP'}
 
+spcol = 'Chemical Analyte'
+modcol = 'ML Algorithm'
+
 for pm in perf_mets:
     
     pm_df = perf_met_dict[pm]
@@ -91,9 +94,11 @@ for pm in perf_mets:
         
         pm_df.loc[pm_df.species == sp,'species'] = labels_dict[sp]
         
+    pm_df['species_model'] = pm_df.species +'_' + pm_df.model
+        
     pm_df.rename(columns = {'trans_val':perf_met_labs[pm],
-                            'model':'ML Algorithm',
-                            'species':'Chemical Analyte'},inplace= True)
+                            'model':modcol,
+                            'species':spcol},inplace= True)
 
 #%% bring in factor group letters
 
@@ -101,8 +106,19 @@ factor_letters_fn = f'{abbrv}_rsq-rmse_Tukey-by-spmod_factor-letters.csv'
 
 factor_letters = pd.read_csv(os.path.join(streams_output_dir,'stats',factor_letters_fn))
 
+# modify species names to match labels in figure
+
+factor_letters['species'] = factor_letters.species_model.apply(lambda x: x.split('_')[0])
+
+factor_letters['model'] = factor_letters.species_model.apply(lambda x: x.split('_')[1])
+
+for sp in list(labels_dict.keys()):
+    
+    factor_letters.loc[factor_letters.species==sp,'species'] = labels_dict[sp]
 
 #%% Make figure showing filtration results separately for each species, model, and perf_met
+
+pm = perf_mets[0] # for testing
 
 for pm in perf_mets:
     
@@ -110,10 +126,37 @@ for pm in perf_mets:
     
     pm_lab = perf_met_labs[pm]
     
-    g = sns.catplot(data = pm_df, y = pm_lab, x = 'Chemical Analyte', hue = 'treatment',
+    pm_max = pm_df[pm_lab].max()
+    
+    ### make figure using seaborn
+    
+    g = sns.catplot(data = pm_df, y = pm_lab, x = spcol, hue = 'treatment',
                     kind = 'box', palette = {'combined':'ghostwhite','filtered':'lightsteelblue',
                                              'unfiltered':'slategrey'},
-                    row = 'ML Algorithm',height = 3,aspect = 2.5)
+                    row = modcol,height = 3,aspect = 2.5)
+    
+    ### loop through each axis and block-factor level to add Tukey significance letters
+    
+    for imod,ax in enumerate(g.figure.axes):
+        
+        mod = pm_df[modcol].unique()[imod]
+        
+        for isp,sp in enumerate(pm_df[spcol].unique()):
+            
+            y_text = pm_max
+    
+            x_text = [isp-0.25,isp,isp+0.25]
+        
+            text = factor_letters.loc[(factor_letters.model==mod)&\
+                                      (factor_letters.species==sp)&\
+                                          (factor_letters.perf_met==pm),'letters'].values
+        
+            for i_text in range(len(text)):
+            
+                ax.text(x_text[i_text],y_text,text[i_text],color = 'red',ha = 'center',
+                        bbox = {'facecolor':'white','alpha':0.7,'boxstyle':'Round, pad=0.1'})
+    
+    ### save figure
     
     plt.savefig(os.path.join(streams_fig_dir,f'filtration_{pm}_boxplot.png'),dpi = 300)
 
