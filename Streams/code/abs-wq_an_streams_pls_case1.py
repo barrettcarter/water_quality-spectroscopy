@@ -35,26 +35,59 @@ from sklearn.metrics import mean_squared_error as MSE
 
 from joblib import dump
 
-#%% Set paths and bring in data
+#%% A: Set paths and bring in data; using Barrett's data only (hogup and hogdn only)
 
 path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' #for Laptop; path to relevant files
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')                   #file path for input data folder
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #file path for outputs data folder
-abs_wq_df_fn = 'abs_wq_df_streams.csv'                                         #input data file (absorbance and lab results)
-abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)                                  #translate computer file into program variable
 
-#%% seperate into filtered and unfiltered sample sets; subset by sampling site
 
-abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]                   #used to filter for true samples
+# abs_wq_df_fn = 'abs_wq_df_streams_clean.csv'                                 #input data; using Barrett's data only (hogup/hogdn)
+# abs_wq_df_fn = 'abs_wq_df_streams_combined_clean.csv'                        #input data; using Barrett and Ethan's data (hogup/hogdn)
+# abs_wq_df_fn = 'abs_wq_df_streams_2023_clean.csv'                            #input data; using Ethan's data (all sites; Ocean Optics)
+abs_wq_df_fn = 'abs_wq_df_streams_2023_clean_SN.csv'                         #input data; using Ethan's data (all sites; StellarNet)
+# abs_wq_df_fn = 'abs_wq_df_streams_all_clean.csv'                             #input data; using Barrett and Ethan's data (hogdn/hogup for Barrett, all sites for Ethan)
 
-abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn', 'hogup'])] #for site-based subsetting
- 
+abs_wq_df_fil=pd.read_csv(inter_dir+abs_wq_df_fn)                              #translate computer file into program variable
+
+#%% B: Set paths and bring in data; use Barrett's data (hogup/hogdn) to train and my data to test
+
+#path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' #for Laptop; path to relevant files
+#inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')                   #file path for input data folder
+#output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #file path for outputs data folder
+#input_train_fn = 'abs_wq_df_streams.csv'                                    #input data file for training
+#input_train_df = pd.read_csv(inter_dir+input_train_fn)                   #translate computer file into dataframe
+
+#input_test_fn_excel = 'abs_wq_df_streams_OO_Ethan.xlsx'                     #name of input Excel file for testing
+#input_test_df = pd.read_excel(inter_dir+input_test_fn_excel)             #read the Excel file into a dataframe
+
+#%% A and C: subset by filtration and sampling site; use Barrett's data to train and test OR use combined dataframe
+
+#abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]                  #clean df is already filtered
+#abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn', 'hogup'])]#clean df is already site-specific
 input_df = abs_wq_df_fil                                                       #define variable as the input for future functions
 
-species = abs_wq_df.columns[0:8]                                               #create list from column headings
+species = abs_wq_df_fil.columns[0:3]                                               #create list from column headings
 s = species[2]                                                                 #defines the third element from the list of column headings as 's'
-species = ['Nitrate-N']                                                 #creates list for variable 'species'
-                             
+species = ['Nitrate-N']                                                        #creates list for variable 'species'
+
+#%% B: subset by filtration and sampling site; use Barrett's dataframe to train and my dataframe to test
+       
+#input_train_df_fil = input_train_df.loc[input_train_df['Filtered']==True,:]                       #used to include filtered samples
+#input_train_df_fil = input_train_df_fil.loc[input_train_df_fil.Name.isin(['hogdn', 'hogup'])]     #for site-based subsetting
+#input_train_df = input_train_df_fil                                                               #define variable as the training input for future functions
+
+#species = input_train_df.columns[0:8]                                          #create list from first eight column names
+#s = species[2]                                                                 #defines the third element from the list of column headings as 's'
+#species = ['Nitrate-N']                                                        #redefine species as [see inside brackets]
+
+#input_test_df_fil = input_test_df.loc[input_test_df.Name.isin(['hogdn', 'hogup'])] #for site-based subsetting; this dataset is already filtered
+#input_test_df = input_test_df_fil                                                  #define variable as the testing input for future functions
+
+#species = input_test_df.columns[0:3]                                           #create list from first three column names
+#s = species[2]                                                                 #defines the third element from the list of column headings as 's'
+#species = ['Nitrate-N']                                                        #redefine species as [see inside brackets
+
 #%% Create function for writing outputs                                        #Define function for creating outputs (to use later)
 
 def create_outputs(input_df,iterations = 1, autosave = False, return_df = False, 
@@ -74,9 +107,6 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
         else:
             print('Error: outputs must be of type list or float')
         return(sub_df)
-    
-    ### Create a model for every species
-    # s = 'Molybdenum' # this is for testing
     
     outputs_df = pd.DataFrame(columns= ['output','species','iteration','value']) #save outputs in dataframe
     
@@ -110,10 +140,8 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
             
             Y = inter_df[s]                                                    #extract the column specified by s
             
-            #if there is one dataset
             X_train, X_test, y_train, y_test = train_test_split(X, Y, random_state=iteration, #split into 30% test and 70% training set
-                                                                test_size = 0.3)
-            #no random split needed if not
+                                                                    test_size = 0.3)
             
             param_grid = [{'n_components':np.arange(1,20)}]                    #defines grid for hyperparameter to be tuned
             pls = PLSRegression() #create PLSRegression
@@ -248,7 +276,7 @@ def make_plots(outputs_df, output_label):                                      #
 
 #%% create outputs for models trained with samples and save to exported file (use the create_outputs function)
 
-outputs_df = create_outputs(abs_wq_df_fil, iterations = 20, autosave = True, #filtered samples, no synthetic samples
+outputs_df = create_outputs(abs_wq_df_fil, iterations = 200, autosave = True, #filtered samples, no synthetic samples
                output_path = os.path.join(output_dir,'streams_PLS_results.csv'),
                return_df = True) #create outputs and save
 
