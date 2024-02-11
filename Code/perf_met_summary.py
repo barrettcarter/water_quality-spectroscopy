@@ -44,8 +44,8 @@ sns.set_style(rc = rc)
 
 user = os.getlogin()
 
-# path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
-path_to_wqs = f'C:\\Users\\{user}\\Documents\\GitHub\\water_quality-spectroscopy' # for laptop
+path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
+# path_to_wqs = f'C:\\Users\\{user}\\Documents\\GitHub\\water_quality-spectroscopy' # for laptop
 
 perf_mets = ['test_rmse','test_rsq']
 
@@ -191,6 +191,19 @@ for stype in sample_types:
         
 #%% reshape dataframe
 
+st_map = {'Hydroponics':'HNS','Streams':'Stream'}
+
+sp_map = {'Nitrate-N':'NO3-N','Potassium':'K','Calcium':'Ca','Sulfate':'SO4',
+          'Phosphorus':'P','Magnesium':'Mg','Ammonium-N':'NH4-N',
+          'pH':'pH','Iron':'Fe','Manganese':'Mn','Boron':'B',
+          'Zinc':'Zn','Copper':'Cu','Molybdenum':'Mb',
+          'TKN':'TKN','ON':'ON','TN':'TN',
+          'Phosphate-P':'PO4-P','TP':'TP','OP':'OP'}
+
+true_tests['sample_type'] = true_tests['sample_type'].apply(lambda x: st_map[x])
+
+true_tests['species'] = true_tests['species'].apply(lambda x: sp_map[x])
+
 true_tests['sample type, chemical analyte, ML algorithm'] = true_tests['sample_type']+\
     ', '+true_tests['species']+', '+true_tests['model']
 
@@ -210,9 +223,9 @@ true_ests.sort_values(by = ID_col,inplace=True)
 #%% make 1:1 plot
 
 g = sns.lmplot(data = true_ests, x = 'True Concentration', y = 'Estimated Concentration',
-           col = ID_col,col_wrap = 4,height = 5,
+           col = ID_col,col_wrap = 5,height = 3,
            facet_kws = {'sharey':False,'sharex':False},
-           scatter_kws = {'color':'grey','alpha': 0.5})
+           scatter_kws = {'color':'grey','alpha': 0.5, 's':2})
 
 g.set_titles('{col_name}')
 
@@ -220,7 +233,13 @@ plt.savefig(os.path.join(fig_dir,'Exp1_opt_11_plots.png'),dpi = 300)
 
 #%% make subset for 2 best fits for each sample type
 
-stype = 'Streams'
+sample_types = ['HNS','Stream']
+
+pm_summary['sample_type'] = pm_summary['sample_type'].apply(lambda x: st_map[x])
+
+pm_summary['species'] = pm_summary['species'].apply(lambda x: sp_map[x])
+
+stype = 'Stream' # for testing
 
 for stype in sample_types:
     
@@ -251,9 +270,9 @@ true_ests_best.rename(columns = {'True Concentration':'True Concentration (mg/L)
                                  'Estimated Concentration':'Estimated Concentration (mg/L)'},inplace = True)
 
 g = sns.lmplot(data = true_ests_best, x = 'True Concentration (mg/L)', y = 'Estimated Concentration (mg/L)',
-           col = ID_col,col_wrap = 2,height = 5,
+           col = ID_col,col_wrap = 2,height = 4,
            facet_kws = {'sharey':False,'sharex':False},
-           scatter_kws = {'color':'grey','alpha': 0.5})
+           scatter_kws = {'color':'grey','alpha': 0.5,'s':2})
 
 g.set_titles('{col_name}')
 
