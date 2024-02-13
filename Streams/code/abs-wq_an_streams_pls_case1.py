@@ -44,8 +44,8 @@ output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #
 
 # abs_wq_df_fn = 'abs_wq_df_streams_clean.csv'                                 #input data; using Barrett's data only (hogup/hogdn)
 # abs_wq_df_fn = 'abs_wq_df_streams_combined_clean.csv'                        #input data; using Barrett and Ethan's data (hogup/hogdn)
-# abs_wq_df_fn = 'abs_wq_df_streams_2023_clean.csv'                            #input data; using Ethan's data (all sites; Ocean Optics)
-abs_wq_df_fn = 'abs_wq_df_streams_2023_clean_SN.csv'                         #input data; using Ethan's data (all sites; StellarNet)
+abs_wq_df_fn = 'abs_wq_df_streams_2023_clean.csv'                            #input data; using Ethan's data (all sites; Ocean Optics)
+# abs_wq_df_fn = 'abs_wq_df_streams_2023_clean_SN.csv'                         #input data; using Ethan's data (all sites; StellarNet)
 # abs_wq_df_fn = 'abs_wq_df_streams_all_clean.csv'                             #input data; using Barrett and Ethan's data (hogdn/hogup for Barrett, all sites for Ethan)
 
 abs_wq_df_fil=pd.read_csv(inter_dir+abs_wq_df_fn)                              #translate computer file into program variable
@@ -91,7 +91,7 @@ species = ['Nitrate-N']                                                        #
 #%% Create function for writing outputs                                        #Define function for creating outputs (to use later)
 
 def create_outputs(input_df,iterations = 1, autosave = False, return_df = False, 
-                   return_all = False, output_path = None, subset_name = 'hogdn_and_hogup__only_case1'):
+                   return_all = False, output_path = None, subset_name = '2023_data'):
     #input traindf and test df
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -177,7 +177,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
                 
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)  #concatenate the separate assignments into one table
                 
-            filename = 'pls_streams-hogdn_only-syn-aug-FALSE_PLS_It0-19.joblib'#provide filename for the document
+            filename = 'pls_streams-2023_data_filtered_PLS_It0-19.joblib'      #provide filename for the document
             pickle_path = os.path.join(output_dir,'picklejar',filename)        #send it to the pickejar folder with the given filename
             dump(clf,pickle_path)                                              #save the model to files
             
@@ -276,7 +276,7 @@ def make_plots(outputs_df, output_label):                                      #
 
 #%% create outputs for models trained with samples and save to exported file (use the create_outputs function)
 
-outputs_df = create_outputs(abs_wq_df_fil, iterations = 200, autosave = True, #filtered samples, no synthetic samples
+outputs_df = create_outputs(abs_wq_df_fil, iterations = 100, autosave = True, #filtered samples, no synthetic samples
                output_path = os.path.join(output_dir,'streams_PLS_results.csv'),
                return_df = True) #create outputs and save
 
