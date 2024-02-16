@@ -41,12 +41,12 @@ path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' #
 inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')                   #file path for input data folder
 output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #file path for outputs data folder
 
-
 # abs_wq_df_fn = 'abs_wq_df_streams_clean.csv'                                 #input data; using Barrett's data only (hogup/hogdn)
 # abs_wq_df_fn = 'abs_wq_df_streams_combined_clean.csv'                        #input data; using Barrett and Ethan's data (hogup/hogdn)
-abs_wq_df_fn = 'abs_wq_df_streams_2023_clean.csv'                            #input data; using Ethan's data (all sites; Ocean Optics)
+abs_wq_df_fn = 'abs_wq_df_streams_2023_clean.csv'                              #input data; using Ethan's data (all sites; Ocean Optics)
 # abs_wq_df_fn = 'abs_wq_df_streams_2023_clean_SN.csv'                         #input data; using Ethan's data (all sites; StellarNet)
 # abs_wq_df_fn = 'abs_wq_df_streams_all_clean.csv'                             #input data; using Barrett and Ethan's data (hogdn/hogup for Barrett, all sites for Ethan)
+
 
 abs_wq_df_fil=pd.read_csv(inter_dir+abs_wq_df_fn)                              #translate computer file into program variable
 
@@ -196,92 +196,87 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
 
 #%% Define function for making plots                                           #Define function for making plots (to use later)
 
-def make_plots(outputs_df, output_label):                                      #define plot
+def make_plots(outputs_df, output_label):
+    
+    fig, ax = plt.subplots(dpi=300)  # Create a single subplot
+    fig.set_size_inches(10, 12)  # Set the size of the figure
+    fig.suptitle(output_label, fontsize=18)  # Add a centered title with a fontsize of 18
 
-    ## make plots for filtered samples
-        
-    fig, axs = plt.subplots(1,2,dpi = 300)                                     #creates figure (fig) and subplots (axs) in 1 row and 2 columns. DPI (dots per inch) is the resolution.
-    fig.set_size_inches(15,15)                                                 #set width and height to 15 inches
-    fig.suptitle(output_label,fontsize = 18)                                   #add centered title with a fontsize of 18
-    fig.tight_layout(pad = 4)                                                  #set distance between plot and figure (padding)
-    #axs[2, 2].axis('off') #This will create a 3x3 matrix (Python starts index at 0)
-    #row = 0 #For one row/two columns, only one variable is used
-    col = 0
-    species = outputs_df.species.unique()                                      #extracts values from 'species' column and assigns them to variable 'species'
-    for s in species:                                                          #iterate over each unique value in the 'species' array
-        y_true_train = outputs_df.loc[((outputs_df.species == s) &             #extract value of 'y_true_train' for species 's'
-                                        (outputs_df.output == 'y_true_train')),
-                                        'value']
-        
-        y_hat_train = outputs_df.loc[((outputs_df.species == s) &              #extract value of 'y_hat_train' for species 's'
-                                        (outputs_df.output == 'y_hat_train')),
-                                        'value']
-        
-        y_true_test = outputs_df.loc[((outputs_df.species == s) &              #extract value of 'y_true_test' for species 's'
-                                        (outputs_df.output == 'y_true_test')),
-                                        'value']
-        
-        y_hat_test = outputs_df.loc[((outputs_df.species == s) &               #extract value of 'y_hat_test' for species 's'
-                                        (outputs_df.output == 'y_hat_test')),
-                                        'value']
-        
-        line11 = np.linspace(min(np.concatenate((y_true_train,y_hat_train,     #create array of evenly spaced values between max and min values
-                                                  y_true_test,y_hat_test))),   #max and min values are from the four provided variables
-                              max(np.concatenate((y_true_train,y_hat_train,
-                                                  y_true_test,y_hat_test))))
-        
-        y_text = min(line11)+(max(line11)-min(line11))*0                       #y_text is set to minimum value of line11
-        x_text = max(line11)-(max(line11)-min(line11))*0.5                     #x_text is set halfway between the min and max values of line11
-        
-        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq')&    #store train_rsq output for given species
-                            (outputs_df.species==s)]
-        
-        train_rsq = np.mean(train_rsq)                                         #set mean
-        
-        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq')&      #store test_rsq output for given species
-                            (outputs_df.species==s)]
-        
-        test_rsq = np.mean(test_rsq)                                           #set mean
-        
-        ax = axs[col]                                                          #access column 1
-        
-        for label in (ax.get_xticklabels() + ax.get_yticklabels()):            #set font size of tick marks
+    species = outputs_df.species.unique()
+
+    for s in species:
+        y_true_train = outputs_df.loc[((outputs_df.species == s) &
+                                       (outputs_df.output == 'y_true_train')),
+                                      'value']
+
+        y_hat_train = outputs_df.loc[((outputs_df.species == s) &
+                                       (outputs_df.output == 'y_hat_train')),
+                                      'value']
+
+        y_true_test = outputs_df.loc[((outputs_df.species == s) &
+                                      (outputs_df.output == 'y_true_test')),
+                                     'value']
+
+        y_hat_test = outputs_df.loc[((outputs_df.species == s) &
+                                      (outputs_df.output == 'y_hat_test')),
+                                     'value']
+
+        line11 = np.linspace(min(np.concatenate((y_true_train, y_hat_train,
+                                                y_true_test, y_hat_test))),
+                             max(np.concatenate((y_true_train, y_hat_train,
+                                                y_true_test, y_hat_test))))
+
+        y_text = min(line11) + (max(line11) - min(line11)) * 0
+        x_text = max(line11) - (max(line11) - min(line11)) * 0.5
+
+        train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq') &
+                                        (outputs_df.species == s)]
+
+        train_rsq = np.mean(train_rsq)
+
+        test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq') &
+                                       (outputs_df.species == s)]
+
+        test_rsq = np.mean(test_rsq)
+
+        for label in (ax.get_xticklabels() + ax.get_yticklabels()):
             label.set_fontsize(16)
-        
-        axs[col].plot(y_true_train,y_hat_train,'o',markersize = 4, label = 'training set') #create subplot of y_true_train and y_hat_train
-        axs[col].plot(y_true_test,y_hat_test,'o',markersize = 4, label = 'test set')       #create subplot of y_true_test and y_hat_test
-        axs[col].plot(line11,line11,'k--',label= '1:1 line')                               #add a diagonal dashed line for line11 values
-        # axs[row,col].set_title(s)
-        axs[col].legend(loc = 'upper left',fontsize = 16)                                  #add a legend to the top-left of the subplot
-        axs[col].set_xlabel('Lab Measured '+s+' (mg/L)',fontsize = 16)                     #add a label to the x-axis (lab measured)
-        axs[col].set_ylabel('Predicted '+s+' (mg/L)',fontsize = 16)                        #add a label to the y-axis (predicted)
-        # axs[row,col].get_xaxis().set_visible(False)
-        ax.text(x_text,y_text,r'$train\/r^2 =$'+str(np.round(train_rsq,3))+'\n'            #adds training and test r-squared values to the subplot
-                +r'$test\/r^2 =$'+str(np.round(test_rsq,3)), fontsize = 16)
-        # ticks = ax.get_yticks()
-        # print(ticks)
-        # # tick_labels = ax.get_yticklabels()
-        # tick_labels =[str(round(x,1)) for x in ticks]
-        # tick_labels = tick_labels[1:-1]
-        # print(tick_labels)
-        # ax.set_xticks(ticks)
-        # ax.set_xticklabels(tick_labels)
-        
-        #if col == 1:
-            #col = 0
-            #row += 1
-        #else
-        col +=1                                                                #increment the value of 'col'
-        fig.show()                                                             #show figure
+
+        ax.plot(y_true_train, y_hat_train, 'o', markersize=4, label='training set')
+        ax.plot(y_true_test, y_hat_test, 'o', markersize=4, label='test set')
+        ax.plot(line11, line11, 'k--', label='1:1 line')
+        ax.legend(loc='upper left', fontsize=16)
+        ax.set_xlabel('Lab Measured ' + s + ' (mg/L)', fontsize=16)
+        ax.set_ylabel('Predicted ' + s + ' (mg/L)', fontsize=16)
+        ax.text(x_text, y_text, r'$train\/r^2 =$' + str(np.round(train_rsq, 3)) + '\n'
+                + r'$test\/r^2 =$' + str(np.round(test_rsq, 3)), fontsize=16)
+
+        # Add vertical lines with legend labels
+        ax.axvline(x=0.053, linestyle='--', color='black', label='MDL')
+        ax.axvline(x=0.131, linestyle='--', color='gray', label='PQL')
+
+        ax.legend(loc='upper left', fontsize=16)
+        ax.set_xlabel('Lab Measured ' + s + ' (mg/L)', fontsize=16)
+        ax.set_ylabel('Predicted ' + s + ' (mg/L)', fontsize=16)
+        ax.text(x_text, y_text, r'$train\/r^2 =$' + str(np.round(train_rsq, 3)) + '\n'
+                + r'$test\/r^2 =$' + str(np.round(test_rsq, 3)), fontsize=16)
+    plt.show()
 
 #%% create outputs for models trained with samples and save to exported file (use the create_outputs function)
 
-outputs_df = create_outputs(abs_wq_df_fil, iterations = 100, autosave = True, #filtered samples, no synthetic samples
+outputs_df = create_outputs(abs_wq_df_fil, iterations = 80, autosave = True, #filtered samples, no synthetic samples
                output_path = os.path.join(output_dir,'streams_PLS_results.csv'),
                return_df = True) #create outputs and save
 
  
 #%% make plots for all samples and show (use the make_plots function)
 
-make_plots(outputs_df,'Filtered Samples')
+make_plots(outputs_df,'Comparison of Measured and Predicted Values of Nitrate-N')
 
+#%% filter out predcited values less than the MDL and re-make the plots and R^2
+
+# Specify the path where you want to save the Excel file
+excel_path = os.path.join(output_dir, '80_It_Results.xlsx')
+
+# Export the DataFrame to Excel
+outputs_df.to_excel(excel_path, index=False)
