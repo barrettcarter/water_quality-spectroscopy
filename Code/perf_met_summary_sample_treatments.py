@@ -40,6 +40,8 @@ for rcparam in rc.keys():
 
 sns.set_style(rc = rc)
 
+from matplotlib.cm import get_cmap
+
 #%% Set paths
 
 user = os.getlogin()
@@ -355,7 +357,8 @@ ID_col = 'sample type, chemical analyte, model'
 true_ests.sort_values(by = ID_col,inplace=True)
 
 true_ests.rename(columns = {'treatment':'Sample Treatment'},inplace=True)
-#%% make 1:1 plots for best performing model/treatment for each chemical analyte/sample type
+#%% make 1:1 plots for best performing model for each chemical analyte/sample type
+### separated by treatment
 
 g = sns.lmplot(data = true_ests, x = 'True Concentration', y = 'Estimated Concentration',
            col = ID_col,col_wrap = 5,height = 3,scatter = False,hue = 'Sample Treatment',
@@ -368,7 +371,7 @@ plt.savefig(os.path.join(fig_dir,'Exp2_ALL_11_plots.png'),dpi = 300)
 
 #%% make subset for 2 most significant/relevant effects of sample treatment
 
-subs = ['Stream_TN','Stream_PO4-P','HNS_Fe','HNS_Zn']
+subs = ['Stream_PO4-P','HNS_Zn']
 
 true_ests_best = true_ests[(true_ests.sample_type+'_'+true_ests.species).isin(subs)]
 
@@ -377,17 +380,64 @@ true_ests_best.rename(columns = {'True Concentration':'True Concentration (mg/L)
 
 #%% make 1:1 plots for best fits
 
-plt.figure(dpi = 300)
+subs = ['Stream_PO4-P','HNS_Zn','Stream_PO4-P_unfiltered','HNS_Zn_diluted']
 
+fig, axs = plt.subplots(nrows = 2, ncols = 2, dpi = 300, figsize = [6.5,6.5],
+                        layout = 'constrained')
 
-g = sns.lmplot(data = true_ests_best, x = 'True Concentration (mg/L)', y = 'Estimated Concentration (mg/L)',
-           col = ID_col,col_wrap = 2,height = 4,
-           facet_kws = {'sharey':False,'sharex':False},
-           scatter_kws = {'color':'grey','alpha': 0.5,'s':2})
+axs = fig.axes
 
-g.set_titles('{col_name}')
+for i,ax in enumerate(axs):
+    
+    sub = subs[i]
+    
+    if i < 2:
+    
+        data_sub = true_ests_best[(true_ests_best.sample_type+'_'+true_ests_best.species).isin([sub])]
+        
+        groups = data_sub['Sample Treatment'].unique()
+        
+        for ci,st in enumerate(groups):
+        
+            sns.regplot(data = data_sub[data_sub['Sample Treatment']==st], 
+                        x = 'True Concentration (mg/L)', 
+                        y = 'Estimated Concentration (mg/L)',
+                        # color = ci,
+                        scatter_kws = {'alpha': 0.2,'s':2},
+                        line_kws={'lw': 1,'label': st},
+                        label = st,
+                        ax = ax)
+        
+        # sns.move_legend(ax,'upper left')
+        
+        # ax.legend(loc = 'upper left')
+        
+        handles, labels = ax.get_legend_handles_labels()
+        n = len(groups)
+        hrangeev = np.arange(n,)*2
+        hrangeod = np.arange(n)*2+1
+        ax.legend(handles=[(h1, h2) for h1, h2 in zip(np.array(handles)[hrangeev], 
+                                                      np.array(handles)[hrangeod])],
+                    labels=list(np.array(labels)[hrangeev]),
+                    fontsize=10,
+                    loc = 'upper left')
+        
+        ax.set_title(data_sub['sample type, chemical analyte, model'].values[0]) 
+        
+    if i >= 2:
+    
+        data_sub = true_ests_best[(true_ests_best.sample_type+'_'+true_ests_best.species+'_'+true_ests_best['Sample Treatment']).isin([sub])]
+        
+        sns.regplot(data = data_sub, x = 'True Concentration (mg/L)', 
+                    y = 'Estimated Concentration (mg/L)',
+                    scatter_kws = {'color':'grey','alpha': 0.5,'s':2},
+                    ax = ax)
+        
+        ax.set_title((data_sub['sample type, chemical analyte, model']+\
+                      ', '+data_sub['Sample Treatment']).values[0]) 
+            
 
-plt.savefig(os.path.join(fig_dir,'Exp2_opt_best_11_plots.png'),dpi = 300)
+plt.savefig(os.path.join(fig_dir,'Exp2_best_11_plots.png'),dpi = 300)
 
 #%% Scratch
 
