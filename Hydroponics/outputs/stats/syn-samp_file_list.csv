@@ -1,0 +1,17 @@
+,0
+1,HNSd30_syn-aug-False_DL_It0-19_results.csv
+2,HNSd30_syn-aug-False_PLS_It0-19_results.csv
+3,HNSd30_syn-aug-False_RF-PCA_It0-19_results.csv
+4,HNSd30_syn-aug-False_XGB-PCA_It0-19_results.csv
+5,HNSd30_syn-aug-True_DL_It0-19_results.csv
+6,HNSd30_syn-aug-True_PLS_It0-19_results.csv
+7,HNSd30_syn-aug-True_RF-PCA_It0-19_results.csv
+8,HNSd30_syn-aug-True_XGB-PCA_It0-19_results.csv
+25,HNS_syn-aug-False_DL_It0-19_results.csv
+26,HNS_syn-aug-False_PLS_It0-19_results.csv
+27,HNS_syn-aug-False_RF-PCA_It0-19_results.csv
+28,HNS_syn-aug-False_XGB-PCA_It0-19_results.csv
+29,HNS_syn-aug-True_DL_It0-19_results.csv
+30,HNS_syn-aug-True_PLS_It0-19_results.csv
+31,HNS_syn-aug-True_RF-PCA_It0-19_results.csv
+32,HNS_syn-aug-True_XGB-PCA_It0-19_results.csv

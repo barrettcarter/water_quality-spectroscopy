@@ -1,0 +1,9 @@
+,0
+19,streams-fil_syn-aug-False_DL_It0-19_results.csv
+21,streams-fil_syn-aug-False_PLS_It0-19_results.csv
+22,streams-fil_syn-aug-False_RF-PCA_It0-19_results.csv
+24,streams-fil_syn-aug-False_XGB-PCA_It0-19_results.csv
+25,streams-fil_syn-aug-True_DL_It0-19_results.csv
+27,streams-fil_syn-aug-True_PLS_It0-19_results.csv
+28,streams-fil_syn-aug-True_RF-PCA_It0-19_results.csv
+30,streams-fil_syn-aug-True_XGB-PCA_It0-19_results.csv
