@@ -48,28 +48,52 @@ path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
 fig_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images'
 
 inter_dirs = {'Streams':os.path.join(path_to_wqs,'Streams','intermediates'),
-              'HNS':os.path.join(path_to_wqs,'Hydroponics','intermediates'),
-              'HNSd30':os.path.join(path_to_wqs,'Hydroponics','intermediates')}
+              'HNS':os.path.join(path_to_wqs,'Hydroponics','intermediates')}
 
 output_dirs = {'Streams':os.path.join(path_to_wqs,'Streams','outputs'),
-              'HNS':os.path.join(path_to_wqs,'Hydroponics','outputs'),
-              'HNSd30':os.path.join(path_to_wqs,'Hydroponics','outputs')}
+              'HNS':os.path.join(path_to_wqs,'Hydroponics','outputs')}
 
 real_fns = {'Streams':'abs_wq_df_streams.csv',
-            'HNS':'abs-wq_HNSr_df.csv',
-            'HNSd30':'abs-wq_HNSrd30_df.csv'}
+            'HNS':'abs-wq_HNSr_df.csv'}
 
 syn_fns = {'Streams':'abs-wq_SWs_OO.csv',
-            'HNS':'abs-wq_HNSs_df.csv',
-            'HNSd30':'abs-wq_HNSsd30_df.csv'}
+            'HNS':'abs-wq_HNSs_df.csv'}
 
 stypes = list(inter_dirs.keys())
+
+# groups_dict = {'Nitrate-N':'Group 1', 'TKN':'Group 1', 'ON':'Group 1', 'TN':'Group 1',
+#                'Ammonium-N':'Group 2','Phosphate-P':'Group 2','TP':'Group 2','OP':'Group 2'}
+
+# labels_dict = {'Nitrate-N':'NO3-N','TKN':'TKN','ON':'ON','TN':'TN',
+#                'Ammonium-N':'NH4-N','Phosphate-P':'PO4-P','TP':'TP','OP':'OP'}
+
+# plot_info = pd.DataFrame({'sample_type':['stream','stream','stream','stream',
+#                                          'stream','stream','stream','stream',
+#                                          'HNS','HNS','HNS','HNS','HNS','HNS','HNS',
+#                                          'HNS','HNS','HNS','HNS','HNS','HNS','HNS'],
+#                           'analyte':['Nitrate-N', 'TKN', 'ON', 'TN',
+#                                      'Ammonium-N','Phosphate-P','TP','OP',
+#                                      'Nitrate-N','Potassium','Calcium','Sulfate',
+#                                      'Phosphorus','Magnesium','Ammonium-N','pH',
+#                                      'Iron','Manganese','Boron','Zinc','Copper','Molybdenum'],
+#                           'group':['Group 1','Group 1','Group 1','Group 1',
+#                                    'Group 2','Group 2','Group 2','Group 2',
+#                                    'Group 1','Group 1','Group 1','Group 1',
+#                                    'Group 2','Group 2','Group 3'],
+#                           'label':[]})
+
+# 'g1':['Nitrate-N','Potassium','Calcium','Sulfate'],
+#                'g2':['Phosphorus','Magnesium'],
+#                'g3':['Ammonium-N','pH','Iron'],
+#                'g4':['Manganese','Boron','Zinc','Copper','Molybdenum']
 
 #%% make plots for each sample type
 
 desc_stats_df = pd.DataFrame()
 
-stype = stypes[0] # for testing
+wq_dict = {}
+
+stype = stypes[1] # for testing
 
 for stype in stypes:
     
@@ -94,15 +118,9 @@ for stype in stypes:
     
         syn_df = syn_df.loc[syn_df.Storage_time==10,'Ammonium-N':'TN']
         
-    elif stype=='HNS':
-        
-        real_df = real_df.loc[:,'Nitrate-N':'pH']
-        
-        syn_df = syn_df.loc[:,'Nitrate-N':'pH']
-        
     else:
         
-        real_df = real_df.loc[:,'pH':'Nitrate-N']
+        real_df = real_df.loc[:,'Nitrate-N':'pH']
         
         syn_df = syn_df.loc[:,'pH':'Nitrate-N']
         
@@ -115,52 +133,108 @@ for stype in stypes:
     
     all_long = pd.DataFrame()
     
+    for col in all_df.columns:
+        
+        if col != 'origin':
+            
+            sub_df = all_df.loc[:,[col,'origin']]
+            
+            sub_df.rename(columns = {col:'concentration'},inplace=True)
+            
+            sub_df['analyte'] = col
+            
+            all_long = pd.concat([all_long,sub_df],ignore_index = True)
+            
+    wq_dict[stype] = all_long
+    
     ### calculate summary statistics and compile into dataframe
     
-    desc_stats = all_df.groupby('origin').describe()
+    desc_stats = all_long.groupby(['origin','analyte']).concentration.describe().reset_index()
     
-    desc_stats.to_csv(os.path.join(output_dir,f'WQ_desc_stats_Filt-{filt}.csv'))
+    desc_stats['sample_type'] = stype
+    
+    desc_stats_df = pd.concat([desc_stats_df,desc_stats],ignore_index=True)
+    
+#%% save decriptive stats
 
-#%% make long dataframe
+output_dir = os.path.join(path_to_wqs,'Outputs')
+    
+desc_stats_df.to_csv(os.path.join(output_dir,'WQ_desc_stats_syn-aug.csv'),index=False)
 
-groups_dict = {'Nitrate-N':'Group 1', 'TKN':'Group 1', 'ON':'Group 1', 'TN':'Group 1',
-               'Ammonium-N':'Group 2','Phosphate-P':'Group 2','TP':'Group 2','OP':'Group 2'}
-
-labels_dict = {'Nitrate-N':'NO3-N','TKN':'TKN','ON':'ON','TN':'TN',
-               'Ammonium-N':'NH4-N','Phosphate-P':'PO4-P','TP':'TP','OP':'OP'}
-
-wq_long = pd.DataFrame(columns = ['Chemical Analyte','Filtration','Concentration (mg/L)',
-                                  'Group'])
-
-for species in list(labels_dict.keys()):
-    
-    sub_df = wq_strm.loc[:,[species,'Filtered']]
-    
-    sub_df.rename(columns = {species:'Concentration (mg/L)'},inplace=True)
-    
-    sub_df['Filtration']='NA'
-    
-    sub_df.loc[sub_df.Filtered==True,'Filtration']='Filtered'
-    
-    sub_df.loc[sub_df.Filtered==False,'Filtration']='Unfiltered'
-    
-    sub_df.drop(columns = 'Filtered',inplace=True)
-    
-    sub_df['Chemical Analyte']=labels_dict[species]
-    
-    sub_df['Group'] = groups_dict[species]
-    
-    wq_long = pd.concat([wq_long,sub_df],ignore_index=True)
-    
 #%% make plot
 
-g = sns.catplot(data=wq_long,x='Chemical Analyte',y = 'Concentration (mg/L)', 
-            hue = 'Filtration',col = 'Group',kind = 'box',sharex=False,sharey=False,
-            palette = {'Unfiltered':'slategrey','Filtered':'lightsteelblue'})
+groups_dict = {'g1':['Nitrate-N','Potassium','Calcium','Sulfate'],
+               'g2':['Phosphorus','Magnesium'],
+               'g3':['Ammonium-N','pH','Iron'],
+               'g4':['Manganese','Boron','Zinc','Copper','Molybdenum'],
+               'g5':['Nitrate-N','TKN','ON','TN'],
+               'g6':['Ammonium-N','Phosphate-P','TP','OP']}
 
-g.set_titles(col_template="")
+group_stype = {'g1':'HNS','g2':'HNS','g3':'HNS','g4':'HNS','g5':'Streams','g6':'Streams'}
 
-plt.savefig(os.path.join(fig_dir,'stream_wq_filtration_boxplot.png'),dpi = 300)
+# group_subplot = {'g1':'fig.add_subplot(5,5,(1,4))',
+#                  'g2':'fig.add_subplot(5,5,(6,7))',
+#                  'g3':'fig.add_subplot(5,5,(8,10))',
+#                  'g4':'fig.add_subplot(5,5,(11,15))',
+#                  'g5':'fig.add_subplot(5,5,(16,19))',
+#                  'g6':'fig.add_subplot(5,5,(21,24))'}
+
+group_subplot = {'g1':'fig.add_subplot(3,16,(1,9))',
+                 'g2':'fig.add_subplot(3,16,(17,21))',
+                 'g3':'fig.add_subplot(3,16,(11,16))',
+                 'g4':'fig.add_subplot(3,16,(23,32))',
+                 'g5':'fig.add_subplot(3,32,(65,79))',
+                 'g6':'fig.add_subplot(3,32,(82,96))'}
+
+labels_df = pd.DataFrame({'name':['Nitrate-N','Potassium','Calcium','Sulfate',
+                                  'Phosphorus','Magnesium','Ammonium-N','pH',
+                                  'Iron','Manganese','Boron','Zinc','Copper',
+                                  'Molybdenum','TKN','ON','TN','Phosphate-P',
+                                  'TP','OP'],
+                          'label':['NO3-N','K','Ca','SO4','P','Mg','NH4-N','pH',
+                                   'Fe','Mn','B','Zn','Cu','Mb','TKN','ON','TN',
+                                   'PO4-P','TP','OP']})
+
+# stype_colors = {'HNS':'tab:red','stream':'tab:blue'}
+
+fig = plt.figure(dpi = 300,figsize = [10,10],constrained_layout = True)
+
+plt.figtext(0.5,0.08,'Chemical Analyte',ha = 'center',va = 'center')
+
+plt.figtext(0.08,0.5,'Concentration (mg/L)',rotation = 'vertical',
+         va = 'center',ha = 'center')
+
+group = 'g1' # for testing
+
+for group in list(groups_dict.keys()):
+    
+    analytes = groups_dict[group]
+    
+    stype = group_stype[group]
+    
+    wq_df = wq_dict[stype]
+    
+    wq_df = wq_df.loc[(wq_df.analyte.isin(analytes)),:]
+    
+    # labels = labels_df.loc[labels_df.name.isin(analytes),'label']
+    
+    wq_df = pd.merge(wq_df,labels_df,left_on='analyte',right_on='name',how='inner')
+    
+    # stype_color = stype_colors[stype]
+    
+    ax = eval(group_subplot[group])
+    
+    # ax.boxplot(wq_df.loc[:,analytes],notch=True,boxprops={'color': stype_color})
+    sns.boxplot(data=wq_df,x='label',y='concentration',hue = 'origin')
+    
+    ax.set_xlabel('')
+    ax.set_ylabel('')
+    ax.set_title(stype)
+    
+    # ax.set_xticks(np.arange(0,len(analytes)))
+    # ax.set_xticklabels(labels)
+    
+    # ax.set_title(stype)
 
 #%% make useful variables for heatmaps
 
