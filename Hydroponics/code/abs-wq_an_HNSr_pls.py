@@ -35,7 +35,7 @@ from joblib import dump
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
+path_to_wqs = 'D:\\GitHub\\PhD\\water_quality-spectroscopy' #external HD
 # path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
@@ -63,7 +63,8 @@ subset_name = abs_wq_df_fn.split(sep = '_')[1]
 #%% Create function for writing outputs
 
 def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
-                   subset_name = None, syn_aug = False, syn_df = None):
+                   subset_name = None, syn_aug = False, syn_df = None,
+                   species = 'All'):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -97,7 +98,9 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
     
     iteration = 1 # this is for testing
     
-    species = input_df.columns[0:14]
+    if species == 'All':
+    
+        species = input_df.columns[0:14]
     
     for s in species:
         for iteration in range(iterations):
@@ -269,14 +272,16 @@ def make_plots(outputs_df, output_label):
 #%% Run create_outputs function for testing
 
 outputs_r_df = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'HNS_syn-aug-False_PLS_It0-19_results.csv'),
-                            subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
+                            output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-False_PLS_It0-19_results.csv'),
+                            subset_name = subset_name,syn_aug = False,
+                            species = ['Sulfate']) # no synthetic samples
 
 
 
 outputs_rs_df = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'HNS_syn-aug-True_PLS_It0-19_results.csv'),
-                            subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+                            output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-True_PLS_It0-19_results.csv'),
+                            subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df,
+                            species = ['Sulfate']) # real and synthetic samples
 
 make_plots(outputs_r_df,'Hydroponic Samples - Real only')
 make_plots(outputs_rs_df,'Hydroponic Samples - Real and Synthetic')
