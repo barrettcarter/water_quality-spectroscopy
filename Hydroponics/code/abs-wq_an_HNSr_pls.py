@@ -30,8 +30,6 @@ from joblib import dump
 
 #%% Set paths and bring in data
 
-#%% Set paths and bring in data
-
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
@@ -40,11 +38,11 @@ path_to_wqs = 'D:\\GitHub\\PhD\\water_quality-spectroscopy' #external HD
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
-abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+# abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
 
-# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
-syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
+syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+# syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # abs_wq_df_dil_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples by themselves
 # abs_wq_df_und_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples by themselves
@@ -272,14 +270,14 @@ def make_plots(outputs_df, output_label):
 #%% Run create_outputs function for testing
 
 outputs_r_df = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-False_PLS_It0-19_results.csv'),
+                            output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-False_PLS_It0-19_results.csv'),
                             subset_name = subset_name,syn_aug = False,
                             species = ['Sulfate']) # no synthetic samples
 
 
 
 outputs_rs_df = create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                            output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-True_PLS_It0-19_results.csv'),
+                            output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-True_PLS_It0-19_results.csv'),
                             subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df,
                             species = ['Sulfate']) # real and synthetic samples
 
