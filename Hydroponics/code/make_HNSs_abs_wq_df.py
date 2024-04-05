@@ -5,14 +5,14 @@ Created on Thu Oct  7 16:40:40 2021
 @author: jbarrett.carter
 """
 import pandas as pd
-import numpy as np
+# import numpy as np
 import os
 
 #%% Set paths and bring in data
 
 user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = r'D:\GitHub\PhD\water_quality-spectroscopy' # for external HD
 abs_df_dir=os.path.join(path_to_wqs,'Data/spectra/')
 wq_df_dir=os.path.join(path_to_wqs,'Hydroponics/inputs/water_quality/')
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
@@ -65,6 +65,14 @@ abs_wq_df.rename(columns = {'NH4N':'Ammonium-N','NO3N':'Nitrate-N','B':'Boron',
 
 abs_wq_df.drop(columns = 'TKN',inplace = True)
 abs_wq_df.drop(columns = 'EC',inplace = True)
+
+#%% convert 'S' to Sulfate
+
+mw_sulfate = 96.06 # molar mass of sulfate
+
+mw_S = 32.06 # molar mass of sulfur
+
+abs_wq_df['Sulfate'] = abs_wq_df.Sulfate*mw_sulfate/mw_S
 
 #%% Export dataframe
 
