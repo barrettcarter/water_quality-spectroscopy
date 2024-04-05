@@ -40,7 +40,8 @@ from sklearn.base import BaseEstimator
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+path_to_wqs = 'D:\\GitHub\\PhD\\water_quality-spectroscopy' #external HD
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
@@ -129,7 +130,8 @@ class pca_RF(BaseEstimator):
 #%% Create function for writing outputs
 
 def create_outputs(input_df,iterations = 1, autosave = False, output_path = None,
-                   subset_name = None, syn_aug = False, syn_df = None):
+                   subset_name = None, syn_aug = False, syn_df = None,
+                   species = 'All'):
     
     def write_output_df(the_output,output_name,species_name,iteration_num):
     
@@ -164,7 +166,9 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
        
     iteration = 1 # this is for testing
     
-    species = input_df.columns[0:14]
+    if species == 'All':
+    
+        species = input_df.columns[0:14]
     
     if type(iterations)==int:
         iterations = range(iterations)
@@ -357,12 +361,14 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 #                             output_path = os.path.join(output_dir,output_fn))
 
 create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_RF-PCA_It0-19_results.csv'),
-               subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
+               output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-False_RF-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = False,
+               species = ['Sulfate']) # filtered samples, no synthetic samples
 
 create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNSd30_syn-aug-True_RF-PCA_It0-19_results.csv'),
-               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+               output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-True_RF-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df,
+               species = ['Sulfate']) # filtered samples with synthetic samples
 
                                                        
 #%% make plots for all samples
