@@ -42,11 +42,11 @@ path_to_wqs = 'D:\\GitHub\\PhD\\water_quality-spectroscopy' #external HD
 inter_dir = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
-# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
-abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+# abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
 
-# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
-syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
+syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+# syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
 
 # Bring in data
 abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
@@ -524,11 +524,11 @@ def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
 #%% Create outputs
 
 create_outputs(input_df = abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-False_DL_It0-19_results.csv'),
+               output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-False_DL_It0-19_results.csv'),
                subset_name = subset_name,syn_aug = False) # no synthetic samples
 
 create_outputs(input_df = abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-True_DL_It0-19_results.csv'),
+               output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-True_DL_It0-19_results.csv'),
                subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # with synthetic samples
 
 
