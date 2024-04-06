@@ -27,7 +27,11 @@ wq_df=pd.read_csv(wq_df_dir+wq_df_fn)
 #%% Some data wrangling
 
 # Add 'Name' to wq_df specifically for HNSsd30 samples
-wq_df['Name']=wq_df['ID#'].apply(lambda x: 'HNSs'+str(x))
+wq_df['Name']=wq_df['ID#'].apply(lambda x: 'HNSs'+str(x)+'d30')
+
+# # Add 'Name' to wq_df specifically for HNSs samples
+# wq_df['Name']=wq_df['ID#'].apply(lambda x: 'HNSs'+str(x))
+
 #HNSs_inds = abs_df['Name'].apply(lambda x: x in wq_df['Name'])
 
 # Select only HNSs samples
@@ -76,4 +80,5 @@ abs_wq_df['Sulfate'] = abs_wq_df.Sulfate*mw_sulfate/mw_S
 
 #%% Export dataframe
 
-abs_wq_df.to_csv(inter_dir+'abs-wq_HNSs_df.csv',index=False)
+abs_wq_df.to_csv(inter_dir+'abs-wq_HNSsd30_df.csv',index=False) # for diluted samples
+# abs_wq_df.to_csv(inter_dir+'abs-wq_HNSs_df.csv',index=False) # for undiluted samples
