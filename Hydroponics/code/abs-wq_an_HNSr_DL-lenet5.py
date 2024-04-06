@@ -36,8 +36,9 @@ print('modules loaded')
 
 # user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'D:\\GitHub\\PhD\\water_quality-spectroscopy' #external HD
 inter_dir = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
@@ -59,7 +60,9 @@ subset_name = abs_wq_df_fn.split(sep = '_')[1]
 
 np.random.seed(7)
 
-species=list(abs_wq_df.columns[0:14])
+# species=list(abs_wq_df.columns[0:14])
+
+species = ['Sulfate'] # for re-running analysis on Sulfate
 
 # species=['Nitrate-N'] # for testing
 
@@ -507,26 +510,26 @@ def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
             
             iterations = range(iterations)
         
-        else:
-        
-            for iteration in iterations:
-                
-                outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
-                             output_names,variable_names, output_path = output_path,
-                             autosave = autosave, subset_name = subset_name,
-                             syn_aug = syn_aug, syn_df = syn_df)
+        for iteration in iterations:
+            
+            # print(f'creating outputs for {s}: iteration {iteration}')
+            
+            outputs_df = make_outputs(df,num_epochs,outputs_df,s,iteration,
+                         output_names,variable_names, output_path = output_path,
+                         autosave = autosave, subset_name = subset_name,
+                         syn_aug = syn_aug, syn_df = syn_df)
         
     # return(outputs_df)
 
 #%% Create outputs
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                output_path = os.path.join(output_dir,'HNS_syn-aug-False_DL_It0-19_results.csv'),
-                subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
+create_outputs(input_df = abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-False_DL_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = False) # no synthetic samples
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                output_path = os.path.join(output_dir,'HNS_syn-aug-True_DL_It0-19_results.csv'),
-                subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
+create_outputs(input_df = abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-True_DL_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # with synthetic samples
 
 
 #%% Define function for making plots
@@ -673,4 +676,18 @@ create_outputs(abs_wq_df, iterations = 20, autosave = True,
 
 # v = v.values
 # v = v.repeat(2,axis = 0)
+
+#%% Scratch
+
+# input_df = abs_wq_df
+# iterations = 20
+# autosave = True
+# output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-False_DL_It0-19_results.csv')
+# subset_name = subset_name
+# syn_aug = False
+
+# num_epochs = 5000
+# s = 'Sulfate'
+# iteration = 0
+
 
