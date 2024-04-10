@@ -41,7 +41,8 @@ from sklearn.base import BaseEstimator
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\water_quality-spectroscopy' #for laptop (new)
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+path_to_wqs = 'D:\\GitHub\\PhD\\water_quality-spectroscopy' #external HD
 inter_dir=os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir=os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
@@ -370,12 +371,34 @@ def create_outputs(input_df,iterations = 1, autosave = False, output_path = None
 
 #%% Create outputs for models trained with filtered, unfiltered, and all samples
 
-# create_outputs(abs_wq_df, iterations = 20, autosave = True,
-#                output_path = os.path.join(output_dir,'HNSd30_syn-aug-False_XGB-PCA_It0-19_results.csv'),
-#                subset_name = subset_name,syn_aug = False) #  no synthetic samples
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-False_XGB-PCA_It0-19_results.csv'),
+                subset_name = subset_name,syn_aug = False) #  no synthetic samples
 
 create_outputs(abs_wq_df, iterations = 20, autosave = True,
-               output_path = os.path.join(output_dir,'HNSd30_syn-aug-True_XGB-PCA_It0-19_results.csv'),
+               output_path = os.path.join(output_dir,'HNSd30-SO4_syn-aug-True_XGB-PCA_It0-19_results.csv'),
+               subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # with synthetic samples
+
+# abs_wq_df_fn = 'abs-wq_HNSrd30_df.csv' # for diluted samples
+abs_wq_df_fn = 'abs-wq_HNSr_df.csv' # for undiluted samples
+
+# syn_abs_wq_df_fn = 'abs-wq_HNSsd30_df.csv' # for diluted synthetic samples
+syn_abs_wq_df_fn = 'abs-wq_HNSs_df.csv' # for undiluted synthetic samples
+
+# Bring in data
+abs_wq_df=pd.read_csv(inter_dir+abs_wq_df_fn)
+# abs_wq_df = abs_wq_df.loc[0:56,:] # because the minimum of the two sample sizes (diluted versus undiluted) is 56
+
+syn_abs_wq_df=pd.read_csv(inter_dir+syn_abs_wq_df_fn)
+
+subset_name = abs_wq_df_fn.split(sep = '_')[1]
+
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+                output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-False_XGB-PCA_It0-19_results.csv'),
+                subset_name = subset_name,syn_aug = False) #  no synthetic samples
+
+create_outputs(abs_wq_df, iterations = 20, autosave = True,
+               output_path = os.path.join(output_dir,'HNS-SO4_syn-aug-True_XGB-PCA_It0-19_results.csv'),
                subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # with synthetic samples
 
  
