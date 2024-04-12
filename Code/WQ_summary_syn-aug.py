@@ -93,6 +93,8 @@ desc_stats_df = pd.DataFrame()
 
 wq_dict = {}
 
+wq_wd_dict = {}
+
 stype = stypes[1] # for testing
 
 for stype in stypes:
@@ -130,6 +132,8 @@ for stype in stypes:
     syn_df['origin'] = 'synthetic'
     
     all_df = pd.concat([real_df,syn_df])
+    
+    wq_wd_dict[stype] = all_df
     
     all_long = pd.DataFrame()
     
@@ -238,47 +242,57 @@ for group in list(groups_dict.keys()):
 
 #%% make useful variables for heatmaps
 
-wq_strm.rename(columns = labels_dict,inplace=True)
+origins = ['natural','synthetic']
 
-wq_strm.loc[wq_strm.Filtered,'Filtration'] = 'Filtered'
-wq_strm.loc[wq_strm.Filtered==False,'Filtration'] = 'Unfiltered'
-
-filtration = wq_strm.Filtration.unique()
+labels_dict = {'Nitrate-N':'NO3-N','Potassium':'K','Calcium':'Ca',
+               'Sulfate':'SO4','Phosphorus':'P','Magnesium':'Mg',
+               'Ammonium-N':'NH4-N','pH':'pH','Iron':'Fe','Manganese':'Mn',
+               'Boron':'B','Zinc':'Zn','Copper':'Cu','Molybdenum':'Mb',
+               'Phosphate-P':'PO4-P'}
 
 #%% make heatmaps
 
-filt = 'Unfiltered' # for testing
+org = 'synthetic' # for testing
 
-wq_corrs_dict = {}
+wq_corrs_dict = {'Streams':{},'HNS':{}}
 
-for filt in filtration:
+for stype in stypes:
     
-    wq_df = wq_strm.loc[wq_strm.Filtration==filt,'NH4-N':'OP']
-    wq = wq_df[wq_df.isna().any(axis=1)==False]
-    
-    wq_ar = wq.to_numpy()
-    wq_corrs = np.corrcoef(wq_ar,rowvar = False)
-    
-    wq_corrs_dict[filt] = wq_corrs
-    
-    wq_map = np.empty(wq_corrs.shape)
-    
-    for r in range(wq_map.shape[0]):
-        for c in range(wq_map.shape[1]):
-            if r>c:
-                wq_map[r,c]=False
-            else:
-                wq_map[r,c]=True
-     
-    plt.figure(dpi = 300)
-    
-    plt.title(filt)
-    
-    sns.heatmap(wq_corrs,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
-                vmin = -1, vmax = 1,center =0, cmap = 'coolwarm',
-                annot = True,annot_kws={'size':'x-small'},fmt = '.2f')
-    
-    # plt.savefig(os.path.join(fig_dir,f'{filt}_WQ_heatmap.png'),dpi=300,bbox_inches='tight')
+    wq_stype = wq_wd_dict[stype]
+
+    for org in origins:
+        
+        wq_df = wq_stype.loc[wq_stype.origin==org,:]
+        
+        wq_df.rename(columns = labels_dict,inplace = True)
+        
+        wq_df.drop('origin',axis = 1,inplace=True)
+        
+        wq = wq_df[wq_df.isna().any(axis=1)==False]
+        
+        wq_ar = wq.to_numpy()
+        wq_corrs = np.corrcoef(wq_ar,rowvar = False)
+        
+        wq_corrs_dict[stype][org] = wq_corrs
+        
+        wq_map = np.empty(wq_corrs.shape)
+        
+        for r in range(wq_map.shape[0]):
+            for c in range(wq_map.shape[1]):
+                if r>c:
+                    wq_map[r,c]=False
+                else:
+                    wq_map[r,c]=True
+         
+        plt.figure(dpi = 300)
+        
+        plt.title(org+' '+stype)
+        
+        sns.heatmap(wq_corrs,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
+                    vmin = -1, vmax = 1,center =0, cmap = 'coolwarm',
+                    annot = True,annot_kws={'size':'x-small'},fmt = '.2f')
+        
+        # plt.savefig(os.path.join(fig_dir,f'{filt}_WQ_heatmap.png'),dpi=300,bbox_inches='tight')
     
 #%% make difference heatmap
 
