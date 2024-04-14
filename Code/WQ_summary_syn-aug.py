@@ -87,7 +87,7 @@ stypes = list(inter_dirs.keys())
 #                'g3':['Ammonium-N','pH','Iron'],
 #                'g4':['Manganese','Boron','Zinc','Copper','Molybdenum']
 
-#%% make plots for each sample type
+#%% wrangle data and produced descriptive stats
 
 desc_stats_df = pd.DataFrame()
 
@@ -294,95 +294,87 @@ for stype in stypes:
         
         # plt.savefig(os.path.join(fig_dir,f'{filt}_WQ_heatmap.png'),dpi=300,bbox_inches='tight')
     
-#%% make difference heatmap
-
-wq_corrs_filt = wq_corrs_dict['Filtered']
-wq_corrs_unf = wq_corrs_dict['Unfiltered']
-
-wq_corrs_dif = wq_corrs_filt - wq_corrs_unf
-
-mean_corr_dif = np.mean(wq_corrs_dif)
-
-# wq_corrs_pdif = np.round(wq_corrs_dif/wq_corrs_unf*100).astype(int)
-
-wq_corrs_pdif = wq_corrs_dif/np.abs(wq_corrs_unf)
-
-diff_dict = {'Difference':wq_corrs_dif,'Percent Difference': wq_corrs_pdif}
-
-fmt_dict = {'Difference':'.2f','Percent Difference':'.0%'}
-
-for diff in list(diff_dict.keys()):
-    
-    wq_corrs = diff_dict[diff]
-    
-    plt.figure(dpi = 300)
-    
-    plt.title(diff)
-    
-    sns.heatmap(wq_corrs,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
-                center =0, cmap = 'coolwarm',
-                annot = True,annot_kws={'size':'x-small'},fmt = fmt_dict[diff])
-    
-    plt.savefig(os.path.join(fig_dir,f'{diff}_WQ_heatmap.png'),dpi=300,bbox_inches='tight')
     
 #%% r-squared heatmaps
 
-wq_rsq_filt = wq_corrs_filt**2
-wq_rsq_unf = wq_corrs_unf**2
+org = 'synthetic' # for testing
 
-wq_rsq_dict = {'Filtered':wq_rsq_filt,'Unfiltered':wq_rsq_unf}
+wq_rsqs_dict = {'Streams':{},'HNS':{}}
 
-for filtration in ['Filtered','Unfiltered']:
+for stype in stypes:
     
-    wq_corrs = wq_rsq_dict[filtration]
+    wq_corrs_stype = wq_corrs_dict[stype]
     
-    wq_map = np.empty(wq_corrs.shape)
-    
-    for r in range(wq_map.shape[0]):
-        for c in range(wq_map.shape[1]):
-            if r>c:
-                wq_map[r,c]=False
-            else:
-                wq_map[r,c]=True
-     
-    plt.figure(dpi = 300)
-    
-    plt.title(f'$r^2$ {filtration}')
-    
-    sns.heatmap(wq_corrs,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
-                vmin = 0, vmax = 1,center =0.5, cmap = 'Reds',
-                annot = True,annot_kws={'size':'x-small'},fmt = '.3f')
-    
-    plt.savefig(os.path.join(fig_dir,f'{filtration}_WQ_rsq_heatmap.png'),dpi=300,bbox_inches='tight')
-    
-#%% make difference heatmap
+    wq_stype = wq_wd_dict[stype]
 
-wq_rsq_dif = wq_rsq_filt - wq_rsq_unf
-
-mean_rsq_fil = np.mean(wq_rsq_filt)
-
-mean_rsq_unf = np.mean(wq_rsq_unf)
-
-mean_rsq_dif = np.mean(wq_rsq_dif)
-
-# wq_rsq_pdif = np.round(wq_rsq_dif/wq_rsq_unf*100).astype(int)
-
-wq_rsq_pdif = wq_rsq_dif/np.abs(wq_rsq_unf)
-
-diff_dict = {'Difference':wq_rsq_dif,'Percent Difference': wq_rsq_pdif}
-
-fmt_dict = {'Difference':'.2f','Percent Difference':'.0%'}
-
-for diff in list(diff_dict.keys()):
+    for org in origins:
+        
+        wq_df = wq_stype.loc[wq_stype.origin==org,:]
+        
+        wq_df.rename(columns = labels_dict,inplace = True)
+        
+        wq_df.drop('origin',axis = 1,inplace=True)
+        
+        wq = wq_df[wq_df.isna().any(axis=1)==False]
+        
+        wq_corrs = wq_corrs_stype[org]
+        
+        wq_rsqs = wq_corrs**2
+        
+        wq_rsqs_dict[stype][org] = wq_rsqs
+        
+        wq_map = np.empty(wq_corrs.shape)
+        
+        for r in range(wq_map.shape[0]):
+            for c in range(wq_map.shape[1]):
+                if r>c:
+                    wq_map[r,c]=False
+                else:
+                    wq_map[r,c]=True
+         
+        plt.figure(dpi = 300)
+        
+        plt.title(org+' '+stype)
+        
+        sns.heatmap(wq_rsqs,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
+                    vmin = 0, vmax = 1,center =0.5, cmap = 'Reds',
+                    annot = True,annot_kws={'size':'x-small'},fmt = '.2f')
     
-    wq_rsq = diff_dict[diff]
+#%% make dataframe and generate descriptive stats
+
+wq_corr_df = pd.DataFrame(columns = ['sample_type','origin','metric','value'])
+
+stype = stypes[0] # for testing
+
+for stype in stypes:
     
-    plt.figure(dpi = 300)
+    wq_corrs_stype = wq_corrs_dict[stype]
     
-    plt.title(diff)
+    wq_rsqs_stype = wq_rsqs_dict[stype]
     
-    sns.heatmap(wq_rsq,mask = wq_map,xticklabels = wq.columns,yticklabels = wq.columns,
-                center =0, cmap = 'coolwarm',
-                annot = True,annot_kws={'size':'x-small'},fmt = fmt_dict[diff])
-    
-    plt.savefig(os.path.join(fig_dir,f'{diff}_WQ_rsq_heatmap.png'),dpi=300,bbox_inches='tight')
+    org = origins[0] # for testing
+
+    for org in origins:
+        
+        corrs = pd.DataFrame({'value':wq_corrs_stype[org].flatten()})
+        corrs = corrs.loc[corrs.value < 0.9999,:].reset_index(drop = True)
+        corrs = corrs[0:int(corrs.shape[0]/2)]
+        corrs['metric'] = 'r'
+        
+        rsqs = pd.DataFrame({'value':wq_rsqs_stype[org].flatten()})
+        rsqs = rsqs.loc[rsqs.value < 0.9999,:].reset_index(drop = True)
+        rsqs = rsqs[0:int(rsqs.shape[0]/2)]
+        rsqs['metric'] = 'r-sq'
+        
+        wq_corr_sub = pd.concat([corrs,rsqs],ignore_index = True)
+        
+        wq_corr_sub['sample_type'] = stype
+        wq_corr_sub['origin'] = org
+        
+        wq_corr_df = pd.concat([wq_corr_df,wq_corr_sub],ignore_index = True)
+        
+wq_corr_stats = wq_corr_df.groupby(['sample_type','origin','metric']).value.describe()
+
+#%% save stats
+
+wq_corr_stats.to_csv(os.path.join(path_to_wqs,'Outputs','WQ_corr_stats_syn-aug.csv'))
