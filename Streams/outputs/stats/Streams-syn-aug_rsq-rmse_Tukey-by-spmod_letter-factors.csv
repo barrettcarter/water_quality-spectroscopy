@@ -1,0 +1,94 @@
+species_model,perf_met,letter,factor_levs
+Ammonium-N_DL,test_rmse,a,False True
+Ammonium-N_PLS,test_rmse,a,False True
+Ammonium-N_RF-PCA,test_rmse,a,False True
+Ammonium-N_XGB-PCA,test_rmse,a,False True
+Nitrate-N_DL,test_rmse,a,False
+Nitrate-N_DL,test_rmse,b,True
+Nitrate-N_PLS,test_rmse,a,False
+Nitrate-N_PLS,test_rmse,b,True
+Nitrate-N_RF-PCA,test_rmse,a,False
+Nitrate-N_RF-PCA,test_rmse,b,True
+Nitrate-N_XGB-PCA,test_rmse,a,False
+Nitrate-N_XGB-PCA,test_rmse,b,True
+ON_DL,test_rmse,a,False
+ON_DL,test_rmse,b,True
+ON_PLS,test_rmse,a,False
+ON_PLS,test_rmse,b,True
+ON_RF-PCA,test_rmse,a,False
+ON_RF-PCA,test_rmse,b,True
+ON_XGB-PCA,test_rmse,a,False
+ON_XGB-PCA,test_rmse,b,True
+OP_DL,test_rmse,a,False True
+OP_PLS,test_rmse,a,False True
+OP_RF-PCA,test_rmse,a,False True
+OP_XGB-PCA,test_rmse,a,False True
+Phosphate-P_DL,test_rmse,a,False True
+Phosphate-P_PLS,test_rmse,a,False True
+Phosphate-P_RF-PCA,test_rmse,a,False True
+Phosphate-P_XGB-PCA,test_rmse,a,False True
+TKN_DL,test_rmse,a,False
+TKN_DL,test_rmse,b,True
+TKN_PLS,test_rmse,a,False
+TKN_PLS,test_rmse,b,True
+TKN_RF-PCA,test_rmse,a,False
+TKN_RF-PCA,test_rmse,b,True
+TKN_XGB-PCA,test_rmse,a,False
+TKN_XGB-PCA,test_rmse,b,True
+TN_DL,test_rmse,a,False
+TN_DL,test_rmse,b,True
+TN_PLS,test_rmse,a,False
+TN_PLS,test_rmse,b,True
+TN_RF-PCA,test_rmse,a,False True
+TN_XGB-PCA,test_rmse,a,False True
+TP_DL,test_rmse,a,False True
+TP_PLS,test_rmse,a,False True
+TP_RF-PCA,test_rmse,a,False True
+TP_XGB-PCA,test_rmse,a,False True
+Ammonium-N_DL,test_rsq,a,False True
+Ammonium-N_PLS,test_rsq,a,False True
+Ammonium-N_RF-PCA,test_rsq,a,False True
+Ammonium-N_XGB-PCA,test_rsq,a,False True
+Nitrate-N_DL,test_rsq,a,False
+Nitrate-N_DL,test_rsq,b,True
+Nitrate-N_PLS,test_rsq,a,False
+Nitrate-N_PLS,test_rsq,b,True
+Nitrate-N_RF-PCA,test_rsq,a,False
+Nitrate-N_RF-PCA,test_rsq,b,True
+Nitrate-N_XGB-PCA,test_rsq,a,False
+Nitrate-N_XGB-PCA,test_rsq,b,True
+ON_DL,test_rsq,a,False
+ON_DL,test_rsq,b,True
+ON_PLS,test_rsq,a,False
+ON_PLS,test_rsq,b,True
+ON_RF-PCA,test_rsq,a,False
+ON_RF-PCA,test_rsq,b,True
+ON_XGB-PCA,test_rsq,a,False
+ON_XGB-PCA,test_rsq,b,True
+OP_DL,test_rsq,a,False True
+OP_PLS,test_rsq,a,False True
+OP_RF-PCA,test_rsq,a,False True
+OP_XGB-PCA,test_rsq,a,False True
+Phosphate-P_DL,test_rsq,a,False
+Phosphate-P_DL,test_rsq,b,True
+Phosphate-P_PLS,test_rsq,a,False True
+Phosphate-P_RF-PCA,test_rsq,a,False True
+Phosphate-P_XGB-PCA,test_rsq,a,False True
+TKN_DL,test_rsq,a,False
+TKN_DL,test_rsq,b,True
+TKN_PLS,test_rsq,a,False
+TKN_PLS,test_rsq,b,True
+TKN_RF-PCA,test_rsq,a,False
+TKN_RF-PCA,test_rsq,b,True
+TKN_XGB-PCA,test_rsq,a,False
+TKN_XGB-PCA,test_rsq,b,True
+TN_DL,test_rsq,a,False
+TN_DL,test_rsq,b,True
+TN_PLS,test_rsq,a,False
+TN_PLS,test_rsq,b,True
+TN_RF-PCA,test_rsq,a,False True
+TN_XGB-PCA,test_rsq,a,False True
+TP_DL,test_rsq,a,False True
+TP_PLS,test_rsq,a,False True
+TP_RF-PCA,test_rsq,a,False True
+TP_XGB-PCA,test_rsq,a,False True
