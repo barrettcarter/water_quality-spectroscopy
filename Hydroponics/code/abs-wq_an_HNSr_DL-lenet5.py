@@ -36,8 +36,9 @@ print('modules loaded')
 
 # user = os.getlogin() 
 # path_to_wqs = 'C:\\Users\\'+user+'\\OneDrive\\Research\\PhD\\Data_analysis\\water_quality-spectroscopy\\'
-path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
+# path_to_wqs = '/blue/ezbean/jbarrett.carter/water_quality-spectroscopy/' # for HiPerGator
 # path_to_wqs = 'C:\\Users\\'+ user + '\\Documents\\GitHub\\PhD\\water_quality-spectroscopy' #for work computer
+path_to_wqs = 'D:/GitHub/PhD/water_quality-spectroscopy/' # for external HD
 inter_dir = os.path.join(path_to_wqs,'Hydroponics/intermediates/')
 output_dir = os.path.join(path_to_wqs,'Hydroponics/outputs/')
 
@@ -501,13 +502,17 @@ def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
 ################################################################################ PROCESS
 
     df = input_df
+    
+    print(species)
     for s in species:
+        
+        print(s)
         
         if type(iterations)==int:
             
             iterations = range(iterations)
         
-        else:
+        else: # LOGICAL ERROR. THIS CODE WILL NOT DO ANALYSIS FOR FIRST SPECIES (Nitrate-N)
         
             for iteration in iterations:
                 
@@ -520,12 +525,12 @@ def create_outputs(input_df,num_epochs = 5000,iterations = 1, autosave = False,
 
 #%% Create outputs
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                output_path = os.path.join(output_dir,'HNS_syn-aug-False_DL_It0-19_results.csv'),
+create_outputs(abs_wq_df, iterations = 1, autosave = True,
+                output_path = os.path.join(output_dir,'HNS_syn-aug-False_DL_It0_results.csv'),
                 subset_name = subset_name,syn_aug = False) # filtered samples, no synthetic samples
 
-create_outputs(abs_wq_df, iterations = 20, autosave = True,
-                output_path = os.path.join(output_dir,'HNS_syn-aug-True_DL_It0-19_results.csv'),
+create_outputs(abs_wq_df, iterations = 1, autosave = True,
+                output_path = os.path.join(output_dir,'HNS_syn-aug-True_DL_It0_results.csv'),
                 subset_name = subset_name,syn_aug = True, syn_df = syn_abs_wq_df) # filtered samples with synthetic samples
 
 
@@ -673,4 +678,8 @@ create_outputs(abs_wq_df, iterations = 20, autosave = True,
 
 # v = v.values
 # v = v.repeat(2,axis = 0)
+
+for s in species:
+    
+    print(s)
 
