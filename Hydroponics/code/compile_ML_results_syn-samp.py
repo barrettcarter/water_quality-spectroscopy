@@ -37,11 +37,9 @@ output_files = pd.Series(output_files)
 
 #%% choose which files to compile and save file list
 
-# output_files = output_files[[1,2,3,4,5,6,7,8,25,26,27,28,29,30,31,32]] # select ML results files corresponding to experiment
-
-output_files = pd.concat([output_files[1:9],
-                          output_files[10:26],
-                          output_files[42:50]]) # select ML results files corresponding to experiment
+# output_files = pd.concat([output_files[1:11],
+#                           output_files[12:30],
+#                           output_files[46:54]]) # select ML results files corresponding to experiment
 
 output_files.to_csv(os.path.join(output_dir,'stats','syn-samp_file_list.csv'))
 
@@ -81,6 +79,10 @@ outputs_df['syn_aug'] = syn_aug
 if 'SO4' not in file:
     
     outputs_df = outputs_df.loc[outputs_df.species != 'Sulfate',:]
+    
+else:
+    
+    outputs_df = outputs_df.loc[outputs_df.species == 'Sulfate',:]
 
 for file in output_files[1:]:
     
@@ -117,10 +119,6 @@ for file in output_files[1:]:
     else:
         
         output_df = output_df.loc[output_df.species == 'Sulfate',:]
-        
-    if 'Nitrate-N' not in output_df.species.unique():
-        
-        print(f'Nitrate-N missing in {file}')
   
     outputs_df = pd.concat([outputs_df,output_df],ignore_index = True)
     
