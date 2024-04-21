@@ -61,7 +61,7 @@ outputs_df['syn_aug'] = outputs_df.syn_aug.apply(lambda x: str(x))
   
 #%% create some useful variables
 
-treatment = 'undiluted'
+treatment = 'diluted'
 
 outputs_df = outputs_df.loc[outputs_df.treatment==treatment,:].reset_index(drop = True)
 

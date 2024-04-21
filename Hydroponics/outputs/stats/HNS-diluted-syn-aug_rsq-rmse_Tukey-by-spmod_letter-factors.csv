@@ -1,0 +1,176 @@
+species_model,perf_met,letter,factor_levs
+Ammonium-N_DL,test_rmse,a,False
+Ammonium-N_DL,test_rmse,b,True
+Ammonium-N_PLS,test_rmse,a,False
+Ammonium-N_PLS,test_rmse,b,True
+Ammonium-N_RF-PCA,test_rmse,a,False
+Ammonium-N_RF-PCA,test_rmse,b,True
+Ammonium-N_XGB-PCA,test_rmse,a,False
+Ammonium-N_XGB-PCA,test_rmse,b,True
+Boron_DL,test_rmse,a,False
+Boron_DL,test_rmse,b,True
+Boron_PLS,test_rmse,a,False True
+Boron_RF-PCA,test_rmse,a,False True
+Boron_XGB-PCA,test_rmse,a,False True
+Calcium_DL,test_rmse,a,False
+Calcium_DL,test_rmse,b,True
+Calcium_PLS,test_rmse,a,False True
+Calcium_RF-PCA,test_rmse,a,False True
+Calcium_XGB-PCA,test_rmse,a,False
+Calcium_XGB-PCA,test_rmse,b,True
+Copper_DL,test_rmse,a,False
+Copper_DL,test_rmse,b,True
+Copper_PLS,test_rmse,a,False True
+Copper_RF-PCA,test_rmse,a,False True
+Copper_XGB-PCA,test_rmse,a,False True
+Iron_DL,test_rmse,a,False
+Iron_DL,test_rmse,b,True
+Iron_PLS,test_rmse,a,False
+Iron_PLS,test_rmse,b,True
+Iron_RF-PCA,test_rmse,a,False True
+Iron_XGB-PCA,test_rmse,a,False
+Iron_XGB-PCA,test_rmse,b,True
+Magnesium_DL,test_rmse,a,False
+Magnesium_DL,test_rmse,b,True
+Magnesium_PLS,test_rmse,a,False True
+Magnesium_RF-PCA,test_rmse,a,False True
+Magnesium_XGB-PCA,test_rmse,a,False True
+Manganese_DL,test_rmse,a,False
+Manganese_DL,test_rmse,b,True
+Manganese_PLS,test_rmse,a,False
+Manganese_PLS,test_rmse,b,True
+Manganese_RF-PCA,test_rmse,a,False
+Manganese_RF-PCA,test_rmse,b,True
+Manganese_XGB-PCA,test_rmse,a,False
+Manganese_XGB-PCA,test_rmse,b,True
+Molybdenum_DL,test_rmse,a,False
+Molybdenum_DL,test_rmse,b,True
+Molybdenum_PLS,test_rmse,a,False
+Molybdenum_PLS,test_rmse,b,True
+Molybdenum_RF-PCA,test_rmse,a,False True
+Molybdenum_XGB-PCA,test_rmse,a,False True
+Nitrate-N_DL,test_rmse,a,False True
+Nitrate-N_PLS,test_rmse,a,False True
+Nitrate-N_RF-PCA,test_rmse,a,False True
+Nitrate-N_XGB-PCA,test_rmse,a,False
+Nitrate-N_XGB-PCA,test_rmse,b,True
+Phosphorus_DL,test_rmse,a,False
+Phosphorus_DL,test_rmse,b,True
+Phosphorus_PLS,test_rmse,a,False True
+Phosphorus_RF-PCA,test_rmse,a,False True
+Phosphorus_XGB-PCA,test_rmse,a,False True
+Potassium_DL,test_rmse,a,False
+Potassium_DL,test_rmse,b,True
+Potassium_PLS,test_rmse,a,False True
+Potassium_RF-PCA,test_rmse,a,False
+Potassium_RF-PCA,test_rmse,b,True
+Potassium_XGB-PCA,test_rmse,a,False
+Potassium_XGB-PCA,test_rmse,b,True
+Sulfate_DL,test_rmse,a,False
+Sulfate_DL,test_rmse,b,True
+Sulfate_PLS,test_rmse,a,False
+Sulfate_PLS,test_rmse,b,True
+Sulfate_RF-PCA,test_rmse,a,False True
+Sulfate_XGB-PCA,test_rmse,a,False True
+Zinc_DL,test_rmse,a,False
+Zinc_DL,test_rmse,b,True
+Zinc_PLS,test_rmse,a,False
+Zinc_PLS,test_rmse,b,True
+Zinc_RF-PCA,test_rmse,a,False
+Zinc_RF-PCA,test_rmse,b,True
+Zinc_XGB-PCA,test_rmse,a,False
+Zinc_XGB-PCA,test_rmse,b,True
+pH_DL,test_rmse,a,False
+pH_DL,test_rmse,b,True
+pH_PLS,test_rmse,a,False True
+pH_RF-PCA,test_rmse,a,False True
+pH_XGB-PCA,test_rmse,a,False
+pH_XGB-PCA,test_rmse,b,True
+Ammonium-N_DL,test_rsq,a,False True
+Ammonium-N_PLS,test_rsq,a,False True
+Ammonium-N_RF-PCA,test_rsq,a,False
+Ammonium-N_RF-PCA,test_rsq,b,True
+Ammonium-N_XGB-PCA,test_rsq,a,False True
+Boron_DL,test_rsq,a,False
+Boron_DL,test_rsq,b,True
+Boron_PLS,test_rsq,a,False True
+Boron_RF-PCA,test_rsq,a,False True
+Boron_XGB-PCA,test_rsq,a,False
+Boron_XGB-PCA,test_rsq,b,True
+Calcium_DL,test_rsq,a,False
+Calcium_DL,test_rsq,b,True
+Calcium_PLS,test_rsq,a,False True
+Calcium_RF-PCA,test_rsq,a,False
+Calcium_RF-PCA,test_rsq,b,True
+Calcium_XGB-PCA,test_rsq,a,False
+Calcium_XGB-PCA,test_rsq,b,True
+Copper_DL,test_rsq,a,False True
+Copper_PLS,test_rsq,a,False True
+Copper_RF-PCA,test_rsq,a,False True
+Copper_XGB-PCA,test_rsq,a,False True
+Iron_DL,test_rsq,a,False
+Iron_DL,test_rsq,b,True
+Iron_PLS,test_rsq,a,False
+Iron_PLS,test_rsq,b,True
+Iron_RF-PCA,test_rsq,a,False True
+Iron_XGB-PCA,test_rsq,a,False
+Iron_XGB-PCA,test_rsq,b,True
+Magnesium_DL,test_rsq,a,False
+Magnesium_DL,test_rsq,b,True
+Magnesium_PLS,test_rsq,a,False True
+Magnesium_RF-PCA,test_rsq,a,False True
+Magnesium_XGB-PCA,test_rsq,a,False True
+Manganese_DL,test_rsq,a,False
+Manganese_DL,test_rsq,b,True
+Manganese_PLS,test_rsq,a,False
+Manganese_PLS,test_rsq,b,True
+Manganese_RF-PCA,test_rsq,a,False
+Manganese_RF-PCA,test_rsq,b,True
+Manganese_XGB-PCA,test_rsq,a,False
+Manganese_XGB-PCA,test_rsq,b,True
+Molybdenum_DL,test_rsq,a,False
+Molybdenum_DL,test_rsq,b,True
+Molybdenum_PLS,test_rsq,a,False
+Molybdenum_PLS,test_rsq,b,True
+Molybdenum_RF-PCA,test_rsq,a,False
+Molybdenum_RF-PCA,test_rsq,b,True
+Molybdenum_XGB-PCA,test_rsq,a,False True
+Nitrate-N_DL,test_rsq,a,False True
+Nitrate-N_PLS,test_rsq,a,False
+Nitrate-N_PLS,test_rsq,b,True
+Nitrate-N_RF-PCA,test_rsq,a,False
+Nitrate-N_RF-PCA,test_rsq,b,True
+Nitrate-N_XGB-PCA,test_rsq,a,False
+Nitrate-N_XGB-PCA,test_rsq,b,True
+Phosphorus_DL,test_rsq,a,False
+Phosphorus_DL,test_rsq,b,True
+Phosphorus_PLS,test_rsq,a,False
+Phosphorus_PLS,test_rsq,b,True
+Phosphorus_RF-PCA,test_rsq,a,False True
+Phosphorus_XGB-PCA,test_rsq,a,False True
+Potassium_DL,test_rsq,a,False
+Potassium_DL,test_rsq,b,True
+Potassium_PLS,test_rsq,a,False True
+Potassium_RF-PCA,test_rsq,a,False
+Potassium_RF-PCA,test_rsq,b,True
+Potassium_XGB-PCA,test_rsq,a,False
+Potassium_XGB-PCA,test_rsq,b,True
+Sulfate_DL,test_rsq,a,False
+Sulfate_DL,test_rsq,b,True
+Sulfate_PLS,test_rsq,a,False True
+Sulfate_RF-PCA,test_rsq,a,False True
+Sulfate_XGB-PCA,test_rsq,a,False True
+Zinc_DL,test_rsq,a,False
+Zinc_DL,test_rsq,b,True
+Zinc_PLS,test_rsq,a,False
+Zinc_PLS,test_rsq,b,True
+Zinc_RF-PCA,test_rsq,a,False
+Zinc_RF-PCA,test_rsq,b,True
+Zinc_XGB-PCA,test_rsq,a,False
+Zinc_XGB-PCA,test_rsq,b,True
+pH_DL,test_rsq,a,False
+pH_DL,test_rsq,b,True
+pH_PLS,test_rsq,a,False True
+pH_RF-PCA,test_rsq,a,False True
+pH_XGB-PCA,test_rsq,a,False
+pH_XGB-PCA,test_rsq,b,True
