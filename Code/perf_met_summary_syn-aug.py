@@ -3,7 +3,7 @@
 Created on Mon Jan 15 15:13:09 2024
 
 This script is for producing summary tables for HUM performance metrics separated
-by chemical analyte, ML algorithm, and sample treatment
+by chemical analyte, ML algorithm, and synthetic sample augmentation.
 
 @author: carter_j
 """
@@ -53,14 +53,18 @@ perf_mets = ['test_rmse','test_rsq']
 
 sample_types = ['Streams','Hydroponics']
 
-exp_names = {'Streams':'Streams-filtration','Hydroponics':'HNS-dilution'}
+exp_names = {'Streams':['Streams-syn-aug'],'Hydroponics':['HNS-diluted-syn-aug',
+                                                          'HNS-undiluted-syn-aug']}
+
+stype_abbrv = {'Streams-syn-aug':'stream','HNS-diluted-syn-aug':'HNSd30',
+               'HNS-undiluted-syn-aug':'HNS'}
 
 fig_dir = f'C:\\Users\\{user}\\OneDrive\\Research\\PhD\\Communications\\Images'
 
 #%% bring in performance metric data for each sample type and save descriptive 
 ### stats for each performance metric, chemical analyte, and ML algorithm.
 
-pm_summary = pd.DataFrame(columns = ['sample_type','species','model','treatment','perf_met',
+pm_summary = pd.DataFrame(columns = ['sample_type','species','model','syn_aug','perf_met',
                                      'mean','std','min','25%','50%','75%','max'])
 
 pm = perf_mets[0]
@@ -71,47 +75,49 @@ for pm in perf_mets:
     
     for stype in sample_types:
         
-        exp_name = exp_names[stype]
+        for exp_name in exp_names[stype]:
         
-        output_dir = os.path.join(path_to_wqs,stype,'outputs','performance metrics')
-        
-        output_fn = f'{exp_name}_{pm}.csv'
-        
-        pm_df = pd.read_csv(os.path.join(output_dir,output_fn))
-
-        species = pm_df.species.unique()
-        
-        models = pm_df.model.unique()
-        
-        treatments = pm_df.treatment.unique()
-        
-        sp = species[0] # for testing
-        
-        mod = models[0] # for testing
-
-        for sp in species:
+            output_dir = os.path.join(path_to_wqs,stype,'outputs','performance metrics')
             
-            for mod in models:
-                
-                for trmt in treatments:
+            output_fn = f'{exp_name}_{pm}.csv'
             
-                    pm_smt = pm_df[(pm_df.species==sp)&(pm_df.model==mod)&(pm_df.treatment==trmt)]
-                    
-                    smt_stats = pd.DataFrame(pm_smt.value.describe()['mean':'max']).T.reset_index(drop=True)
-                    
-                    smt_stats[['sample_type','species','model','treatment','perf_met']] =\
-                        [stype,sp,mod,trmt,pm]
+            pm_df = pd.read_csv(os.path.join(output_dir,output_fn))
+            
+            sample_type = stype_abbrv[exp_name]
+    
+            species = pm_df.species.unique()
+            
+            models = pm_df.model.unique()
+            
+            syn_augs = pm_df.syn_aug.unique()
+            
+            sp = species[0] # for testing
+            
+            mod = models[0] # for testing
+    
+            for sp in species:
                 
-                    pm_summary = pd.concat([pm_summary,smt_stats],ignore_index = True)
+                for mod in models:
+                    
+                    for syn_aug in syn_augs:
+                
+                        pm_sma = pm_df[(pm_df.species==sp)&(pm_df.model==mod)&(pm_df.syn_aug==syn_aug)]
+                        
+                        sma_stats = pd.DataFrame(pm_sma.value.describe()['mean':'max']).T.reset_index(drop=True)
+                        
+                        sma_stats[['sample_type','species','model','syn_aug','perf_met']] =\
+                            [sample_type,sp,mod,syn_aug,pm]
+                    
+                        pm_summary = pd.concat([pm_summary,sma_stats],ignore_index = True)
             
 #%% save summary table
 
-pm_summary.to_csv(os.path.join(path_to_wqs,'Outputs','perf_met_summary_sample_treatments.csv'),index = False)
+pm_summary.to_csv(os.path.join(path_to_wqs,'Outputs','perf_met_summary_syn-aug.csv'),index = False)
 
 #%% bring in performance metric data for each sample type and find the model with
 ### the minimum average RMSE and maximum average R-sq
 
-pm_summary = pd.DataFrame(columns = ['sample_type','species','model','treatment','perf_met','value'])
+pm_summary = pd.DataFrame(columns = ['sample_type','species','model','syn_aug','perf_met','value'])
 
 pm = perf_mets[0]
 
@@ -123,52 +129,54 @@ for pm in perf_mets:
         
         output_dir = os.path.join(path_to_wqs,stype,'outputs','performance metrics')
         
-        exp_name = exp_names[stype]
+        for exp_name in exp_names[stype]:
         
-        output_fn = f'{exp_name}_{pm}.csv'
-        
-        pm_df = pd.read_csv(os.path.join(output_dir,output_fn))
-
-        pm_df['smt'] = pm_df.species+'_'+pm_df.model+'_'+pm_df.treatment
-        
-        pm_df = pm_df.loc[:,['value','smt']]
-        
-        pm_means = pm_df.groupby('smt').mean()
-        
-        pm_means.reset_index(inplace = True)
-        
-        pm_means['species'] = pm_means.smt.apply(lambda x: x.split('_')[0])
-        
-        pm_means['model'] = pm_means.smt.apply(lambda x: x.split('_')[1])
-        
-        pm_means['treatment'] = pm_means.smt.apply(lambda x: x.split('_')[2])
-        
-        if pm == 'test_rmse':
-        
-            pm_opts = pm_means.loc[:,['value','species']].groupby('species').min().reset_index()
+            output_fn = f'{exp_name}_{pm}.csv'
             
-        elif pm == 'test_rsq':
+            pm_df = pd.read_csv(os.path.join(output_dir,output_fn))
+    
+            pm_df['sma'] = pm_df.species+'_'+pm_df.model+'_'+pm_df.syn_aug.apply(lambda x: str(x))
             
-            pm_opts = pm_means.loc[:,['value','species']].groupby('species').max().reset_index()
+            sample_type = stype_abbrv[exp_name]
             
-        for i,row in pm_opts.iterrows():
+            pm_df = pm_df.loc[:,['value','sma']]
             
-            mod_opt = pm_means.loc[(pm_means.species == row.species)&(pm_means.value==row.value),'model']
+            pm_means = pm_df.groupby('sma').mean()
             
-            trmt_opt = pm_means.loc[(pm_means.species == row.species)&(pm_means.value==row.value),'treatment']
+            pm_means.reset_index(inplace = True)
             
-            new_row = pd.DataFrame({'sample_type':stype,'species':row.species,'model':mod_opt,
-                                    'treatment':trmt_opt,'perf_met':pm,'value':row.value})
+            pm_means['species'] = pm_means.sma.apply(lambda x: x.split('_')[0])
             
-            pm_summary = pd.concat([pm_summary,new_row],ignore_index = True)
+            pm_means['model'] = pm_means.sma.apply(lambda x: x.split('_')[1])
+            
+            pm_means['syn_aug'] = pm_means.sma.apply(lambda x: x.split('_')[2])
+            
+            if pm == 'test_rmse':
+            
+                pm_opts = pm_means.loc[:,['value','species']].groupby('species').min().reset_index()
+                
+            elif pm == 'test_rsq':
+                
+                pm_opts = pm_means.loc[:,['value','species']].groupby('species').max().reset_index()
+                
+            for i,row in pm_opts.iterrows():
+                
+                mod_opt = pm_means.loc[(pm_means.species == row.species)&(pm_means.value==row.value),'model']
+                
+                trmt_opt = pm_means.loc[(pm_means.species == row.species)&(pm_means.value==row.value),'syn_aug']
+                
+                new_row = pd.DataFrame({'sample_type':sample_type,'species':row.species,'model':mod_opt,
+                                        'syn_aug':trmt_opt,'perf_met':pm,'value':row.value})
+                
+                pm_summary = pd.concat([pm_summary,new_row],ignore_index = True)
             
 #%% save summary table
 
-pm_summary.to_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary_sample_treatments.csv'),index = False)
+pm_summary.to_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary_syn-aug.csv'),index = False)
 
 #%% compile the true and predicted values for the optimal models
 
-pm_summary = pd.read_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary_sample_treatments.csv'))
+pm_summary = pd.read_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary_syn-aug.csv'))
 
 pm_summary = pm_summary.loc[pm_summary.perf_met == 'test_rsq',:] # optimal models based on r-sq
 
@@ -179,7 +187,9 @@ pm_summary = pm_summary.loc[pm_summary.perf_met == 'test_rsq',:] # optimal model
 stype = 'Streams' # for testing.
 stype = sample_types[-1]
 
-aliases = exp_names
+aliases = {'Streams':'streams-syn-aug','Hydroponics':'HNS-syn-aug'}
+
+HNS_als = {'HNS':'undiluted','HNSd30':'diluted'}
 
 for stype in sample_types:
     
@@ -188,28 +198,43 @@ for stype in sample_types:
     compiled_outputs = pd.read_csv(os.path.join(path_to_wqs,stype,'outputs',
                                                 f'{stype_al}_ML_results_compiled.csv'))
     
-    compiled_outputs.sample_type = stype
-    
-    stype_pm_opt = pm_summary.loc[pm_summary.sample_type==stype,:]
-    
-    valid_comb = stype_pm_opt.set_index(['sample_type','species','model','treatment']).index
-
-    compiled_outputs = compiled_outputs[compiled_outputs.set_index(['sample_type','species','model',
-                                                                    'treatment']).index.isin(valid_comb)]
-    
-    compiled_outputs = compiled_outputs[compiled_outputs.output.isin(['y_true_test','y_hat_test'])]
-    
-    if stype == sample_types[0]:
-    
-        true_tests = compiled_outputs
+    for exp_name in exp_names[stype]:
         
-    else:
+        sample_type = stype_abbrv[exp_name]
         
-        true_tests = pd.concat([true_tests,compiled_outputs],ignore_index=True)
+        if stype=='Hydroponics':
+            
+            HNS_al = HNS_als[sample_type]
+            
+            comp_out_sub = compiled_outputs.loc[compiled_outputs.treatment==HNS_al,:].\
+                reset_index(drop=True)
+                
+        else:
+            
+            comp_out_sub = compiled_outputs
+    
+        comp_out_sub.sample_type = sample_type
+        
+        stype_pm_opt = pm_summary.loc[pm_summary.sample_type==sample_type,:]
+        
+        valid_comb = stype_pm_opt.set_index(['sample_type','species','model','syn_aug']).index
+    
+        comp_out_sub = comp_out_sub[comp_out_sub.set_index(['sample_type','species','model',
+                                                            'syn_aug']).index.isin(valid_comb)]
+        
+        comp_out_sub = comp_out_sub[comp_out_sub.output.isin(['y_true_test','y_hat_test'])]
+        
+        if stype == sample_types[0]:
+        
+            true_tests = comp_out_sub
+            
+        else:
+            
+            true_tests = pd.concat([true_tests,comp_out_sub],ignore_index=True)
         
 #%% reshape dataframe
 
-st_map = {'Hydroponics':'HNS','Streams':'Stream'}
+true_tests['syn_aug']=true_tests.syn_aug.apply(lambda x: str(x))
 
 sp_map = {'Nitrate-N':'NO3-N','Potassium':'K','Calcium':'Ca','Sulfate':'SO4',
           'Phosphorus':'P','Magnesium':'Mg','Ammonium-N':'NH4-N',
@@ -218,15 +243,10 @@ sp_map = {'Nitrate-N':'NO3-N','Potassium':'K','Calcium':'Ca','Sulfate':'SO4',
           'TKN':'TKN','ON':'ON','TN':'TN',
           'Phosphate-P':'PO4-P','TP':'TP','OP':'OP'}
 
-trmt_map = {'comb':'combined','fil':'filtered','unf':'unfiltered','diluted':'diluted',
-            'undiluted':'undiluted'}
-
-true_tests['sample_type'] = true_tests['sample_type'].apply(lambda x: st_map[x])
-
 true_tests['species'] = true_tests['species'].apply(lambda x: sp_map[x])
 
-true_tests['sample type, chemical analyte, ML algorithm, treatment'] = true_tests['sample_type']+\
-    ', '+true_tests['species']+', '+true_tests['model']+', '+true_tests['treatment']
+true_tests['sample type, chemical analyte, ML algorithm, syn. aug.'] = true_tests['sample_type']+\
+    ', '+true_tests['species']+', '+true_tests['model']+', '+true_tests['syn_aug']
 
 y_true_test = true_tests[true_tests.output=='y_true_test'].reset_index(drop=True)
 
@@ -238,23 +258,23 @@ true_ests.rename(columns = {'value':'True Concentration'},inplace=True)
 
 true_ests['Estimated Concentration'] = y_hat_test['value']
 
-ID_col = 'sample type, chemical analyte, ML algorithm, treatment'
+ID_col = 'sample type, chemical analyte, ML algorithm, syn. aug.'
 
 true_ests.sort_values(by = ID_col,inplace=True)
-#%% make 1:1 plots for best performing model/treatment for each chemical analyte/sample type
+#%% make 1:1 plots for best performing model/syn_aug for each chemical analyte/sample type
 
 g = sns.lmplot(data = true_ests, x = 'True Concentration', y = 'Estimated Concentration',
-           col = ID_col,col_wrap = 5,height = 3,
+           col = ID_col,col_wrap = 8,height = 3,
            facet_kws = {'sharey':False,'sharex':False},
            scatter_kws = {'color':'grey','alpha': 0.5,'s':2})
 
 g.set_titles('{col_name}')
 
-plt.savefig(os.path.join(fig_dir,'Exp2_opt_11_plots.png'),dpi = 300)
+plt.savefig(os.path.join(fig_dir,'Exp3_opt_11_plots.png'),dpi = 300)
 
-#%% make subset for 2 most significant/relevant effects of sample treatment
+#%% make subset for 4 most significant/relevant effects of sample syn_aug
 
-subs = ['Stream_TN','Stream_PO4-P','HNS_Fe','HNS_Zn']
+subs = ['stream_PO4-P','stream_TN','HNS_NO3-N','HNS_Fe']
 
 true_ests_best = true_ests[(true_ests.sample_type+'_'+true_ests.species).isin(subs)]
 
@@ -273,12 +293,12 @@ g = sns.lmplot(data = true_ests_best, x = 'True Concentration (mg/L)', y = 'Esti
 
 g.set_titles('{col_name}')
 
-plt.savefig(os.path.join(fig_dir,'Exp2_opt_best_11_plots.png'),dpi = 300)
+plt.savefig(os.path.join(fig_dir,'Exp3_opt_best_11_plots.png'),dpi = 300)
 
-#%% compile the true and predicted values for ALL models
-### for making 1:1 plots showing all sample treatments
+#%% compile the true and predicted values for all main factor levels
+### for making 1:1 plots showing all sample syn_augs
 
-pm_summary = pd.read_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary_sample_treatments.csv'))
+pm_summary = pd.read_csv(os.path.join(path_to_wqs,'Outputs','perf_met_opt_summary_syn-aug.csv'))
 
 pm_summary = pm_summary.loc[pm_summary.perf_met == 'test_rsq',:] # optimal models based on r-sq
 
@@ -289,7 +309,9 @@ pm_summary = pm_summary.loc[pm_summary.perf_met == 'test_rsq',:] # optimal model
 stype = 'Streams' # for testing.
 stype = sample_types[-1]
 
-aliases = exp_names
+aliases = {'Streams':'streams-syn-aug','Hydroponics':'HNS-syn-aug'}
+
+HNS_als = {'HNS':'undiluted','HNSd30':'diluted'}
 
 for stype in sample_types:
     
@@ -298,27 +320,43 @@ for stype in sample_types:
     compiled_outputs = pd.read_csv(os.path.join(path_to_wqs,stype,'outputs',
                                                 f'{stype_al}_ML_results_compiled.csv'))
     
-    compiled_outputs.sample_type = stype
-    
-    stype_pm_opt = pm_summary.loc[pm_summary.sample_type==stype,:]
-    
-    valid_comb = stype_pm_opt.set_index(['sample_type','species','model']).index
-
-    compiled_outputs = compiled_outputs[compiled_outputs.set_index(['sample_type','species','model']).index.isin(valid_comb)]
-    
-    compiled_outputs = compiled_outputs[compiled_outputs.output.isin(['y_true_test','y_hat_test'])]
-    
-    if stype == sample_types[0]:
-    
-        true_tests = compiled_outputs
+    for exp_name in exp_names[stype]:
         
-    else:
+        sample_type = stype_abbrv[exp_name]
         
-        true_tests = pd.concat([true_tests,compiled_outputs],ignore_index=True)
+        if stype=='Hydroponics':
+            
+            HNS_al = HNS_als[sample_type]
+            
+            comp_out_sub = compiled_outputs.loc[compiled_outputs.treatment==HNS_al,:].\
+                reset_index(drop=True)
+                
+        else:
+            
+            comp_out_sub = compiled_outputs
+    
+        comp_out_sub.sample_type = sample_type
+        
+        stype_pm_opt = pm_summary.loc[pm_summary.sample_type==sample_type,:]
+        
+        valid_comb = stype_pm_opt.set_index(['sample_type','species','model']).index
+    
+        comp_out_sub = comp_out_sub[comp_out_sub.set_index(['sample_type','species','model']).\
+                                    index.isin(valid_comb)]
+        
+        comp_out_sub = comp_out_sub[comp_out_sub.output.isin(['y_true_test','y_hat_test'])]
+        
+        if stype == sample_types[0]:
+        
+            true_tests = comp_out_sub
+            
+        else:
+            
+            true_tests = pd.concat([true_tests,comp_out_sub],ignore_index=True)
         
 #%% reshape dataframe
 
-st_map = {'Hydroponics':'HNS','Streams':'Stream'}
+true_tests['syn_aug']=true_tests.syn_aug.apply(lambda x: str(x))
 
 sp_map = {'Nitrate-N':'NO3-N','Potassium':'K','Calcium':'Ca','Sulfate':'SO4',
           'Phosphorus':'P','Magnesium':'Mg','Ammonium-N':'NH4-N',
@@ -327,19 +365,9 @@ sp_map = {'Nitrate-N':'NO3-N','Potassium':'K','Calcium':'Ca','Sulfate':'SO4',
           'TKN':'TKN','ON':'ON','TN':'TN',
           'Phosphate-P':'PO4-P','TP':'TP','OP':'OP'}
 
-trmt_map = {'comb':'combined','fil':'filtered','unf':'unfiltered','diluted':'diluted',
-            'undiluted':'undiluted'}
-
-true_tests['sample_type'] = true_tests['sample_type'].apply(lambda x: st_map[x])
-
 true_tests['species'] = true_tests['species'].apply(lambda x: sp_map[x])
 
-true_tests['treatment'] = true_tests['treatment'].apply(lambda x: trmt_map[x])
-
-# true_tests['sample type, chemical analyte, ML algorithm, treatment'] = true_tests['sample_type']+\
-#     ', '+true_tests['species']+', '+true_tests['model']+', '+true_tests['treatment']
-
-true_tests['sample type, chemical analyte, model'] = true_tests['sample_type']+\
+true_tests['sample type, chemical analyte, ML algorithm'] = true_tests['sample_type']+\
     ', '+true_tests['species']+', '+true_tests['model']
 
 y_true_test = true_tests[true_tests.output=='y_true_test'].reset_index(drop=True)
@@ -352,26 +380,26 @@ true_ests.rename(columns = {'value':'True Concentration'},inplace=True)
 
 true_ests['Estimated Concentration'] = y_hat_test['value']
 
-ID_col = 'sample type, chemical analyte, model'
+ID_col = 'sample type, chemical analyte, ML algorithm'
 
 true_ests.sort_values(by = ID_col,inplace=True)
 
-true_ests.rename(columns = {'treatment':'Sample Treatment'},inplace=True)
+true_ests.rename(columns = {'syn_aug': 'syn. aug.'},inplace=True)
 #%% make 1:1 plots for best performing model for each chemical analyte/sample type
-### separated by treatment
+### separated by syn_aug
 
 g = sns.lmplot(data = true_ests, x = 'True Concentration', y = 'Estimated Concentration',
-           col = ID_col,col_wrap = 5,height = 3,scatter = False,hue = 'Sample Treatment',
+           col = ID_col,col_wrap = 8,height = 3,scatter = False,hue = 'syn. aug.',
            facet_kws = {'sharey':False,'sharex':False},
            scatter_kws = {'color':'grey','alpha': 0.5,'s':2})
 
 g.set_titles('{col_name}')
 
-plt.savefig(os.path.join(fig_dir,'Exp2_ALL_11_plots.png'),dpi = 300)
+plt.savefig(os.path.join(fig_dir,'Exp3_ALL_11_plots.png'),dpi = 300)
 
-#%% make subset for 2 most significant/relevant effects of sample treatment
+#%% make subset for 2 most significant/relevant effects of sample syn_aug
 
-subs = ['Stream_PO4-P','HNS_Zn']
+subs = ['stream_NO3-N','HNS_Fe']
 
 true_ests_best = true_ests[(true_ests.sample_type+'_'+true_ests.species).isin(subs)]
 
@@ -380,7 +408,7 @@ true_ests_best.rename(columns = {'True Concentration':'True Concentration (mg/L)
 
 #%% make 1:1 plots for best fits
 
-subs = ['Stream_PO4-P','HNS_Zn','Stream_PO4-P_unfiltered','HNS_Zn_diluted']
+subs = ['stream_NO3-N','HNS_Fe','stream_NO3-N_False','HNS_Fe_False']
 
 fig, axs = plt.subplots(nrows = 2, ncols = 2, dpi = 300, figsize = [6.5,6.5],
                         layout = 'constrained')
@@ -393,13 +421,14 @@ for i,ax in enumerate(axs):
     
     if i < 2:
     
-        data_sub = true_ests_best[(true_ests_best.sample_type+'_'+true_ests_best.species).isin([sub])]
+        data_sub = true_ests_best[(true_ests_best.sample_type+'_'+true_ests_best.species).\
+                                  isin([sub])].sort_values('syn. aug.')
         
-        groups = data_sub['Sample Treatment'].unique()
+        groups = data_sub['syn. aug.'].unique()
         
         for ci,st in enumerate(groups):
         
-            sns.regplot(data = data_sub[data_sub['Sample Treatment']==st], 
+            sns.regplot(data = data_sub[data_sub['syn. aug.']==st], 
                         x = 'True Concentration (mg/L)', 
                         y = 'Estimated Concentration (mg/L)',
                         # color = ci,
@@ -422,22 +451,23 @@ for i,ax in enumerate(axs):
                     fontsize=10,
                     loc = 'upper left')
         
-        ax.set_title(data_sub['sample type, chemical analyte, model'].values[0]) 
+        ax.set_title(data_sub['sample type, chemical analyte, ML algorithm'].values[0]) 
         
     if i >= 2:
     
-        data_sub = true_ests_best[(true_ests_best.sample_type+'_'+true_ests_best.species+'_'+true_ests_best['Sample Treatment']).isin([sub])]
+        data_sub = true_ests_best[(true_ests_best.sample_type+'_'+true_ests_best.species+'_'+\
+                                   true_ests_best['syn. aug.']).isin([sub])]
         
         sns.regplot(data = data_sub, x = 'True Concentration (mg/L)', 
                     y = 'Estimated Concentration (mg/L)',
                     scatter_kws = {'color':'grey','alpha': 0.5,'s':2},
                     ax = ax)
         
-        ax.set_title((data_sub['sample type, chemical analyte, model']+\
-                      ', '+data_sub['Sample Treatment']).values[0]) 
+        ax.set_title((data_sub['sample type, chemical analyte, ML algorithm']+\
+                      ', '+data_sub['syn. aug.']).values[0]) 
             
 
-plt.savefig(os.path.join(fig_dir,'Exp2_best_11_plots.png'),dpi = 300)
+plt.savefig(os.path.join(fig_dir,'Exp3_best_11_plots.png'),dpi = 300)
 
 #%% Scratch
 
@@ -469,3 +499,7 @@ compiled_outputs[compiled_outputs.set_index(['sample_type','species','model']).i
 #                          (compiled_outputs.model=='RF-PCA'),:].shape
 
 # pd.Series(compiled_outputs.model.unique()).isin(stype_pm_opt.model.unique())
+
+#%% look at stream NO3-N estimated using DL; to check
+
+
