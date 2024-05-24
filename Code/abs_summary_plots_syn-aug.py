@@ -150,18 +150,27 @@ abs_stats = pd.concat([abs_av_stats,abs_sd_stats],ignore_index = True)
 
 abs_stats.to_csv(os.path.join(output_dir,'abs_stats_syn-aug.csv'),index = False)
 
-#%% scratch
+#%% determine max absorbances
 
-HNS_max_diff = abs_av_diffs[abs_av_diffs.HNS == abs_av_diffs.HNS.min()]['HNS']
+abs_av.reset_index(inplace = True, names = 'waveband')
+abs_av['wavelengths'] = wavelengths
 
-HNS_max_diff_band = int(list(HNS_max_diff.index)[0].split('_')[1])
+abs_av_max = abs_av.iloc[:,1:-1].max()
 
-HNS_max_diff_wl = wavelengths[HNS_max_diff_band-1]
+#%% determine peak wavelengths
 
-Strm_max_diff = abs_av_diffs[abs_av_diffs.Streams == abs_av_diffs.Streams.min()]['Streams']
+abs_peaks = pd.DataFrame()
 
-Strm_max_diff_band = int(list(Strm_max_diff.index)[0].split('_')[1])
+for stype in abs_av.columns[1:-1]:
+    
+    # print(abs_av.loc[abs_av[stype]==abs_av_max[stype],'wavelengths'])
+    
+    abs_peaks.loc[0,stype] = abs_av.loc[abs_av[stype]==abs_av_max[stype],'wavelengths'].values[0]
+    
+abs_peaks.loc[1,:] = abs_av_max
 
-Strm_max_diff_wl = wavelengths[Strm_max_diff_band-1]
+abs_peaks.rename(index = {0:'peak wavelength',1:'peak absorbance'},inplace=True)
 
+#%% save peak wavelengths
 
+abs_peaks.to_csv(os.path.join(output_dir,'peak wavelengths - syn-aug.csv'))
