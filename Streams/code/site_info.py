@@ -95,4 +95,4 @@ for i,site in enumerate(lulc_totals.Name.unique()):
 
 #%% save output
 
-lulc_tot_wd.to_csv(os.path.join(path_to_wqs,'Streams','outputs','LULC_watershed_percentages.csv'))
+lulc_tot_wd.to_csv(os.path.join(path_to_wqs,'Streams','outputs','LULC_watershed_percentages.csv'), index = False)
