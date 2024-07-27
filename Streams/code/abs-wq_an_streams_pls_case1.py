@@ -4,12 +4,13 @@ Created on Tue Mar 23 16:39:55 2021
 
 @author: jbarrett.carter
 """
-#Case 1: To test temporal variability, could past data return accurate results for the same sites?	
-#Model will be trained on the hogdn and hogup values of the 2-year sampling
-#Model will be tested on hogup and hogdn values of the new sampling
-#First run will only look at orthophosphate (Phosphate-P)
 			
 # Edited by Ethan Lantzy in 2023-24
+#If modifying, 
+    #edit iterations (lines 66, 91 and 287) to the specified iteration number
+    #edit data input source (line 44-49) to the intended Excel sheet
+    #edit species column to read from (line 73 and 74)
+
 #%% import libraries
 
 import pandas as pd
@@ -44,53 +45,25 @@ output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #
 # abs_wq_df_fn = 'abs_wq_df_streams_clean.csv'                                 #input data; using Barrett's data only (hogup/hogdn)
 # abs_wq_df_fn = 'abs_wq_df_streams_combined_clean.csv'                        #input data; using Barrett and Ethan's data (hogup/hogdn)
 abs_wq_df_fn = 'abs_wq_df_streams_2023_clean.csv'                              #input data; using Ethan's data (all sites; Ocean Optics)
+# abs_wq_df_fn = 'abs_wq_df_streams_2023_clean_no_B.csv'                       #input data; using Ethan's data (all sites except for B; Ocean Optics)
 # abs_wq_df_fn = 'abs_wq_df_streams_2023_clean_SN.csv'                         #input data; using Ethan's data (all sites; StellarNet)
 # abs_wq_df_fn = 'abs_wq_df_streams_all_clean.csv'                             #input data; using Barrett and Ethan's data (hogdn/hogup for Barrett, all sites for Ethan)
 
 
 abs_wq_df_fil=pd.read_csv(inter_dir+abs_wq_df_fn)                              #translate computer file into program variable
 
-#%% B: Set paths and bring in data; use Barrett's data (hogup/hogdn) to train and my data to test
-
-#path_to_wqs = '/Users/ethanlantzy/Documents/GitHub/water_quality-spectroscopy' #for Laptop; path to relevant files
-#inter_dir=os.path.join(path_to_wqs,'Streams/intermediates/')                   #file path for input data folder
-#output_dir=os.path.join(path_to_wqs,'Streams/outputs/')                        #file path for outputs data folder
-#input_train_fn = 'abs_wq_df_streams.csv'                                    #input data file for training
-#input_train_df = pd.read_csv(inter_dir+input_train_fn)                   #translate computer file into dataframe
-
-#input_test_fn_excel = 'abs_wq_df_streams_OO_Ethan.xlsx'                     #name of input Excel file for testing
-#input_test_df = pd.read_excel(inter_dir+input_test_fn_excel)             #read the Excel file into a dataframe
-
 #%% A and C: subset by filtration and sampling site; use Barrett's data to train and test OR use combined dataframe
 
-#abs_wq_df_fil = abs_wq_df.loc[abs_wq_df['Filtered']==True,:]                  #clean df is already filtered
 #abs_wq_df_fil = abs_wq_df_fil.loc[abs_wq_df_fil.Name.isin(['hogdn', 'hogup'])]#clean df is already site-specific
 input_df = abs_wq_df_fil                                                       #define variable as the input for future functions
 
-species = abs_wq_df_fil.columns[0:3]                                               #create list from column headings
-s = species[2]                                                                 #defines the third element from the list of column headings as 's'
-species = ['Nitrate-N']                                                        #creates list for variable 'species'
-
-#%% B: subset by filtration and sampling site; use Barrett's dataframe to train and my dataframe to test
-       
-#input_train_df_fil = input_train_df.loc[input_train_df['Filtered']==True,:]                       #used to include filtered samples
-#input_train_df_fil = input_train_df_fil.loc[input_train_df_fil.Name.isin(['hogdn', 'hogup'])]     #for site-based subsetting
-#input_train_df = input_train_df_fil                                                               #define variable as the training input for future functions
-
-#species = input_train_df.columns[0:8]                                          #create list from first eight column names
-#s = species[2]                                                                 #defines the third element from the list of column headings as 's'
-#species = ['Nitrate-N']                                                        #redefine species as [see inside brackets]
-
-#input_test_df_fil = input_test_df.loc[input_test_df.Name.isin(['hogdn', 'hogup'])] #for site-based subsetting; this dataset is already filtered
-#input_test_df = input_test_df_fil                                                  #define variable as the testing input for future functions
-
-#species = input_test_df.columns[0:3]                                           #create list from first three column names
-#s = species[2]                                                                 #defines the third element from the list of column headings as 's'
-#species = ['Nitrate-N']                                                        #redefine species as [see inside brackets
+#species = abs_wq_df_fil.columns[0:3]                                          #create list of species from column headings
+#s = species[2]                                                                #defines one element from the list of column headings as 's'
+species = ['Nitrate-N']                                                        #define species as a specific value
 
 #%% Create function for writing outputs                                        #Define function for creating outputs (to use later)
 
-def create_outputs(input_df,iterations = 1, autosave = False, return_df = False, 
+def create_outputs(input_df,iterations = 5, autosave = False, return_df = False, 
                    return_all = False, output_path = None, subset_name = '2023_data'):
     #input traindf and test df
     def write_output_df(the_output,output_name,species_name,iteration_num):
@@ -147,26 +120,26 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
             pls = PLSRegression() #create PLSRegression
             clf = GridSearchCV(pls,param_grid,scoring = 'neg_mean_absolute_error') #perform hyperparameter tuning for pls model; search parameter grid and identify best using neg. MAE
             
-            clf.fit(X_train,y_train)                                           #fit model to data to find best parameters
+            clf.fit(X_train,y_train)                                           #fit model to data to find best parameters for each iteration
             n_comp = float(clf.best_params_['n_components'])                   #extract optimal # of components from the best parameters
-            pls_opt = clf.best_estimator_                                      #extract best model (which includes best hyperparameters)
+            pls_opt = clf.best_estimator_                                      #extract best PLS regression model for each iteration
             Y_hat = list(pls_opt.predict(X_test)[:,0])                         #testing set predictions using the best model
             Y_hat_train = list(pls_opt.predict(X_train)[:,0])                  #training set predictions using the best model
             
-            r_sq = float(pls_opt.score(X_test,y_test))                         #r^2 for testing set
-            r_sq_train = float(pls_opt.score(X_train,y_train))                 #r^2 for training set
+            r_sq = float(pls_opt.score(X_test,y_test))                         #r^2 for testing set for this iteration
+            r_sq_train = float(pls_opt.score(X_train,y_train))                 #r^2 for training set for this iteration
     
-            MSE_test = MSE(y_test,Y_hat)                                       #calculate MSE by comparing actual (y_test) to predicted (Y_hat_) --> test set
-            RMSE_test = float(np.sqrt(MSE_test))                               #takes square root of MSE; converts type to float --> test set
+            MSE_test = MSE(y_test,Y_hat)                                       #calculate MSE by comparing actual (y_test) to predicted (Y_hat_) --> test set for this iteration
+            RMSE_test = float(np.sqrt(MSE_test))                               #takes square root of MSE; converts type to float --> test set for this iteration
             
-            MSE_train = MSE(y_train,Y_hat_train)                               #calculate MSE by comparing actual (y_test) to predicted (Y_hat_) --> training set
-            RMSE_train = float(np.sqrt(MSE_train))                             #takes square root of MSE; converts type to float --> training set
+            MSE_train = MSE(y_train,Y_hat_train)                               #calculate MSE by comparing actual (y_test) to predicted (Y_hat_) --> training set for this iteration
+            RMSE_train = float(np.sqrt(MSE_train))                             #takes square root of MSE; converts type to float --> training set for this iteration
             
-            abs_test_errors = abs(y_test-Y_hat)                                #absolute errors for testing set
+            abs_test_errors = abs(y_test-Y_hat)                                #absolute errors for testing set for this iteration
             APE_test = abs_test_errors/y_test                                  #APE = absolute percent error,decimal (absolute error as a percentage of actual values)
             MAPE_test = float(np.mean(APE_test)*100)                           #this is percentage
             
-            abs_train_errors = abs(y_train-Y_hat_train)                        #difference between training and test values (absolute values)
+            abs_train_errors = abs(y_train-Y_hat_train)                        #difference between training and test values (absolute values) for this iteration
             APE_train = abs_train_errors/y_train                               #APE = Absolute Percent Error, decimal
             MAPE_train = float(np.mean(APE_train)*100)                         #MAPE: Mean Average Percent Error, percentage
             
@@ -177,7 +150,7 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
                 
                 outputs_df = pd.concat([outputs_df,sub_df],ignore_index=True)  #concatenate the separate assignments into one table
                 
-            filename = 'pls_streams-2023_data_filtered_PLS_It0-19.joblib'      #provide filename for the document
+            filename = 'pls_streams-2023_data_PLS_It0-79.joblib'      #provide filename for the document, which has the optimal model for each iteration
             pickle_path = os.path.join(output_dir,'picklejar',filename)        #send it to the pickejar folder with the given filename
             dump(clf,pickle_path)                                              #save the model to files
             
@@ -194,14 +167,12 @@ def create_outputs(input_df,iterations = 1, autosave = False, return_df = False,
         return({'outputs_df':outputs_df, 'X_train':X_train, 'y_train':y_train,
                 'inter_df':inter_df})
 
-#%% Define function for making plots                                           #Define function for making plots (to use later)
+#%% Define function for making plots                                          
 
 def make_plots(outputs_df, output_label):
     
     fig, ax = plt.subplots(dpi=300)  # Create a single subplot
     fig.set_size_inches(10, 12)  # Set the size of the figure
-    fig.suptitle(output_label, fontsize=18)  # Add a centered title with a fontsize of 18
-
     species = outputs_df.species.unique()
 
     for s in species:
@@ -232,42 +203,65 @@ def make_plots(outputs_df, output_label):
         train_rsq = outputs_df['value'][(outputs_df.output == 'train_rsq') &
                                         (outputs_df.species == s)]
 
-        train_rsq = np.mean(train_rsq)
+        train_rsq = np.mean(train_rsq)                                         #The train rsq was calculated for each iteration with different model parameters. This takes the average to present.
 
         test_rsq = outputs_df['value'][(outputs_df.output == 'test_rsq') &
                                        (outputs_df.species == s)]
 
-        test_rsq = np.mean(test_rsq)
+        test_rsq = np.mean(test_rsq)                                           #The test rsq was calculated for each iteration with different model parameters. This takes the average to present.
+
+        train_rmse = outputs_df['value'][(outputs_df.output == 'train_rmse') &
+                                          (outputs_df.species == s)]
+
+        train_rmse = np.mean(train_rmse)                                       #The train rsq was calculated for each iteration with different model parameters. This takes the average to present.
+
+        test_rmse = outputs_df['value'][(outputs_df.output == 'test_rmse') &
+                                         (outputs_df.species == s)]
+
+        test_rmse = np.mean(test_rmse)                                         #The test rsq was calculated for each iteration with different model parameters. This takes the average to present.
 
         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
-            label.set_fontsize(16)
+            label.set_fontsize(18)
 
         ax.plot(y_true_train, y_hat_train, 'o', markersize=4, label='training set')
         ax.plot(y_true_test, y_hat_test, 'o', markersize=4, label='test set')
         ax.plot(line11, line11, 'k--', label='1:1 line')
-        ax.legend(loc='upper left', fontsize=16)
-        ax.set_xlabel('Lab Measured ' + s + ' (mg/L)', fontsize=16)
-        ax.set_ylabel('Predicted ' + s + ' (mg/L)', fontsize=16)
+        ax.legend(loc='upper left', fontsize=18)
+        ax.set_xlabel('Lab Measured ' + s + ' (mg/L)', fontsize=18)
+        ax.set_ylabel('Predicted ' + s + ' (mg/L)', fontsize=18)
         ax.text(x_text, y_text, r'$train\/r^2 =$' + str(np.round(train_rsq, 3)) + '\n'
-                + r'$test\/r^2 =$' + str(np.round(test_rsq, 3)), fontsize=16)
+                + r'$test\/r^2 =$' + str(np.round(test_rsq, 3)) + '\n'
+                + r'$train\/RMSE =$' + str(np.round(train_rmse, 3)) + '\n'
+                + r'$test\/RMSE =$' + str(np.round(test_rmse, 3)), fontsize=18)
 
         # Add vertical lines with legend labels
-        ax.axvline(x=0.053, linestyle='--', color='black', label='MDL')
-        ax.axvline(x=0.131, linestyle='--', color='gray', label='PQL')
+        #ax.axvline(x=0.053, linestyle='--', color='black', label='MDL')
+        #ax.axvline(x=0.131, linestyle='--', color='gray', label='PQL')
+
+        # Add solid black bar along the x-axis
+        ax.axhline(y=0, color='black', linewidth=2)
+
+        # Set x-axis limit to start from zero
+        ax.set_xlim(left=0)
+
+        # Add solid black bar along the y-axis
+        ax.axvline(x=0, color='black', linewidth=2)
 
         ax.legend(loc='upper left', fontsize=16)
-        ax.set_xlabel('Lab Measured ' + s + ' (mg/L)', fontsize=16)
-        ax.set_ylabel('Predicted ' + s + ' (mg/L)', fontsize=16)
+        ax.set_xlabel('Lab Measured ' + s + ' (mg/L)', fontsize=18)
+        ax.set_ylabel('Predicted ' + s + ' (mg/L)', fontsize=18)
         ax.text(x_text, y_text, r'$train\/r^2 =$' + str(np.round(train_rsq, 3)) + '\n'
-                + r'$test\/r^2 =$' + str(np.round(test_rsq, 3)), fontsize=16)
+                + r'$test\/r^2 =$' + str(np.round(test_rsq, 3)) + '\n'
+                + r'$train\/RMSE =$' + str(np.round(train_rmse, 3)) + '\n'
+                + r'$test\/RMSE =$' + str(np.round(test_rmse, 3)), fontsize=18)
+    
     plt.show()
 
-#%% create outputs for models trained with samples and save to exported file (use the create_outputs function)
+#%% log outputs for previous data analysis and save to file
 
-outputs_df = create_outputs(abs_wq_df_fil, iterations = 80, autosave = True, #filtered samples, no synthetic samples
+outputs_df = create_outputs(abs_wq_df_fil, iterations = 5, autosave = True, 
                output_path = os.path.join(output_dir,'streams_PLS_results.csv'),
-               return_df = True) #create outputs and save
-
+               return_df = True)
  
 #%% make plots for all samples and show (use the make_plots function)
 
